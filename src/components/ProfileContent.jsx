@@ -18,7 +18,7 @@ const ProfileContent = () => {
     username: '',
     phone: '',
     company: '',
-    role: '',           // Role state
+    role: '',           // Role state uchun qo'shildi
     birthdate: '',
     gender: 'male',
     image: null,        // yangi yuklangan rasm (base64)
