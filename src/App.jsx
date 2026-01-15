@@ -135,7 +135,7 @@ const ProtectedLayout = () => {
 
   return (
     <>
-      <div className={`flex h-screen overflow-hidden bg-white `}>
+      <div className={`flex h-screen overflow-hidden bg-white text-black`}>
         {/* 🔥 SIDEBAR - isSidebarOpen va setIsSidebarOpen uzatildi */}
         <Sidebar
           isSidebarOpen={isSidebarOpen}

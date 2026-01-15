@@ -642,10 +642,9 @@ function Bemorlarim() {
                   {selectedAppointment.comment && (
                     <div className="bg-white border border-gray-200 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-2">Izoh</p>
-                      <p className="text-gray-700 whitespace-pre-wrap whitespace-pre-wrap break-words bg-gray-50 p-4 rounded-lg">{selectedAppointment.comment}</p>
+                      <p className="text-gray-700 whitespace-pre-wrap break-words bg-gray-50 p-4 rounded-lg">{selectedAppointment.comment}</p>
                     </div>
                   )}
-
                   {selectedAppointment.doctor?.clinic && (
                     <div className="bg-white border border-gray-200 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-2">Klinika</p>

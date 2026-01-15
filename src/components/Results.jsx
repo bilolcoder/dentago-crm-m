@@ -1,172 +1,169 @@
-import React, { useState, useRef } from 'react';
-
-// Icons
-import { Calendar } from 'lucide-react';
-
-// Recharts
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
-
-// Context
+// src/components/Results.jsx
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useData } from '../context/DataProvider';
+import { Image as ImageIcon, Video, X, Plus, Film, UploadCloud } from 'lucide-react';
 
-const Results = () => {
-  const { data, t } = useData();
-  const dateInputRef = useRef(null);
-  const [selectedDate, setSelectedDate] = useState('2025-01-12');
+function Results() {
+    const { t } = useData();
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [selectedVideo, setSelectedVideo] = useState(null);
 
-  // Helper functions
-  const parseCurrency = (str) => {
-    if (!str) return 0;
-    if (typeof str === 'number') return str;
-    return parseInt(str.toString().replace(/\s/g, '').replace("so'm", '')) || 0;
-  };
+    const handleImageChange = (event) => {
+        const files = Array.from(event.target.files);
+        if (selectedImages.length + files.length <= 4) {
+            const newImages = files.map(file => ({
+                file: file,
+                preview: URL.createObjectURL(file)
+            }));
+            setSelectedImages(prevImages => [...prevImages, ...newImages]);
+        } else {
+            alert(t('max_images_alert') || "Maksimal 4 ta rasm yuklash mumkin");
+        }
+        event.target.value = null;
+    };
 
-  const formatCurrency = (num) => {
-    return num.toLocaleString() + " so'm";
-  };
+    const handleVideoChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setSelectedVideo({
+                file: file,
+                preview: URL.createObjectURL(file)
+            });
+        }
+        event.target.value = null;
+    };
 
-  // Data
-  const services = data.services || [];
-  const payments = data.payments || [];
+    const handleRemoveFile = (type, index) => {
+        if (type === 'image') {
+            URL.revokeObjectURL(selectedImages[index].preview);
+            setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
+        } else if (type === 'video') {
+            if (selectedVideo) {
+                URL.revokeObjectURL(selectedVideo.preview);
+            }
+            setSelectedVideo(null);
+        }
+    };
 
-  // Chart Data
-  const chartData = [
-    {
-      name: t('cash') || 'Naqd',
-      value: payments.filter(p => p.type === 'Naqd').reduce((s, p) => s + parseCurrency(p.amount), 0),
-    },
-    {
-      name: t('card') || 'Karta',
-      value: payments.filter(p => p.type === 'Karta').reduce((s, p) => s + parseCurrency(p.amount), 0),
-    },
-    {
-      name: t('bank_transfer') || 'Hisob raqam',
-      value: payments.filter(p => p.type === 'Hisob raqam' || p.type === 'Bank').reduce((s, p) => s + parseCurrency(p.amount), 0),
-    },
-    {
-      name: 'K-to-K',
-      value: payments.filter(p => p.type === 'Kartadan-kartaga').reduce((s, p) => s + parseCurrency(p.amount), 0),
-    },
-  ];
+    return (
+        <div className='p-4 md:p-8 space-y-10 min-h-screen'>
 
-  return (
-    <div className="p-4 md:p-8 bg-slate-50 min-h-screen">
-      {/* Chart & Top Services */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Breadcrumbs */}
+            <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <Link to="/" className="hover:text-[#00BCE4] transition-colors">{t('dashboard')}</Link>
+                <span className="text-slate-300">/</span>
+                <span className="text-slate-900">{t('my_results')}</span>
+            </nav>
 
-        {/* PAYMENTS CHART */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-blue-100 shadow-sm p-6">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h3 className="text-xl font-bold text-slate-800 capitalize">
-                {t('payments') || "To'lovlar"}
-              </h3>
-              <p className="text-sm text-slate-400 font-medium">To'lov turlari bo'yicha tahlil</p>
-            </div>
+            <header className="space-y-1">
+                <h2 className="text-3xl font-black text-slate-800 tracking-tight">Natijalar <span className="text-[#00BCE4]">Gallereyasi</span></h2>
+                <p className="text-sm text-slate-500 font-medium italic">Bemor davolanish natijalarini rasm va video shaklida saqlang.</p>
+            </header>
 
-            {/* Interactive Calendar */}
-            <div className="relative">
-              <button
-                onClick={() => dateInputRef.current?.showPicker()}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-xl text-sm font-bold text-[#00BCE4] hover:bg-blue-100 transition-all"
-              >
-                <Calendar className="w-4 h-4" />
-                <span>{selectedDate}</span>
-              </button>
-              <input
-                type="date"
-                ref={dateInputRef}
-                className="absolute opacity-0 pointer-events-none"
-                onChange={(e) => setSelectedDate(e.target.value)}
-                value={selectedDate}
-              />
-            </div>
-          </div>
-
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00BCE4" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#00BCE4" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#00BCE4" />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: '#00BCE4', fontWeight: 500 }}
-                />
-                <YAxis hide />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: '16px',
-                    border: 'none',
-                    boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                    backgroundColor: '#ffffff'
-                  }}
-                  formatter={(value) => [formatCurrency(value), "Summa"]}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#00BCE4"
-                  strokeWidth={4}
-                  fillOpacity={1}
-                  fill="url(#colorValue)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* TOP SERVICES */}
-        <div className="bg-white rounded-3xl border border-blue-100 shadow-sm p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-slate-800">
-              {t('top_services') || "Top Xizmatlar"}
-            </h3>
-          </div>
-
-          <div className="space-y-3">
-            {services.slice(0, 6).map((service, index) => (
-              <div
-                key={service.id || index}
-                className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 transition-all group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#00BCE4] flex items-center justify-center text-white font-bold text-sm shadow-md shadow-blue-100">
-                    {index + 1}
-                  </div>
-                  <div className="max-w-[160px]">
-                    <p className="text-sm font-bold text-slate-800 truncate">
-                      {service.name}
-                    </p>
-                    <p className="text-[10px] font-bold text-[#00BCE4] uppercase tracking-wider">
-                      {service.status || 'Aktiv'}
-                    </p>
-                  </div>
+            {/* --- Rasm Yuklash Qismi --- */}
+            <section className="space-y-6 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-emerald-50 rounded-xl">
+                            <ImageIcon className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <h3 className='text-sm font-black text-slate-700 uppercase tracking-wider'>{t('images')}</h3>
+                    </div>
+                    <span className={`text-xs font-black px-3 py-1 rounded-lg ${selectedImages.length === 4 ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
+                        {selectedImages.length} / 4
+                    </span>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-black text-[#00BCE4]">{service.price}</p>
+
+                <div className='flex flex-wrap gap-5'>
+                    {/* Yangi rasm tanlash tugmasi */}
+                    {selectedImages.length < 4 && (
+                        <button
+                            className='w-40 h-40 border-2 border-dashed border-slate-200 text-slate-400 rounded-[2rem] flex flex-col items-center justify-center cursor-pointer hover:border-[#00BCE4] hover:text-[#00BCE4] hover:bg-[#00BCE4]/5 transition-all duration-300 group'
+                            onClick={() => document.getElementById('imageInput').click()}
+                        >
+                            <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-white transition-colors">
+                                <Plus className="w-6 h-6" />
+                            </div>
+                            <span className='mt-3 text-[10px] font-black uppercase tracking-tighter'>{t('select_image')}</span>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                id='imageInput'
+                                multiple
+                                onChange={handleImageChange}
+                            />
+                        </button>
+                    )}
+
+                    {/* Tanlangan rasmlarni ko'rsatish */}
+                    {selectedImages.map((image, index) => (
+                        <div key={index} className='relative w-40 h-40 rounded-[2rem] overflow-hidden shadow-md group border border-slate-100'>
+                            <img
+                                src={image.preview}
+                                alt={`Result ${index + 1}`}
+                                className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
+                            />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <button
+                                onClick={() => handleRemoveFile('image', index)}
+                                className='absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-red-500 rounded-xl p-2 hover:bg-red-500 hover:text-white transition-all shadow-sm'
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ))}
                 </div>
-              </div>
-            ))}
-          </div>
+            </section>
+
+            {/* --- Video Yuklash Qismi --- */}
+            <section className="space-y-6 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-blue-50 rounded-xl">
+                        <Film className="w-5 h-5 text-blue-500" />
+                    </div>
+                    <h3 className='text-sm font-black text-slate-700 uppercase tracking-wider'>{t('video')}</h3>
+                </div>
+
+                <div className='flex flex-wrap gap-5'>
+                    {!selectedVideo ? (
+                        <button
+                            className='w-full max-w-md h-48 border-2 border-dashed border-slate-200 text-slate-400 rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer hover:border-[#00BCE4] hover:text-[#00BCE4] hover:bg-[#00BCE4]/5 transition-all duration-300 group'
+                            onClick={() => document.getElementById('videoInput').click()}
+                        >
+                            <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-white transition-colors">
+                                <UploadCloud className="w-8 h-8" />
+                            </div>
+                            <span className='mt-4 text-[11px] font-black uppercase tracking-widest'>{t('select_video')}</span>
+                            <p className="text-[10px] text-slate-400 mt-1 font-medium">MP4, MOV (max. 50MB)</p>
+                            <input
+                                type="file"
+                                accept="video/*"
+                                className="hidden"
+                                id='videoInput'
+                                onChange={handleVideoChange}
+                            />
+                        </button>
+                    ) : (
+                        <div className='relative w-full max-w-2xl aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-100 bg-black'>
+                            <video
+                                src={selectedVideo.preview}
+                                controls
+                                className='w-full h-full object-contain'
+                            />
+                            <button
+                                onClick={() => handleRemoveFile('video')}
+                                className='absolute top-5 right-5 bg-white text-red-500 rounded-2xl p-3 hover:bg-red-500 hover:text-white transition-all shadow-xl z-10'
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </section>
         </div>
-      </div>
-    </div>
-  );
-};
+    );
+}
 
 export default Results;

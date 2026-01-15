@@ -602,6 +602,7 @@ function MyInformation() {
         price: Number(data.price) || 0,
         rating: Number(data.rating) || 0,
         reviewsCount: Number(data.reviewsCount) || 0,
+        phone: Number(data.phone) || 0,
         // Yangi qo'shilgan: viloyat va tuman
         region: selectedRegion,
         city: selectedCityData ? selectedCityData.label : selectedCity, // Label ni yuborish
@@ -996,7 +997,7 @@ function MyInformation() {
           {/* Qidiruv va token holati */}
           <div className="grid md:grid-cols-1 gap-4">
             <div className="relative">
-              <Search className="absolute left-4 top-1/3 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-4 top-6 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Shifokor ismi, mutaxassisligi, viloyati yoki klinika nomi bo'yicha qidirish..."
