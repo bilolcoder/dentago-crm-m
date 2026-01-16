@@ -425,18 +425,14 @@ function MyInformation() {
       gender: doctor.gender || 'male',
       specialty: doctor.specialty || doctor.specialization || 'Terapevt',
       experienceYears: doctor.experienceYears || doctor.experience || 5,
-      patientsCount: doctor.patientsCount || doctor.patients || 100,
       clinicName: doctor.clinic?.name || doctor.hospitalName || '',
       clinicAddress: doctor.clinic?.address || doctor.address || '',
       price: doctor.price || doctor.consultationPrice || 150000,
-      rating: doctor.rating || 4.5,
-      reviewsCount: doctor.reviewsCount || doctor.reviews || 50,
       workTimeStart: doctor.workTime?.start || doctor.workHours?.start || '09:00',
       workTimeEnd: doctor.workTime?.end || doctor.workHours?.end || '18:00',
       isAvailable24x7: doctor.isAvailable24x7 || doctor.available24_7 || false,
       isActive: doctor.isActive !== undefined ? doctor.isActive : true,
       phone: doctor.phone || doctor.phoneNumber || '',
-      email: doctor.email || '',
       description: doctor.description || doctor.bio || '',
       region: doctor.region || '',
       city: doctor.city || ''
@@ -574,8 +570,8 @@ function MyInformation() {
           console.log('Upload response:', uploadRes.data);
 
           let filename = uploadRes.data?.file?.savedName ||
-                        uploadRes.data?.filename ||
-                        (uploadRes.data?.url ? uploadRes.data.url.split('/').pop() : null);
+            uploadRes.data?.filename ||
+            (uploadRes.data?.url ? uploadRes.data.url.split('/').pop() : null);
 
           if (filename) {
             avatarUrl = `https://app.dentago.uz/images/${filename}`;
@@ -598,10 +594,7 @@ function MyInformation() {
         gender: data.gender || 'male',
         specialty: data.specialty || 'Terapevt',
         experienceYears: Number(data.experienceYears) || 0,
-        patientsCount: Number(data.patientsCount) || 0,
         price: Number(data.price) || 0,
-        rating: Number(data.rating) || 0,
-        reviewsCount: Number(data.reviewsCount) || 0,
         phone: Number(data.phone) || 0,
         // Yangi qo'shilgan: viloyat va tuman
         region: selectedRegion,
@@ -620,7 +613,6 @@ function MyInformation() {
         subscription: createSubscriptionData(),
         avatar: avatarUrl,
         phone: data.phone?.trim() || '',
-        email: data.email?.trim() || '',
         description: data.description?.trim() || '',
         isAvailable24x7: !!data.isAvailable24x7,
         isActive: !!data.isActive
@@ -762,18 +754,14 @@ function MyInformation() {
       gender: 'male',
       specialty: 'Terapevt',
       experienceYears: 5,
-      patientsCount: 100,
       clinicName: '',
       clinicAddress: '',
       price: 150000,
-      rating: 4.5,
-      reviewsCount: 50,
       workTimeStart: '09:00',
       workTimeEnd: '18:00',
       isAvailable24x7: false,
       isActive: true,
       phone: '',
-      email: '',
       description: '',
       region: '',
       city: ''
@@ -818,11 +806,9 @@ function MyInformation() {
     const doctorId = doctor._id || doctor.id;
     const doctorName = doctor.fullName || doctor.name || 'Noma\'lum Shifokor';
     const doctorSpecialty = doctor.specialty || doctor.specialization || 'Mutaxassislik kiritilmagan';
-    const patientsCount = doctor.patientsCount || doctor.patients || 0;
     const experienceYears = doctor.experienceYears || doctor.experience || 0;
     const price = doctor.price || doctor.consultationPrice || 0;
-    const rating = doctor.rating || 0;
-    const reviewsCount = doctor.reviewsCount || doctor.reviews || 0;
+
     const avatar = doctor.avatar || doctor.profileImage || doctor.image || null;
     const region = doctor.region || '';
     const city = doctor.city || '';
@@ -846,12 +832,12 @@ function MyInformation() {
             </div>
           )}
 
-          <div className="absolute top-4 left-4">
+          {/* <div className="absolute top-4 left-4">
             <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-800 flex items-center gap-1">
               <MapIcon className="w-3 h-3" />
               {doctor.clinic?.distanceKm || 2.5} km
             </span>
-          </div>
+          </div> */}
 
           <div className="absolute top-4 right-4">
             <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-xl shadow-lg font-bold">
@@ -889,43 +875,18 @@ function MyInformation() {
           <div className="space-y-3 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-gray-600">
-                <Users className="w-4 h-4" />
-                <span className="text-sm">{patientsCount} ta bemor</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm">{experienceYears} yil tajriba</span>
               </div>
             </div>
-
-            {rating > 0 && (
-              <div className="flex items-center gap-2">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i < Math.floor(rating)
-                          ? 'fill-yellow-400 text-yellow-400'
-                          : 'fill-gray-300 text-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-sm text-gray-600">
-                  ({reviewsCount} sharh)
-                </span>
-              </div>
-            )}
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={() => doctorId && onView(doctorId)}
               disabled={!doctorId}
-              className={`flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg ${
-                !doctorId ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <Eye className="w-4 h-4" />
               Profilni ko'rish
@@ -942,9 +903,8 @@ function MyInformation() {
             <button
               onClick={() => doctorId && onDelete(doctorId)}
               disabled={!doctorId}
-              className={`px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors ${
-                !doctorId ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               title="O'chirish"
             >
               <Trash2 className="w-4 h-4" />
@@ -1044,11 +1004,10 @@ function MyInformation() {
         </div>
 
         {submitMessage.text && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            submitMessage.type === 'success'
-              ? 'bg-green-50 border border-green-200 text-green-700'
-              : 'bg-red-50 border border-red-200 text-red-700'
-          }`}>
+          <div className={`mb-6 p-4 rounded-lg ${submitMessage.type === 'success'
+            ? 'bg-green-50 border border-green-200 text-green-700'
+            : 'bg-red-50 border border-red-200 text-red-700'
+            }`}>
             {submitMessage.text}
           </div>
         )}
@@ -1085,7 +1044,7 @@ function MyInformation() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                 {paginatedDoctors.map((doctor, index) => (
                   <DoctorCard
                     key={doctor._id || doctor.id || index}
@@ -1114,11 +1073,10 @@ function MyInformation() {
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-10 h-10 rounded-lg font-medium transition ${
-                          currentPage === pageNum
-                            ? 'bg-[#00BCE4] text-white'
-                            : 'border border-gray-300 hover:bg-gray-50'
-                        }`}
+                        className={`w-10 h-10 rounded-lg font-medium transition ${currentPage === pageNum
+                          ? 'bg-[#00BCE4] text-white'
+                          : 'border border-gray-300 hover:bg-gray-50'
+                          }`}
                       >
                         {pageNum}
                       </button>
@@ -1231,9 +1189,8 @@ function MyInformation() {
                         required: 'Ism majburiy',
                         minLength: { value: 3, message: 'Kamida 3 ta belgi' }
                       })}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                       placeholder="Aliyev Ali Aliyevich"
                     />
                     {errors.fullName && (
@@ -1306,9 +1263,8 @@ function MyInformation() {
                         value={selectedCity}
                         onChange={(e) => setSelectedCity(e.target.value)}
                         disabled={!selectedRegion}
-                        className={`w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition ${
-                          !selectedRegion ? 'opacity-60 cursor-not-allowed' : ''
-                        }`}
+                        className={`w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition ${!selectedRegion ? 'opacity-60 cursor-not-allowed' : ''
+                          }`}
                         required
                       >
                         <option value="">Tuman/Shaharni tanlang</option>
@@ -1325,7 +1281,7 @@ function MyInformation() {
                   </div>
 
                   {/* Telefon + Email */}
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-1 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         <Phone className="w-4 h-4" /> Telefon *
@@ -1338,31 +1294,13 @@ function MyInformation() {
                             message: '+998XXXXXXXXX formatida kiriting'
                           }
                         })}
-                        className={`w-full px-4 py-3 rounded-xl border ${
-                          errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                          } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                         placeholder="+998901234567"
                       />
                       {errors.phone && (
                         <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
                       )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                        <Mail className="w-4 h-4" /> Email
-                      </label>
-                      <input
-                        type="email"
-                        {...register('email', {
-                          pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: 'Noto\'g\'ri email formati'
-                          }
-                        })}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
-                        placeholder="example@gmail.com"
-                      />
                     </div>
                   </div>
 
@@ -1402,7 +1340,7 @@ function MyInformation() {
                 {/* Tajriba */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Tajriba</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-1 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         <Calendar className="w-4 h-4" /> Tajriba (yil) *
@@ -1414,33 +1352,11 @@ function MyInformation() {
                           min: { value: 0, message: 'Musbat son kiriting' },
                           max: { value: 50, message: '50 yildan kam bo\'lishi kerak' }
                         })}
-                        className={`w-full px-4 py-3 rounded-xl border ${
-                          errors.experienceYears ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        className={`w-full px-4 py-3 rounded-xl border ${errors.experienceYears ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                          } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                       />
                       {errors.experienceYears && (
                         <p className="mt-1 text-sm text-red-600">{errors.experienceYears.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                        <Star className="w-4 h-4" /> Reyting *
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        {...register('rating', {
-                          required: 'Reyting majburiy',
-                          min: { value: 0, message: '0 dan kam bo\'lmasligi kerak' },
-                          max: { value: 5, message: '5 dan ko\'p bo\'lmasligi kerak' }
-                        })}
-                        className={`w-full px-4 py-3 rounded-xl border ${
-                          errors.rating ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
-                      />
-                      {errors.rating && (
-                        <p className="mt-1 text-sm text-red-600">{errors.rating.message}</p>
                       )}
                     </div>
                   </div>
@@ -1458,9 +1374,8 @@ function MyInformation() {
                         required: 'Klinika nomi majburiy',
                         minLength: { value: 2, message: 'Kamida 2 ta belgi' }
                       })}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.clinicName ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.clinicName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                       placeholder="Stomatologiya Premium"
                     />
                     {errors.clinicName && (
@@ -1477,9 +1392,8 @@ function MyInformation() {
                         required: 'Manzil majburiy',
                         minLength: { value: 5, message: 'Kamida 5 ta belgi' }
                       })}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.clinicAddress ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.clinicAddress ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                       placeholder="Toshkent sh., Chilanzor tumani, 45-uy"
                     />
                     {errors.clinicAddress && (
@@ -1501,9 +1415,8 @@ function MyInformation() {
                         required: 'Narx majburiy',
                         min: { value: 0, message: 'Musbat son kiriting' }
                       })}
-                      className={`w-full px-4 py-3 rounded-xl border ${
-                        errors.price ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                      } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.price ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                     />
                     {errors.price && (
                       <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
@@ -1538,31 +1451,7 @@ function MyInformation() {
                 {/* Qo'shimcha */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Qo'shimcha Ma'lumotlar</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                        <Users className="w-4 h-4" /> Bemorlar soni
-                      </label>
-                      <input
-                        type="number"
-                        {...register('patientsCount', { min: 0 })
-                        }
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
-                      />
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4" /> Sharhlar soni
-                      </label>
-                      <input
-                        type="number"
-                        {...register('reviewsCount', { min: 0 })
-                        }
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
-                      />
-                    </div>
-                  </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-gray-100 transition">
@@ -1698,11 +1587,10 @@ function MyInformation() {
                           24/7 Mavjud
                         </div>
                       )}
-                      <div className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                        viewDoctor.isActive !== false
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-red-50 text-red-700'
-                      }`}>
+                      <div className={`px-3 py-1 rounded-lg text-sm font-medium ${viewDoctor.isActive !== false
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50 text-red-700'
+                        }`}>
                         {viewDoctor.isActive !== false ? 'Faol' : 'Faol emas'}
                       </div>
                     </div>
@@ -1710,27 +1598,8 @@ function MyInformation() {
                 </div>
 
                 {/* Statistikalar */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  <div className="bg-gray-50 p-4 rounded-xl text-center">
-                    <div className="text-2xl font-bold text-gray-800 mb-1">
-                      {(viewDoctor.patientsCount || viewDoctor.patients || 0).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">Bemorlar</div>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
 
-                  <div className="bg-gray-50 p-4 rounded-xl text-center">
-                    <div className="text-2xl font-bold text-gray-800 mb-1">
-                      {(viewDoctor.rating || 0).toFixed(1)}
-                    </div>
-                    <div className="text-sm text-gray-600">Reyting</div>
-                  </div>
-
-                  <div className="bg-gray-50 p-4 rounded-xl text-center">
-                    <div className="text-2xl font-bold text-gray-800 mb-1">
-                      {(viewDoctor.reviewsCount || viewDoctor.reviews || 0).toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-600">Sharhlar</div>
-                  </div>
 
                   <div className="bg-gray-50 p-4 rounded-xl text-center">
                     <div className="text-2xl font-bold text-gray-800 mb-1">
@@ -1754,12 +1623,7 @@ function MyInformation() {
                       </div>
                     )}
 
-                    {viewDoctor.email && (
-                      <div className="flex items-center gap-3">
-                        <Mail className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-700">{viewDoctor.email}</span>
-                      </div>
-                    )}
+
                   </div>
                 </div>
 
