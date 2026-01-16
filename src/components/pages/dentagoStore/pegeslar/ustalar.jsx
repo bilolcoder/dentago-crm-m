@@ -10,7 +10,7 @@ import Chair from "../../../../assets/tex.png";
 import Logo from "../../../../assets/logo.png";
 
 const categories = [
-  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/' },
+  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/DentagoStore' },
   { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
   { id: 'texniklar', label: 'Texniklar', Icon: RiToothLine, path: '/texniklar' },
   { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
@@ -213,25 +213,6 @@ function Ustalar() {
         </div>
       </div>
 
-      {/* BOTTOM NAV */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex justify-between items-center z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-        <Link to="/" className="flex flex-col items-center gap-1 text-gray-400">
-          <Home size={24} />
-          <span className="text-[10px]">Bosh sahifa</span>
-        </Link>
-        <Link to="/savat" className="flex flex-col items-center gap-1 text-gray-400">
-          <ShoppingBag size={24} />
-          <span className="text-[10px]">Savatcha</span>
-        </Link>
-        <Link to="/qidiruv" className="flex flex-col items-center gap-1 text-gray-400">
-          <Search size={24} />
-          <span className="text-[10px]">Qidiruv</span>
-        </Link>
-        <Link to="/profil" className="flex flex-col items-center gap-1 text-[#00C2FF]">
-          <User size={24} />
-          <span className="text-[10px]">Profil</span>
-        </Link>
-      </nav>
     </div>
   );
 }

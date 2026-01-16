@@ -9,7 +9,7 @@ import Chair from "../../../assets/chair.png";
 import Logo from "../../../assets/logo.png";
 
 const categories = [
-  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/' },
+  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/DentagoStore' },
   { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
   { id: 'texniklar', label: 'Texniklar', Icon: RiToothLine, path: '/texniklar' },
   { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
