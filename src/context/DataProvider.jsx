@@ -176,13 +176,7 @@ const initialData = {
 
 const DataContext = createContext();
 
-export const useData = () => {
-    const context = useContext(DataContext);
-    if (!context) {
-        throw new Error('useData must be used within a DataProvider');
-    }
-    return context;
-};
+export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
     const [locale, setLocale] = useState(localStorage.getItem('app_locale') || 'uz');
@@ -208,52 +202,50 @@ export const DataProvider = ({ children }) => {
         return initialData;
     });
 
-    // === Auth tekshirish – 1-dataproviderdan olingan ===
+    // === YANGI: Sahifa ochilganda user ma'lumotlarini yuklash ===
     useEffect(() => {
-        const checkAuth = () => {
-            const accessToken = localStorage.getItem('accessToken');
-            const savedUser = localStorage.getItem('userData');
-            const savedPhone = localStorage.getItem('userPhone');
+        const accessToken = localStorage.getItem('accessToken');
+        const savedPhone = localStorage.getItem('userPhone');
+        const savedUser = localStorage.getItem('userData');
 
-            if (!accessToken || !savedUser) {
-                setAuthLoaded(true);
-                return;
+        if (accessToken && savedPhone) {
+            setIsAuthenticated(true);
+
+            // Agar localStorage'da user ma'lumotlari bo'lsa – kontekstga yuklaymiz
+            if (savedUser) {
+                try {
+                    const userObj = JSON.parse(savedUser);
+                    setData(prev => ({ ...prev, user: userObj }));
+                } catch (e) {
+                    console.error("userData parse xatosi:", e);
+                }
             }
+        }
 
-            try {
-                const userObj = JSON.parse(savedUser);
-                setData(prev => ({ ...prev, user: userObj }));
-                setIsAuthenticated(true);
-            } catch (e) {
-                console.error("Auth tekshirishda xato:", e);
-                logout();
-            } finally {
-                setAuthLoaded(true);
-            }
-        };
-
-        checkAuth();
+        setAuthLoaded(true);
     }, []);
 
-    // === loginWithPhone – 1-dataproviderdan olingan (accessToken va refreshToken qo'shildi) ===
-    const loginWithPhone = (phone, userObj = null, accessToken = null, refreshToken = null) => {
-        setIsAuthenticated(true);
+    // === YANGI: loginWithPhone – endi user obyekti qabul qiladi ===
+    const loginWithPhone = (phone, userObj = null) => {
         localStorage.setItem('userPhone', phone);
+        setIsAuthenticated(true);
 
         if (userObj) {
+            // Kontekstga va localStorage'ga saqlaymiz
             setData(prev => ({ ...prev, user: userObj }));
             localStorage.setItem('userData', JSON.stringify(userObj));
         }
-
-        if (accessToken) localStorage.setItem('accessToken', accessToken);
-        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
     };
 
-    // === logout – 1-dataproviderdan olingan ===
+    // === Logout – to'liq tozalash ===
     const logout = () => {
-        localStorage.clear();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userPhone');
+        localStorage.removeItem('userData'); // <<< Muhim!
+
         setIsAuthenticated(false);
-        setData(prev => ({ ...prev, user: null }));
+        setData(prev => ({ ...prev, user: null })); // Kontekstdan ham o'chiramiz
     };
 
     const t = (key) => translations[locale][key] || key;
@@ -286,12 +278,7 @@ export const DataProvider = ({ children }) => {
     };
 
     if (!authLoaded) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                <span className="ml-3 font-medium text-gray-600">Yuklanmoqda...</span>
-            </div>
-        );
+        return <div className="flex h-screen items-center justify-center">Yuklanmoqda...</div>;
     }
 
     return (
@@ -305,8 +292,7 @@ export const DataProvider = ({ children }) => {
             t,
             isAuthenticated,
             loginWithPhone,
-            logout,
-            user: data.user  // <<< Qo'shimcha: user ni qiymatdan oson olish uchun
+            logout
         }}>
             {children}
         </DataContext.Provider>
