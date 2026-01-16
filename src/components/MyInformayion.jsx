@@ -578,7 +578,7 @@ function MyInformation() {
           }
         } catch (uploadError) {
           console.warn('Rasm yuklashda xato:', uploadError);
-          // Rasm yuklashda xato bo'lsa ham 
+          // Rasm yuklashda xato bo'lsa ham
         }
       } else if (isEditing && selectedDoctor && (selectedDoctor.avatar || selectedDoctor.image)) {
         // Tahrirlashda eski rasmni saqlash
@@ -1647,9 +1647,7 @@ function MyInformation() {
                         <p className="text-gray-700">
                           {viewDoctor.clinic?.address || viewDoctor.address || 'Manzil kiritilmagan'}
                         </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Masofa: {viewDoctor.clinic?.distanceKm || 2.5} km
-                        </p>
+                        
                       </div>
                     </div>
                   </div>
