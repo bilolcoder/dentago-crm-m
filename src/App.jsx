@@ -36,6 +36,12 @@ import MyInformation from './components/MyInformayion';
 import Bemorlarim from './components/Bemorlarim';
 import DentagoStore from './components/pages/dentagoStore/dentagoStore';
 import Savat from './components/pages/dentagoStore/savat/Savat';
+import Elonlar from './components/pages/dentagoStore/pegeslar/elonlar';
+import Kurs from './components/pages/dentagoStore/pegeslar/kurs';
+import Ustalar from './components/pages/dentagoStore/pegeslar/ustalar';
+import Texniklar from './components/pages/dentagoStore/pegeslar/texniklar/Texniklar';
+import DoctorDetail from './components/pages/dentagoStore/pegeslar/texniklar/DetailDoctor';
+import MalumotBerish from './components/pages/dentagoStore/pegeslar/texniklar/MalumotBerish';
 
 import Login from './components/Login';
 import Registration from './components/registration';
@@ -159,6 +165,12 @@ const ProtectedLayout = () => {
     if (path === '/bemorlarim') return <Bemorlarim />;
     if (path === '/DentagoStore') return <DentagoStore />;
     if (path === '/savat') return <Savat />;
+    if (path === '/elonlar') return <Elonlar />;
+    if (path === '/ustalar') return <Ustalar />;
+    if (path === '/kurs') return <Kurs />;
+    if (path === '/texniklar') return <Texniklar />;
+    if (path === '/shifokorlar') return <DoctorDetail />;
+    if (path === '/malumot') return <MalumotBerish />;
 
     return <div className="text-center text-3xl mt-20 text-gray-500">404 — Sahifa topilmadi</div>;
   };
