@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataProvider';
 
 // Layout
@@ -34,42 +34,70 @@ import Addproduct from './components/pages/addMahsulot';
 import MahsulotQoshish from './components/pages/BTS/MahsulotQAdd';
 import MyInformation from './components/MyInformayion';
 import Bemorlarim from './components/Bemorlarim';
+import DentagoStore from './components/pages/dentagoStore/dentagoStore';
+import Savat from './components/pages/dentagoStore/savat/Savat';
 
-// Auth
 import Login from './components/Login';
 import Registration from './components/registration';
 
-import Logo from "./assets/dentago.png";
+// Lucide-react dan savat ikonkasi
+import { ShoppingCart } from 'lucide-react';
 
-// 🔵 Telegram tugmasi
+const FloatingButton = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // DentagoStore sahifasida savatcha, qolgan hamma joyda Telegram GO
+  const isDentagoStore = location.pathname === '/DentagoStore';
+
+  if (isDentagoStore) {
+    return (
+      <button
+        onClick={() => navigate('/savat')}
+        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
+        title="Savatga o'tish"
+      >
+        <ShoppingCart size={26} />
+      </button>
+    );
+  }
+
+  // Telegram GO tugmasi (boshqa barcha sahifalarda)
+  return (
+    <a
+      href="https://t.me/Denta_go_bazar"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-6 right-6 z-[9999] w-14 h-14 flex items-center justify-center bg-[#00BCE4] rounded-full shadow-2xl hover:scale-110 transition-all"
+    >
+      <i className="text-2xl font-bold text-white">GO</i>
+    </a>
+  );
+};
+
 const TelegramButton = () => (
   <a
-    href="https://t.me/dentalsoft_uz"
+    href="https://t.me/Denta_go_bazar"
     target="_blank"
     rel="noopener noreferrer"
     className="fixed bottom-6 right-6 z-[9999] w-14 h-14 flex items-center justify-center bg-[#00BCE4] rounded-full shadow-2xl hover:scale-110 transition-all"
   >
-    {/* <img src={Logo} alt="DentaGo" className="w-10 h-10 rounded" /> */}
-    <i className='text-2xl font-bold text-white'>GO</i>
+    <i className="text-2xl font-bold text-white">GO</i>
   </a>
 );
 
-// 🔐 Protected Layout (faqat autentifikatsiya qilinganlar uchun)
 const ProtectedLayout = () => {
   const { isAuthenticated, theme, t } = useData();
   const location = useLocation();
 
-  // 🔥 SIDEBAR STATE - BU JUDA MUHIM!
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Agar login qilinmagan bo'lsa — login sahifasiga yubor
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
   const path = location.pathname;
 
-  // Sahifa nomini olish
   const getCurrentPageName = () => {
     if (path === '/' || path === '/dashboard') return t('main') || 'Bosh sahifa';
     if (path === "/hisobot/to'lovlar") return t('payments') || "To'lovlar";
@@ -129,6 +157,8 @@ const ProtectedLayout = () => {
     if (path === '/MahsulotQoshish') return <MahsulotQoshish />;
     if (path === '/my-information') return <MyInformation />;
     if (path === '/bemorlarim') return <Bemorlarim />;
+    if (path === '/DentagoStore') return <DentagoStore />;
+    if (path === '/savat') return <Savat />;
 
     return <div className="text-center text-3xl mt-20 text-gray-500">404 — Sahifa topilmadi</div>;
   };
@@ -136,14 +166,12 @@ const ProtectedLayout = () => {
   return (
     <>
       <div className={`flex h-screen overflow-hidden bg-white text-black`}>
-        {/* 🔥 SIDEBAR - isSidebarOpen va setIsSidebarOpen uzatildi */}
         <Sidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
 
         <main className="flex-1 overflow-y-auto">
-          {/* 🔥 HEADER - isSidebarOpen, setIsSidebarOpen va currentPage uzatildi */}
           <Header
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
@@ -155,12 +183,11 @@ const ProtectedLayout = () => {
           </div>
         </main>
       </div>
-      <TelegramButton />
+      <FloatingButton />
     </>
   );
 };
 
-// 🔑 Auth sahifalari
 const LoginPage = () => (
   <>
     <Login />
@@ -175,11 +202,9 @@ const RegisterPage = () => (
   </>
 );
 
-// 🏠 Bosh sahifa — smart redirect
 const HomeRedirect = () => {
   const { isAuthenticated } = useData();
 
-  // Login bo'lgan bo'lsa → dashboard, aks holda → login
   return isAuthenticated ? (
     <Navigate to="/dashboard" replace />
   ) : (
@@ -187,19 +212,15 @@ const HomeRedirect = () => {
   );
 };
 
-// 🚀 MAIN APP
 const App = () => {
   return (
     <DataProvider>
       <Routes>
-        {/* Bosh sahifa — autentifikatsiyaga qarab yo'naltiradi */}
         <Route path="/" element={<HomeRedirect />} />
 
-        {/* Auth sahifalari */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Barcha himoyalangan routelar (sidebar + header bilan) */}
         <Route path="/*" element={<ProtectedLayout />} />
       </Routes>
     </DataProvider>

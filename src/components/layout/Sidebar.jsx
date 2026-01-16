@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-    Home, FileText, Stethoscope, Send, Users, Settings, BookOpen,
+    Home,Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
     ChevronDown, ListOrdered, Archive, User, PlusCircle, X
 } from 'lucide-react';
 import { HiOutlineInformationCircle } from "react-icons/hi";
@@ -67,6 +67,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: ListOrdered, label: t('orders_bts'), route: "/orders", type: "link" },
         { icon: User, label: t('my_results'), route: "/result", type: "link" },
         { icon: PlusCircle, label: "Mahsulot qo'shish", route: "/addproduct", type: "link" },
+        { icon: Store, label: "Dentago Store", route: "/DentagoStore", type: "link" },
 
         {
             icon: Archive,
