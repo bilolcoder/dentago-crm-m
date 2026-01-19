@@ -385,7 +385,16 @@ const Savat = () => {
         ))}
       </div>
 
-      <div className="fixed bottom-0 w-[78%] right-5 bg-white p-6 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-40 border-t border-gray-200">
+      <div
+  className="
+    fixed bottom-0 inset-x-0
+    md:inset-x-auto md:right-5 md:w-[78%]
+    bg-white p-4 sm:p-6
+    rounded-t-3xl md:rounded-t-3xl
+    shadow-[0_-6px_20px_rgba(0,0,0,0.1)]
+    z-40 border-t border-gray-200
+  "
+>
         <div className="space-y-3 mb-6 text-sm">
           <div className="flex justify-between text-gray-400">
             <span>Tovarlar ({jamiTovarlar} dona)</span>
