@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // ✅ useState import qiling
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataProvider';
 
@@ -47,10 +47,16 @@ import MalumotBerish from './components/pages/dentagoStore/pegeslar/texniklar/Ma
 import Login from './components/Login';
 import Registration from './components/registration';
 
-// Floating button uchun ikonalar
+// Floating button uchun ikonalar va axios
 import { ShoppingCart } from 'lucide-react';
+import axios from 'axios';
 
-// Current page title aniqlash uchun funksiya
+// API sozlamalari
+const BASE_URL = "https://app.dentago.uz";
+const getToken = () => localStorage.getItem('accessToken');
+
+
+// Current page title aniqlash funksiyasi
 const getCurrentPageTitle = (pathname) => {
   const routes = {
     '/dashboard': 'Dashboard',
@@ -95,21 +101,70 @@ const getCurrentPageTitle = (pathname) => {
 
 const FloatingButton = () => {
   const location = useLocation();
-
   const isDentagoStore = location.pathname === '/DentagoStore';
+
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      const token = getToken();
+      if (!token) {
+        setCartCount(0);
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${BASE_URL}/api/cart`, {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 8000,
+        });
+
+        if (response.data?.success && response.data?.data?.items) {
+          const totalQuantity = response.data.data.items.reduce(
+            (sum, item) => sum + (Number(item.quantity) || 1),
+            0
+          );
+          setCartCount(totalQuantity);
+        } else {
+          setCartCount(0);
+        }
+      } catch (err) {
+        console.log("Savat sonini olishda xato:", err);
+        setCartCount(0);
+      }
+    };
+
+    // Faqat DentagoStore sahifasida ishlaydi
+    if (isDentagoStore) {
+      fetchCartCount();
+
+      // Har 20-30 sekundda yangilab turish (ixtiyoriy)
+      const interval = setInterval(fetchCartCount, 25000);
+      return () => clearInterval(interval);
+    }
+  }, [isDentagoStore]);
 
   if (isDentagoStore) {
     return (
-      <button
-        onClick={() => window.location.href = '/savat'}
-        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
-        title="Savatga o'tish"
-      >
-        <ShoppingCart size={26} />
-      </button>
+      <div className="fixed bottom-6 right-6 z-[9999]">
+        <button
+          onClick={() => (window.location.href = '/savat')}
+          className="relative w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
+          title="Savatga o'tish"
+        >
+          <ShoppingCart size={26} />
+
+          {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[22px] h-5 flex items-center justify-center rounded-full px-1.5 shadow-lg border-2 border-white">
+              {cartCount > 99 ? '99+' : cartCount}
+            </span>
+          )}
+        </button>
+      </div>
     );
   }
 
+  // Boshqa sahifalarda Telegram tugmasi
   return (
     <a
       href="https://t.me/Denta_go_bazar"
@@ -126,26 +181,23 @@ const ProtectedLayout = () => {
   const { isAuthenticated } = useData();
   const location = useLocation();
 
-  // ✅ Sidebar state'ini ProtectedLayout ichida boshqaring
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Current page title
+
   const currentPage = getCurrentPageTitle(location.pathname);
 
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-white text-black">
-        {/* ✅ Sidebar'ga props o'tkazish */}
         <Sidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
         <main className="flex-1 overflow-y-auto">
-          {/* ✅ Header'ga props o'tkazish */}
           <Header
             setIsSidebarOpen={setIsSidebarOpen}
             isSidebarOpen={isSidebarOpen}
@@ -201,6 +253,7 @@ const ProtectedLayout = () => {
           </div>
         </main>
       </div>
+
       <FloatingButton />
     </>
   );
@@ -220,5 +273,6 @@ const App = () => {
     </DataProvider>
   );
 };
+
 
 export default App;

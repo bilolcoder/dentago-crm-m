@@ -252,6 +252,7 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await onAddToCart(product);
+    window.location.reload();
   };
 
   return (
