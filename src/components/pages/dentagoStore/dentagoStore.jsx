@@ -9,7 +9,7 @@ import Chair from "../../../assets/chair.png";
 import Logo from "../../../assets/logo.png";
 
 const categories = [
-  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/' },
+  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/DentagoStore' },
   { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
   { id: 'texniklar', label: 'Texniklar', Icon: RiToothLine, path: '/texniklar' },
   { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
@@ -119,7 +119,7 @@ function Boshsaxifa() {
     <div className="min-h-screen bg-white relative">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
-        <header className="p-4 sticky top-0 bg-white z-30 shadow-sm">
+        <header className="sticky top-0 bg-white z-30">
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />

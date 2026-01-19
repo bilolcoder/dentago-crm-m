@@ -1,7 +1,7 @@
 export const translations = {
     uz: {
         // Sidebar Main
-        main: "Asosiy",
+        main: "Statistika",
         my_information: "Ma'lumotlarim",
         bemorlarim: "Bemorlarim",
         calendar: "Taqvim",
@@ -510,7 +510,7 @@ export const translations = {
         status: "Status",
         active: "Active",
         inactive: "Inactive",
-        dashboard: "Dashboard",
+        dashboard: "Statistika",
         price: "Price",
         category: "Category",
         description: "Description",

@@ -186,25 +186,7 @@ function Elonlar() {
         </div>
       </div>
 
-      {/* 6. BOTTOM NAVIGATION */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex justify-between items-center z-50">
-        <Link to="/" className="flex flex-col items-center gap-1 text-gray-400">
-          <Home size={24} />
-          <span className="text-[10px] font-medium">Bosh sahifa</span>
-        </Link>
-        <Link to="/savat" className="flex flex-col items-center gap-1 text-gray-400">
-          <ShoppingBag size={24} />
-          <span className="text-[10px] font-medium">Savatcha</span>
-        </Link>
-        <Link to="/qidiruv" className="flex flex-col items-center gap-1 text-gray-400">
-          <Search size={24} />
-          <span className="text-[10px] font-medium">Qidiruv</span>
-        </Link>
-        <Link to="/profil" className="flex flex-col items-center gap-1 text-gray-400">
-          <User size={24} />
-          <span className="text-[10px] font-medium">Profil</span>
-        </Link>
-      </nav>
+    
     </div>
   );
 }

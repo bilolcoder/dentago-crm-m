@@ -178,12 +178,12 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
             {/* O'ng qism: Ikonkalar */}
             <div className="flex items-center gap-1 sm:gap-3">
                 {/* Qidiruv */}
-                <button
+                {/* <button
                     onClick={() => setIsSearchOpen(true)}
                     className="p-2 text-slate-500 rounded-xl hover:bg-blue-50 transition-all group"
                 >
                     <Search className="w-5 h-5 group-hover:text-[#00BCE4] transition-colors" />
-                </button>
+                </button> */}
 
                 {/* Taqvim */}
                 <button

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 function DoctorCard({ id, img, name, job, rating, distance, price, patients, exp, service }) {
 
-  // Rasm yuklanmagan holat uchun
+  // Rasm yuklanmagan holat 
   const handleImageError = (e) => {
     e.target.onerror = null;
     e.target.src = "";

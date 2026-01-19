@@ -4,6 +4,7 @@ import {
     Home,Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
     ChevronDown, ListOrdered, Archive, User, PlusCircle, X
 } from 'lucide-react';
+import { IoIosStats } from "react-icons/io";
 import { HiOutlineInformationCircle } from "react-icons/hi";
 import { BsInstagram, BsTelegram } from 'react-icons/bs';
 import { FaYoutube } from "react-icons/fa";
@@ -61,13 +62,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }, [location.pathname]);
 
     const navItems = [
-        { icon: Home, label: t('main'), route: "/dashboard", type: "link" },
+        { icon: Home, label: "Dentago", route: "/dentago", type: "link" },
+        { icon: IoIosStats , label: t('main'), route: "/dashboard", type: "link" },
         { icon: HiOutlineInformationCircle, label: t('my_information'), route: "/my-information", type: "link" },
         { icon: Users, label: t('bemorlarim'), route: "/bemorlarim", type: "link" },
         { icon: ListOrdered, label: t('orders_bts'), route: "/orders", type: "link" },
         { icon: User, label: t('my_results'), route: "/result", type: "link" },
         { icon: PlusCircle, label: "Mahsulot qo'shish", route: "/addproduct", type: "link" },
-        { icon: Store, label: "Dentago Store", route: "/DentagoStore", type: "link" },
 
         {
             icon: Archive,
