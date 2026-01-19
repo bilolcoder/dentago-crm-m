@@ -164,7 +164,7 @@ function Boshsaxifa() {
 
         {/* Categories */}
         <section className="px-4 md:px-8 pb-12">
-          <div className="grid grid-cols-5 gap-4 md:gap-8">
+          <div className="grid grid-cols-5 max-sm:grid-cols-3 gap-4 md:gap-8">
             {categories.map(({ id, label, Icon, path }) => (
               <Link key={id} to={path} onClick={() => setActiveTab(id)} className="flex flex-col items-center gap-4">
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex border-2 items-center justify-center transition-all ${activeTab === id ? 'bg-cyan-500 border-cyan-500 text-white shadow-lg' : 'bg-white border-cyan-500 text-cyan-500'}`}>
@@ -204,7 +204,7 @@ function Boshsaxifa() {
 
         {/* Products */}
         {!loading && !error && products.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-8 mt-6 pb-10">
+          <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-8 mt-6 pb-10">
             {products.slice(0, 4).map((product) => (
               <ProductCard
                 key={product.id}
@@ -228,7 +228,7 @@ function Boshsaxifa() {
                 <h2 className="text-2xl font-bold text-gray-800">Barcha Mahsulotlar ({products.length})</h2>
               </div>
               <div className="p-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((product) => (
                     <ProductCard
                       key={product.id}
