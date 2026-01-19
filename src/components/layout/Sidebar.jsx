@@ -62,7 +62,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }, [location.pathname]);
 
     const navItems = [
-        { icon: Home, label: "Dentago", route: "/dentago", type: "link" },
+        { icon: Home, label: "Dentago", route: "/DentagoStore", type: "link" },
         { icon: IoIosStats , label: t('main'), route: "/dashboard", type: "link" },
         { icon: HiOutlineInformationCircle, label: t('my_information'), route: "/my-information", type: "link" },
         { icon: Users, label: t('bemorlarim'), route: "/bemorlarim", type: "link" },
@@ -213,7 +213,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 <div className="flex-1 flex flex-col relative min-h-0">
                     {/* Brand Identity */}
                     <div className="p-8 pb-6 flex bg-white items-center justify-between relative">
-                        <div onClick={() => handleNavigation("/")} className="cursor-pointer flex items-center justify-center gap-3 group">
+                        <div onClick={() => handleNavigation("/DentagoStore")} className="cursor-pointer flex items-center justify-center gap-3 group">
                             <img className='h-37.5 -mt-18.25 mx-auto ml-[32px]' src={Logo} alt="Logo" />
                         </div>
                         {/* Yopish tugmasi - faqat mobilda */}
