@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataProvider';
-
 // Layout komponentlari
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
-
 // Sahifalar
 import DashboardContent from './components/DashboardContent';
 import PaymentsContent from './components/PaymentsContent';
@@ -37,7 +35,6 @@ import Bemorlarim from './components/Bemorlarim';
 import DentagoStore from './components/pages/dentagoStore/dentagoStore';
 import Savat from './components/pages/dentagoStore/savat/Savat';
 import ProductDetail from './components/pages/dentagoStore/savat/ProductDetail';
-
 import Elonlar from './components/pages/dentagoStore/pegeslar/elonlar';
 import Kurs from './components/pages/dentagoStore/pegeslar/kurs';
 import Ustalar from './components/pages/dentagoStore/pegeslar/ustalar';
@@ -46,16 +43,12 @@ import DoctorDetail from './components/pages/dentagoStore/pegeslar/texniklar/Det
 import MalumotBerish from './components/pages/dentagoStore/pegeslar/texniklar/MalumotBerish';
 import Login from './components/Login';
 import Registration from './components/registration';
-
 // Floating button uchun ikonalar va axios
 import { ShoppingCart } from 'lucide-react';
 import axios from 'axios';
-
 // API sozlamalari
 const BASE_URL = "https://app.dentago.uz";
 const getToken = () => localStorage.getItem('accessToken');
-
-
 // Current page title aniqlash funksiyasi
 const getCurrentPageTitle = (pathname) => {
   const routes = {
@@ -95,101 +88,68 @@ const getCurrentPageTitle = (pathname) => {
     '/sms/shablonlar': 'SMS Shablonlar',
     '/sms/sozlamalar': 'SMS Sozlamalar',
   };
-
   return routes[pathname] || 'DentaGo Platform';
 };
-
 const FloatingButton = () => {
   const location = useLocation();
   const isDentagoStore = location.pathname === '/DentagoStore';
-
   const [cartCount, setCartCount] = useState(0);
-
   useEffect(() => {
-    const fetchCartCount = async () => {
-      const token = getToken();
-      if (!token) {
-        setCartCount(0);
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${BASE_URL}/api/cart`, {
-          headers: { Authorization: `Bearer ${token}` },
-          timeout: 8000,
-        });
-
-        if (response.data?.success && response.data?.data?.items) {
-          const totalQuantity = response.data.data.items.reduce(
-            (sum, item) => sum + (Number(item.quantity) || 1),
-            0
-          );
-          setCartCount(totalQuantity);
-        } else {
-          setCartCount(0);
-        }
-      } catch (err) {
-        console.log("Savat sonini olishda xato:", err);
-        setCartCount(0);
-      }
-    };
-
-    // Faqat DentagoStore sahifasida ishlaydi
-    if (isDentagoStore) {
-      fetchCartCount();
-
-      // Har 20-30 sekundda yangilab turish (ixtiyoriy)
-      const interval = setInterval(fetchCartCount, 25000);
-      return () => clearInterval(interval);
+    fetchCartCount();
+    // Har 20-30 sekundda yangilab turish (ixtiyoriy)
+    const interval = setInterval(fetchCartCount, 700);
+    return () => clearInterval(interval);
+  }, []);
+  const fetchCartCount = async () => {
+    const token = getToken();
+    if (!token) {
+      setCartCount(0);
+      return;
     }
-  }, [isDentagoStore]);
-
-  if (isDentagoStore) {
-    return (
-      <div className="fixed bottom-6 right-6 z-[9999]">
-        <button
-          onClick={() => (window.location.href = '/savat')}
-          className="relative w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
-          title="Savatga o'tish"
-        >
-          <ShoppingCart size={26} />
-
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[22px] h-5 flex items-center justify-center rounded-full px-1.5 shadow-lg border-2 border-white">
-              {cartCount > 99 ? '99+' : cartCount}
-            </span>
-          )}
-        </button>
-      </div>
-    );
-  }
-
-  // Boshqa sahifalarda Telegram tugmasi
+    try {
+      const response = await axios.get(`${BASE_URL}/api/cart`, {
+        headers: { Authorization: `Bearer ${token}` },
+        // timeout: 1000,
+      });
+      if (response.data?.success && response.data?.data?.items) {
+        const totalQuantity = response.data.data.items.reduce(
+          (sum, item) => sum + (Number(item.quantity) || 1),
+          0
+        );
+        setCartCount(totalQuantity);
+      } else {
+        setCartCount(0);
+      }
+    } catch (err) {
+      console.log("Savat sonini olishda xato:", err);
+      setCartCount(0);
+    }
+  };
   return (
-    <a
-      href="https://t.me/Denta_go_bazar"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-[9999] w-14 h-14 flex items-center justify-center bg-[#00BCE4] rounded-full shadow-2xl hover:scale-110 transition-all"
-    >
-      <i className="text-2xl font-bold text-white">GO</i>
-    </a>
+    <div className="fixed bottom-6 right-6 z-[9999]">
+      <button
+        onClick={() => (window.location.href = '/savat')}
+        className="relative w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
+        title="Savatga o'tish"
+      >
+        <ShoppingCart size={26} />
+        {cartCount > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold min-w-[22px] h-5 flex items-center justify-center rounded-full px-1.5 shadow-lg border-2 border-white">
+            {cartCount}
+          </span>
+        )}
+      </button>
+    </div>
   );
 };
-
-const ProtectedLayout = () => {
+const ProtectedLayout = ({ fetchCartCount }) => {
   const { isAuthenticated } = useData();
   const location = useLocation();
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
-
   const currentPage = getCurrentPageTitle(location.pathname);
-
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-white text-black">
@@ -239,26 +199,21 @@ const ProtectedLayout = () => {
               <Route path="/kurs" element={<Kurs />} />
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
-
               {/* Dentago Store sahifalari */}
               <Route path="/DentagoStore" element={<DentagoStore />} />
               <Route path="/savat" element={<Savat />} />
-
               {/* Dinamik mahsulot batafsil sahifasi */}
               <Route path="/mahsulot/:id" element={<ProductDetail />} />
-
               {/* 404 */}
               <Route path="*" element={<div className="text-center text-3xl mt-20 text-gray-500">404 — Sahifa topilmadi</div>} />
             </Routes>
           </div>
         </main>
       </div>
-
       <FloatingButton />
     </>
   );
 };
-
 const App = () => {
   return (
     <DataProvider>
@@ -266,13 +221,10 @@ const App = () => {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-
         {/* Protected barcha sahifalar */}
         <Route path="/*" element={<ProtectedLayout />} />
       </Routes>
     </DataProvider>
   );
 };
-
-
 export default App;

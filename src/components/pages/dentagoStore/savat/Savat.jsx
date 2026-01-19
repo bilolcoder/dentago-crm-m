@@ -162,31 +162,31 @@ const Savat = () => {
   };
   const handleUpdateQuantity = async (itemId, change) => {
     if (!checkAuth(navigate)) return;
-  
+
     // 1. Savatdan mahsulotni topamiz
     const item = apiCartItems.find(i => i.id === itemId);
     if (!item) return;
-  
+
     // Agar miqdor 1 bo'lsa va foydalanuvchi ayirmoqchi bo'lsa, to'xtatamiz
     if (item.quantity <= 1 && change === -1) return;
-  
+
     try {
       setUpdating(prev => ({ ...prev, [itemId]: true }));
-      
+
       // 2. Savatga qo'shish funksiyasini chaqiramiz (change: 1 yoki -1)
       // Bu funksiya sizda yuqorida export qilingan addToCartAPI funksiyasidir
       const result = await addToCartAPI(
-        item.product_id, 
-        item.nomi, 
-        item.narxi, 
+        item.product_id,
+        item.nomi,
+        item.narxi,
         change // miqdorni +1 yoki -1 ko'rinishida yuboramiz
       );
-  
+
       if (result.success) {
         // 3. Agar backend muvaffaqiyatli qabul qilsa, UI-ni yangilash uchun savatni qayta yuklaymiz
         // Bu eng xavfsiz yo'li, chunki backenddagi jami summani aniq olib keladi
         await fetchCartFromAPI(false);
-        
+
         // Agar Context ishlatayotgan bo'lsangiz:
         updateQuantity(itemId, item.quantity + change);
       } else {
@@ -298,15 +298,15 @@ const Savat = () => {
           <button onClick={() => navigate('/DentagoStore')} className="bg-[#00C2FF] text-white px-8 py-3 rounded-full font-bold hover:bg-[#0099DD]">
             Mahsulotlarga o'tish
           </button>
-          
+
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-48 p-4">
-      <div className="flex items-center justify-between mb-6 sticky top-0 bg-gray-50 z-10 py-2">
+    <div className="min-h-screen pb-72 p-4">
+      <div className="flex items-center justify-between mb-6 sticky top-0 z-10 py-2">
         <h1 className="text-center text-xl font-bold text-gray-800">Korzinka</h1>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">{apiCartItems.length} ta mahsulot</span>
@@ -385,7 +385,7 @@ const Savat = () => {
         ))}
       </div>
 
-      <div className="fixed bottom-20 left-0 right-0 bg-white p-6 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-40 border-t border-gray-200">
+      <div className="fixed bottom-0 w-[78%] right-5 bg-white p-6 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-40 border-t border-gray-200">
         <div className="space-y-3 mb-6 text-sm">
           <div className="flex justify-between text-gray-400">
             <span>Tovarlar ({jamiTovarlar} dona)</span>

@@ -93,8 +93,7 @@ function Boshsaxifa() {
         quantity: 1,
         price: priceNumber
       };
-
-      const response = await axios.post(`${BASE_URL}api/cart/add`, cartData, {
+        const response = await axios.post(`${BASE_URL}api/cart/add`, cartData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -252,7 +251,7 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await onAddToCart(product);
-    window.location.reload();
+    // window.location.reload();
   };
 
   return (
@@ -281,9 +280,8 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
         <button
           onClick={handleAddToCart}
           disabled={isLoading}
-          className={`w-full py-3 rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed ${
-            isLoading ? 'bg-gray-400' : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
-          }`}
+          className={`w-full py-3 rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed ${isLoading ? 'bg-gray-400' : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
+            }`}
         >
           {isLoading ? (
             <>
