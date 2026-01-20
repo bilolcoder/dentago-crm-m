@@ -3,6 +3,7 @@ import { useCart } from '../../.././../components/pages/dentagoStore/CartContent
 import { FaTrash, FaMinus, FaPlus, FaShoppingCart, FaSyncAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 
 const BASE_URL = "https://app.dentago.uz";
 
@@ -111,6 +112,11 @@ const Savat = () => {
   useEffect(() => {
     fetchCartFromAPI();
   }, []);
+
+  // const navigate = useNavigate();
+    const handleBackMinus = () => {
+      navigate(-1);
+    }
 
   const fetchCartFromAPI = async (showLoading = true) => {
     try {
@@ -306,6 +312,7 @@ const Savat = () => {
 
   return (
     <div className="min-h-screen pb-72 p-4">
+      <button onClick={handleBackMinus} className='p-3 text-gray-400 bg-gray-100 cursor-pointer rounded-2xl text-2xl'><IoMdArrowRoundBack /></button>
       <div className="flex items-center justify-between mb-6 sticky top-0 z-10 py-2">
         <h1 className="text-center text-xl font-bold text-gray-800">Korzinka</h1>
         <div className="flex items-center gap-2">

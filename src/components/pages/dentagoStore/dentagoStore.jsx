@@ -533,8 +533,7 @@ function Boshsaxifa() {
             <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 rotate-180"><ArrowLeft className="text-white" /></button>
           </div>
         </section>
-
-        {/* Categories Navigation */}
+ 
         <section className="px-4 md:px-8 pb-12">
           <div className="grid grid-cols-4 max-sm:grid-cols-2 gap-4 md:gap-8">
             {categories.map(({ id, label, Icon, path }) => (
