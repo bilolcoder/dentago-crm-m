@@ -36,7 +36,7 @@ const categories = [
   { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
   { id: 'texniklar', label: 'Texniklar', Icon: RiToothLine, path: '/texniklar' },
   { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
-  { id: 'kurslar', label: 'kurslar', Icon: Users, path: '/kurs' },
+  // { id: 'kurslar', label: 'kurslar', Icon: Users, path: '/kurs' },
 ];
 
 // Dropdown uchun mahsulot kategoriyalari - SIZ BERGANLARGA O'ZGARTIRDIM
@@ -536,7 +536,7 @@ function Boshsaxifa() {
 
         {/* Categories Navigation */}
         <section className="px-4 md:px-8 pb-12">
-          <div className="grid grid-cols-5 max-sm:grid-cols-3 gap-4 md:gap-8">
+          <div className="grid grid-cols-4 max-sm:grid-cols-2 gap-4 md:gap-8">
             {categories.map(({ id, label, Icon, path }) => (
               <Link key={id} to={path} onClick={() => setActiveTab(id)} className="flex flex-col items-center gap-4">
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex border-2 items-center justify-center transition-all ${activeTab === id ? 'bg-cyan-500 border-cyan-500 text-white shadow-lg' : 'bg-white border-cyan-500 text-cyan-500'}`}>

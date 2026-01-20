@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Settings, FlaskConical, Trash2, MoreHorizontal, Search, Bell } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 // Swiper kutubxonasi komponentlari va modullari
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -20,6 +21,10 @@ import N4 from "../../../../../assets/dental-drill.webp";
 
 function DetailDoctors() {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const handleBackMinus = () => {
+    navigate(-1);
+  }
 
   const slides = [
     {
@@ -72,6 +77,7 @@ function DetailDoctors() {
       {/* HEADER */}
       <header className="py-4 sticky top-0 bg-white z-30 max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-4">
+          <button onClick={handleBackMinus} className='p-3 text-gray-400 bg-gray-100 cursor-pointer rounded-2xl text-2xl'><IoMdArrowRoundBack /></button>
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
