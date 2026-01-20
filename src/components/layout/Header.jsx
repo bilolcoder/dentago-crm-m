@@ -115,18 +115,18 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
         navigate('/login');
     };
 
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else if (document.exitFullscreen) {
-            document.exitFullscreen();
-        }
-    };
+    // const toggleFullscreen = () => {
+    //     if (!document.fullscreenElement) {
+    //         document.documentElement.requestFullscreen();
+    //     } else if (document.exitFullscreen) {
+    //         document.exitFullscreen();
+    //     }
+    // };
 
-    const handleLocaleChange = (newLocale) => {
-        switchLocale(newLocale);
-        setIsLocaleMenuOpen(false);
-    };
+    // const handleLocaleChange = (newLocale) => {
+    //     switchLocale(newLocale);
+    //     setIsLocaleMenuOpen(false);
+    // };
 
     const getFlag = (loc) => {
         const flagClass = "w-5 h-3.5 object-cover rounded-sm shadow-sm";
@@ -181,16 +181,16 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                 </button>
 
                 {/* Fullscreen */}
-                <button
+                {/* <button
                     onClick={toggleFullscreen}
                     className="p-2 text-slate-500 rounded-xl hover:bg-blue-50 transition-all hidden md:flex"
                     title="To'liq ekran"
                 >
                     <Maximize className="w-5 h-5 hover:text-[#00BCE4]" />
-                </button>
+                </button> */}
 
                 {/* Til tanlash */}
-                <div className="relative">
+                {/* <div className="relative">
                     <button
                         onClick={() => setIsLocaleMenuOpen(!isLocaleMenuOpen)}
                         className="flex items-center gap-1.5 p-1.5 sm:p-2 text-slate-600 rounded-xl hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
@@ -217,7 +217,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                             </div>
                         </>
                     )}
-                </div>
+                </div> */}
 
                 {/* Profil */}
                 <div className="relative flex items-center border-l border-slate-100 ml-1 pl-2 sm:pl-4">
