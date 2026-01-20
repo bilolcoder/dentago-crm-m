@@ -217,6 +217,13 @@ const ProfileContent = () => {
       <div className="max-w-4xl mx-auto">
         {/* Sarlavha */}
         <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-gray-600 hover:text-[#00BCE4] transition-colors"
+          >
+            <ArrowLeft className="w-6 h-6" />
+            <span className="text-lg font-semibold">Orqaga</span>
+          </button>
 
 
         </div>
