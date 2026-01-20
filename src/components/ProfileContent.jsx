@@ -40,7 +40,7 @@ const ProfileContent = () => {
       try {
         const response = await fetch('https://app.dentago.uz/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
-        });
+        }); 
 
         if (!response.ok) throw new Error('Maʼlumotlar olinmadi');
 

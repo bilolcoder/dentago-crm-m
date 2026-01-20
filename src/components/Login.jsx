@@ -187,7 +187,7 @@ const Login = () => {
             localStorage.setItem('refreshToken', verifyData.tokens.refreshToken);
             localStorage.setItem('userPhone', fullPhone);
 
-            console.log('✅ Verify muvaffaqiyatli, tokenlar saqlandi');
+            console.log('✅ Verify muvaffaqiyatli, tokenlar saqlandi'); 
 
             // 2. /api/auth/me dan foydalanuvchi ma'lumotlarini olish
             let username = fullPhone.replace('+998', '9'); // fallback – telefon raqami

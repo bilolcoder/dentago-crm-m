@@ -65,9 +65,9 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
     } = useData();
 
     // Foydalanuvchi ma'lumotlari olish
+    // Foydalanuvchi ma'lumotlari olish
     const getCurrentUser = () => {
-        const manualRole = localStorage.getItem('userRole'); // Ehtimol bu ham keraksizdir, lekin hozircha tursin
-        const getRole = (r) => manualRole ? manualRole.toUpperCase() : (r === 'user' ? 'Role Yoqq' : (r || 'Role Yoqq').toUpperCase());
+        const getRole = (r) => (r === 'user' ? 'Role Yoqq' : (r || 'Role Yoqq').toUpperCase());
 
         if (data.user) {
             return {
@@ -81,7 +81,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
         return {
             username: formattedPhone,
-            role: manualRole || 'Role Yoqq'
+            role: 'Role Yoqq'
         };
     };
 

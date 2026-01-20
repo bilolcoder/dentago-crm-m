@@ -293,7 +293,7 @@ const Registration = () => {
             .replace(/oʼ/g, "o’")
             .replace(/ʻ/g, "’")
             .replace(/ʼ/g, "’")
-            .replace(/`/g, "’")   // Backtick 
+            .replace(/`/g, "’")   // Backtick
             .replace(/‘/g, "’")   // Ochiluvchi smart quote
             .replace(/'/g, "’")   // Oddiy ASCII apostrofni ham almashtiramiz
             .trim();
