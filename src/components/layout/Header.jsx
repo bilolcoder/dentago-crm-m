@@ -64,6 +64,8 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
         logout
     } = useData();
 
+    
+
     // Foydalanuvchi ma'lumotlari olish
     // Foydalanuvchi ma'lumotlari olish
     const getCurrentUser = () => {
