@@ -18,7 +18,9 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         gender: 'male',
         birthdate: '',
         image: null,
-        currentImage: null
+        image: null,
+        currentImage: null,
+        role: ''
     });
 
     useEffect(() => {
@@ -55,7 +57,9 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                         gender: data.user.gender || 'male',
                         birthdate: data.user.birthdate || '',
                         image: null,
-                        currentImage: data.user.image || null
+                        image: null,
+                        currentImage: data.user.image || null,
+                        role: data.user.role || data.role || ''
                     });
                 }
             } catch (err) {
@@ -130,12 +134,8 @@ const EditProfileModal = ({ isOpen, onClose }) => {
             const result = await response.json();
             console.log('Backend muvaffaqiyatli yangilandi:', result);
 
-            // Frontendda ham yangilash
-            const updatedUser = {
-                name: formData.username.trim(),
-                role: 'OPERATOR'
-            };
-            localStorage.setItem('userData', JSON.stringify(updatedUser));
+            // Frontendda ham yangilash (lokal o'zgarishlar uchun)
+            // localStorage.setItem('userData', ...) // O'chirildi
 
             setSuccess('Profil muvaffaqiyatli yangilandi!');
 

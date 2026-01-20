@@ -17,7 +17,7 @@ const ProfileContent = () => {
   const [formData, setFormData] = useState({
     username: '',
     phone: '',
-    company: '',
+    companyName: '',
     role: '',           // Role state uchun qo'shildi
     birthdate: '',
     gender: 'male',
@@ -45,6 +45,7 @@ const ProfileContent = () => {
         if (!response.ok) throw new Error('Maʼlumotlar olinmadi');
 
         const data = await response.json();
+        console.log('ProfileContent API response:', data); // Debug uchun
 
         if (data.user) {
           const fullName = data.user.username || 'Foydalanuvchi';
@@ -61,14 +62,14 @@ const ProfileContent = () => {
             lastName,
             fullName,
             phone: data.user.phone || '+998',
-            company: data.user.company || '',
+            companyName: data.user.companyName || data.user.company || data.user.company_name || '',
             gender: data.user.gender === 'female' ? 'Ayol' : 'Erkak'
           });
 
           setFormData({
             username: data.user.username || '',
             phone: data.user.phone || '',
-            company: data.user.company || '',
+            companyName: data.user.companyName || data.user.company || data.user.company_name || '',
             role: localStorage.getItem('userRole') || data.user.role || 'USER', // Role localStorage dan olindi
             birthdate: formattedBirthDate,
             gender: data.user.gender || 'male',
@@ -76,10 +77,7 @@ const ProfileContent = () => {
             currentImage: data.user.image || null
           });
 
-          localStorage.setItem('userData', JSON.stringify({
-            name: data.user.username,
-            role: 'OPERATOR'
-          }));
+          // localStorage.setItem('userData', ...); // O'chirildi
         }
       } catch (err) {
         setError('Profil yuklanmadi: ' + err.message);
@@ -132,7 +130,7 @@ const ProfileContent = () => {
         username: formData.username.trim(),
         gender: formData.gender,
         birthdate: formData.birthdate || null,
-        companyName: formData.company.trim() || null
+        companyName: formData.companyName.trim() || null
       };
 
       if (formData.image) {
@@ -155,11 +153,8 @@ const ProfileContent = () => {
 
       setSuccess('Profil muvaffaqiyatli yangilandi!');
 
-      // Local ma'lumotlarni yangilash
-      localStorage.setItem('userData', JSON.stringify({
-        name: formData.username.trim(),
-        role: 'OPERATOR'
-      }));
+      // Local ma'lumotlarni yangilash - O'chirildi
+      // localStorage.setItem('userData', ...);
 
       // Update UI state immediately
       const fullName = formData.username.trim();
@@ -172,7 +167,7 @@ const ProfileContent = () => {
         fullName,
         firstName,
         lastName,
-        company: formData.company,
+        companyName: formData.companyName,
         gender: formData.gender === 'female' ? 'Ayol' : 'Erkak'
       }));
 
@@ -218,7 +213,7 @@ const ProfileContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Sarlavha */}
         <div className="flex items-center justify-between mb-8">
@@ -306,8 +301,8 @@ const ProfileContent = () => {
               <input
                 type="text"
                 readOnly={!isEditing}
-                value={formData.company || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+                value={formData.companyName || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
                 placeholder="Название вашей компании"
                 autoComplete="organization"
                 className={`w-full px-5 py-4 rounded-2xl italic transition-all

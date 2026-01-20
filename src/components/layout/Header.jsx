@@ -66,25 +66,12 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
     // Foydalanuvchi ma'lumotlari olish
     const getCurrentUser = () => {
-        const manualRole = localStorage.getItem('userRole');
-        const getRole = (r) => manualRole ? manualRole.toUpperCase() : (r === 'user' ? 'OPERATOR' : (r || 'OPERATOR').toUpperCase());
-
-        const stored = localStorage.getItem('userData');
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored);
-                return {
-                    username: parsed.name || parsed.username || 'Foydalanuvchi',
-                    role: getRole(parsed.role)
-                };
-            } catch (e) {
-                console.error("userData parse xatosi:", e);
-            }
-        }
+        const manualRole = localStorage.getItem('userRole'); // Ehtimol bu ham keraksizdir, lekin hozircha tursin
+        const getRole = (r) => manualRole ? manualRole.toUpperCase() : (r === 'user' ? 'Role Yoqq' : (r || 'Role Yoqq').toUpperCase());
 
         if (data.user) {
             return {
-                username: data.user.username || data.user.name || 'Foydalanuvchi',
+                username: data.user.name || data.user.username || 'Foydalanuvchi',
                 role: getRole(data.user.role)
             };
         }
@@ -94,7 +81,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
         return {
             username: formattedPhone,
-            role: manualRole || 'OPERATOR'
+            role: manualRole || 'Role Yoqq'
         };
     };
 
@@ -120,7 +107,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
     const handleConfirmLogout = () => {
         logout();
-        localStorage.removeItem('userData');
+        // localStorage.removeItem('userData'); // <--- Endi yo'q
         localStorage.removeItem('userPhone');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

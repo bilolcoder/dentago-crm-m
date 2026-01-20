@@ -193,7 +193,7 @@ export const DataProvider = ({ children }) => {
                 return {
                     ...initialData,
                     ...parsed,
-                    user: parsed.user || null
+                    user: null // User har doim API dan keladi
                 };
             } catch (e) {
                 console.error('Maʼlumotlar oʻqishda xato:', e);
@@ -202,24 +202,38 @@ export const DataProvider = ({ children }) => {
         return initialData;
     });
 
+    const fetchUser = async (token) => {
+        try {
+            const response = await fetch('https://app.dentago.uz/api/auth/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const meData = await response.json();
+                if (meData.user) {
+                    const userForApp = {
+                        name: meData.user.username,
+                        role: meData.user.role || meData.role || ''
+                    };
+                    setData(prev => ({ ...prev, user: userForApp }));
+                }
+            }
+        } catch (error) {
+            console.error('User fetch error:', error);
+        }
+    };
+
     // === YANGI: Sahifa ochilganda user ma'lumotlarini yuklash ===
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
         const savedPhone = localStorage.getItem('userPhone');
-        const savedUser = localStorage.getItem('userData');
 
         if (accessToken && savedPhone) {
             setIsAuthenticated(true);
-
-            // Agar localStorage'da user ma'lumotlari bo'lsa – kontekstga yuklaymiz
-            if (savedUser) {
-                try {
-                    const userObj = JSON.parse(savedUser);
-                    setData(prev => ({ ...prev, user: userObj }));
-                } catch (e) {
-                    console.error("userData parse xatosi:", e);
-                }
-            }
+            // userData ni localStoragedan o'qimaymiz, API dan olamiz
+            fetchUser(accessToken);
         }
 
         setAuthLoaded(true);
@@ -231,9 +245,10 @@ export const DataProvider = ({ children }) => {
         setIsAuthenticated(true);
 
         if (userObj) {
-            // Kontekstga va localStorage'ga saqlaymiz
             setData(prev => ({ ...prev, user: userObj }));
-            localStorage.setItem('userData', JSON.stringify(userObj));
+        } else {
+            const token = localStorage.getItem('accessToken');
+            if (token) fetchUser(token);
         }
     };
 
@@ -242,7 +257,7 @@ export const DataProvider = ({ children }) => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userPhone');
-        localStorage.removeItem('userData'); // <<< Muhim!
+        // userData ni o'chirish shart emas, chunki u yo'q
 
         setIsAuthenticated(false);
         setData(prev => ({ ...prev, user: null })); // Kontekstdan ham o'chiramiz

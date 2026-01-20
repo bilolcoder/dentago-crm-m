@@ -160,14 +160,14 @@ const Login = () => {
 
     const handleSmsConfirm = async (code) => {
         if (code.length !== 6) return;
-    
+
         setIsLoading(true);
         setError('');
         setInputBorderState('default');
-    
+
         const cleanPhone = phoneNumber.replace(/\D/g, '');
         const fullPhone = `+${cleanPhone}`;
-    
+
         try {
             // 1. SMS kodini tasdiqlash
             const verifyResponse = await fetch('https://app.dentago.uz/api/auth/app/verify', {
@@ -175,41 +175,45 @@ const Login = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone: fullPhone, otp: code }),
             });
-    
+
             const verifyData = await verifyResponse.json();
-    
+
             if (!verifyResponse.ok || !verifyData.success) {
                 throw new Error(verifyData.message || 'Kod noto‘g‘ri');
             }
-    
+
             // Tokenlarni saqlash
             localStorage.setItem('accessToken', verifyData.tokens.accessToken);
             localStorage.setItem('refreshToken', verifyData.tokens.refreshToken);
             localStorage.setItem('userPhone', fullPhone);
-    
+
             console.log('✅ Verify muvaffaqiyatli, tokenlar saqlandi');
-    
+
             // 2. /api/auth/me dan foydalanuvchi ma'lumotlarini olish
             let username = fullPhone.replace('+998', '9'); // fallback – telefon raqami
-            let userRole = 'OPERATOR';
-    
+            let userRole = 'Role Yoq'; // default rol
+
             try {
                 const meResponse = await fetch('https://app.dentago.uz/api/auth/me', {
                     headers: {
                         'Authorization': `Bearer ${verifyData.tokens.accessToken}`
                     }
                 });
-    
+
                 console.log('meResponse status:', meResponse.status);
-    
+
                 if (meResponse.ok) {
                     const meData = await meResponse.json();
                     console.log('meData:', meData);
-    
+
                     if (meData.user && meData.user.username) {
                         username = meData.user.username.trim();
-                        userRole = 'OPERATOR'; // backendda "user" bo'lsa ham biz "OPERATOR" qilamiz
-                        console.log('✅ Username olindi:', username);
+                        // API response ni to'liq tekshiramiz
+                        console.log('API Full Response:', meData);
+                        console.log('API User Object:', meData.user);
+
+                        userRole = meData.user.role || meData.role || '';
+                        console.log('✅ Aniqlangan Role:', userRole);
                     } else {
                         console.warn('meData.user yoki username yo‘q');
                     }
@@ -219,27 +223,27 @@ const Login = () => {
             } catch (meErr) {
                 console.error('api/auth/me so‘rovida xato:', meErr);
             }
-    
+
             // 3. Header uchun to‘g‘ri formatda saqlash
             const userForApp = {
                 name: username,
                 role: userRole
             };
-    
-            localStorage.setItem('userData', JSON.stringify(userForApp));
-            console.log('✅ userData saqlandi:', userForApp);
-    
+
+            // localStorage.setItem('userData', JSON.stringify(userForApp)); // <--- O'chiramiz
+            console.log('✅ User contextga yuborildi:', userForApp);
+
             // Contextni yangilash
             loginWithPhone(fullPhone, userForApp);
-    
+
             setInputBorderState('success');
             setTimeout(() => navigate('/dashboard'), 800);
-    
+
         } catch (err) {
             setInputBorderState('error');
             setError(err.message || 'Tasdiqlashda xato yuz berdi');
             console.error('handleSmsConfirm xatosi:', err);
-    
+
             setSmsCode('');
             inputsRef.current.forEach(input => input && (input.value = ''));
             inputsRef.current[0]?.focus();
