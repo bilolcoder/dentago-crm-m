@@ -224,8 +224,6 @@ const ProfileContent = () => {
             <ArrowLeft className="w-6 h-6" />
             <span className="text-lg font-semibold">Orqaga</span>
           </button>
-
-
         </div>
 
         {/* Asosiy kartochka */}
@@ -266,8 +264,8 @@ const ProfileContent = () => {
 
             <h2 className="mt-6 text-2xl font-bold text-gray-900">
               {user?.fullName || 'Foydalanuvchi'}
-            </h2>
-            <p className="mt-2 text-lg text-[#00BCE4] font-semibold">
+            </h2> 
+            <p className="mt-2 text-lg text-[#00BCE4] font-semibold">                                                                                                             
               {formData.gender === 'male' ? 'Erkak' : 'Ayol'}
             </p>
           </div>

@@ -97,7 +97,7 @@ const FloatingButton = () => {
   useEffect(() => {
     fetchCartCount();
     // Har 30 sekundda yangilab turish (ixtiyoriy)
-    const interval = setInterval(fetchCartCount, 30000);
+    const interval = setInterval(fetchCartCount, 500);
     return () => clearInterval(interval);
   }, []);
   const fetchCartCount = async () => {
