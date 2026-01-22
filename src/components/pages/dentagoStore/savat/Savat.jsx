@@ -128,6 +128,7 @@ const Savat = () => {
         return;
       }
 
+
       const response = await axios.get(`${BASE_URL}/api/cart`, {
         headers: { 'Authorization': `Bearer ${token}` },
         timeout: 10000
@@ -248,6 +249,7 @@ const Savat = () => {
         })
       ));
 
+
       clearCart();
     } catch (error) {
       fetchCartFromAPI(false);
@@ -330,6 +332,7 @@ const Savat = () => {
         </div>
       </div>
 
+
       <div className="space-y-2">
         {apiCartItems.map(item => (
           <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-start relative hover:shadow-md transition-shadow">
@@ -360,9 +363,7 @@ const Savat = () => {
                   {item.category}{item.company && ` • ${item.company}`}
                 </p>
               )}
-              <p className="text-[#00C2FF] text-[11px] font-bold mb-2">
-                +{Math.round(item.narxi * item.quantity * 0.05).toLocaleString()} so'm bonus
-              </p>
+
 
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="font-black text-lg text-gray-900">
@@ -402,7 +403,7 @@ const Savat = () => {
     z-40 border-t border-gray-200
   "
 >
-        <div className="space-y-3 mb-6 text-sm">
+        <div className="space-y-2 mb-6 text-sm">
           <div className="flex justify-between text-gray-400">
             <span>Tovarlar ({jamiTovarlar} dona)</span>
             <span className="font-bold text-black">{jamiSumma.toLocaleString()} so'm</span>
@@ -415,10 +416,9 @@ const Savat = () => {
             <span className="font-bold text-lg text-black">Jami</span>
             <span className="font-black text-2xl text-black">{jamiSumma.toLocaleString()} so'm</span>
           </div>
-          <p className="text-[#00C2FF] text-xs text-right font-bold mt-1">
-            Bonus: +{Math.round(jamiSumma * 0.05).toLocaleString()} so'm
-          </p>
+
         </div>
+
 
         <button
           onClick={() => navigate('/checkout')}

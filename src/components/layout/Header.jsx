@@ -69,7 +69,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
     // Foydalanuvchi ma'lumotlari olish
     // Foydalanuvchi ma'lumotlari olish
     const getCurrentUser = () => {
-        const getRole = (r) => (r === 'user' ? 'Role Yoqq' : (r || 'Role Yoqq').toUpperCase());
+        const getRole = (r) => (r === 'user' ? 'Role Yoq' : (r || 'Role Yoq').toUpperCase());
 
         if (data.user) {
             return {
@@ -83,7 +83,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
         return {
             username: formattedPhone,
-            role: 'Role Yoqq'
+            role: 'Role Yoq'
         };
     };
 
