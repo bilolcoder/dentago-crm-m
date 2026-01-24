@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataProvider';
-// Layout komponentlari
+
+// Layout
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
-// Sahifalar
+
+// Sahifalar – guruhlab joylashtirdim
 import DashboardContent from './components/DashboardContent';
 import PaymentsContent from './components/PaymentsContent';
 import LeadStatisticsContent from './components/LeadStatisticsContent';
@@ -14,6 +16,8 @@ import SmsTemplatesContent from './components/SmsTemplatesContent';
 import SmsSettingsContent from './components/SmsSettingsContent';
 import GeneralSettingsContent from './components/GeneralSettingsContent';
 import ManualContent from './components/ManualContent';
+
+// Storage
 import DocumentsContent from './components/storage/DocumentsContent';
 import ProductsContent from './components/storage/ProductsContent';
 import CategoriesContent from './components/storage/CategoriesContent';
@@ -21,17 +25,14 @@ import BrandsContent from './components/storage/BrandsContent';
 import UnitsContent from './components/storage/UnitsContent';
 import SuppliersContent from './components/storage/SuppliersContent';
 import ProductUsageContent from './components/storage/ProductUsageContent';
+
+// BTS / Orders
 import OrderList from './components/pages/BTS/OrderList';
 import Yetkazibberish from './components/pages/BTS/yetkazibBeruvchi';
-import Results from './components/Results';
-import ProfileContent from './components/ProfileContent';
-import AppPaymentsContent from './components/AppPaymentsContent';
-import TariffsContent from './components/TariffsContent';
 import Cards from './components/pages/BTS/cards';
-import Addproduct from './components/pages/addMahsulot';
 import MahsulotQoshish from './components/pages/BTS/MahsulotQAdd';
-import MyInformation from './components/MyInformayion';
-import Bemorlarim from './components/Bemorlarim';
+
+// Dentago Store
 import DentagoStore from './components/pages/dentagoStore/dentagoStore';
 import Savat from './components/pages/dentagoStore/savat/Savat';
 import ProductDetail from './components/pages/dentagoStore/savat/ProductDetail';
@@ -41,15 +42,21 @@ import Ustalar from './components/pages/dentagoStore/pegeslar/ustalar';
 import Texniklar from './components/pages/dentagoStore/pegeslar/texniklar/Texniklar';
 import DoctorDetail from './components/pages/dentagoStore/pegeslar/texniklar/DetailDoctor';
 import MalumotBerish from './components/pages/dentagoStore/pegeslar/texniklar/MalumotBerish';
+
+// Boshqa sahifalar
+import Results from './components/Results';
+import ProfileContent from './components/ProfileContent';
+import AppPaymentsContent from './components/AppPaymentsContent';
+import TariffsContent from './components/TariffsContent';
+import Addproduct from './components/pages/addMahsulot';
+import MyInformation from './components/MyInformayion';
+import Bemorlarim from './components/Bemorlarim';
 import Login from './components/Login';
 import Registration from './components/registration';
-// Floating button uchun ikonalar va axios
+
+// Icons
 import { ShoppingCart } from 'lucide-react';
-import axios from 'axios';
-// API sozlamalari
-const BASE_URL = "https://app.dentago.uz";
-const getToken = () => localStorage.getItem('accessToken');
-// Current page title aniqlash funksiyasi
+
 const getCurrentPageTitle = (pathname) => {
   const routes = {
     '/dashboard': 'Dashboard',
@@ -90,45 +97,14 @@ const getCurrentPageTitle = (pathname) => {
   };
   return routes[pathname] || 'DentaGo Platform';
 };
+
 const FloatingButton = () => {
-  const location = useLocation();
-  const isDentagoStore = location.pathname === '/DentagoStore';
-  const [cartCount, setCartCount] = useState(0);
-  useEffect(() => {
-    fetchCartCount();
-    // Har 30 sekundda yangilab turish (ixtiyoriy)
-    const interval = setInterval(fetchCartCount, 500);
-    return () => clearInterval(interval);
-  }, []);
-  const fetchCartCount = async () => {
-    const token = getToken();
-    if (!token) {
-      setCartCount(0);
-      return;
-    }
-    try {
-      const response = await axios.get(`${BASE_URL}/api/cart`, {
-        headers: { Authorization: `Bearer ${token}` },
-        // timeout: 1000,
-      });
-      if (response.data?.success && response.data?.data?.items) {
-        const totalQuantity = response.data.data.items.reduce(
-          (sum, item) => sum + (Number(item.quantity) || 1),
-          0
-        );
-        setCartCount(totalQuantity);
-      } else {
-        setCartCount(0);
-      }
-    } catch (err) {
-      console.log("Savat sonini olishda xato:", err);
-      setCartCount(0);
-    }
-  };
+  const { cartCount } = useData();
+
   return (
     <div className="fixed bottom-6 right-6 z-[9999]">
       <button
-        onClick={() => (window.location.href = '/savat')}
+        onClick={() => window.location.href = '/savat'}
         className="relative w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
         title="Savatga o'tish"
       >
@@ -142,21 +118,21 @@ const FloatingButton = () => {
     </div>
   );
 };
-const ProtectedLayout = ({ fetchCartCount }) => {
+const ProtectedLayout = () => {
   const { isAuthenticated } = useData();
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+
   const currentPage = getCurrentPageTitle(location.pathname);
+
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-white text-black">
-        <Sidebar
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-        />
+        <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
         <main className="flex-1 overflow-y-auto">
           <Header
             setIsSidebarOpen={setIsSidebarOpen}
@@ -165,55 +141,76 @@ const ProtectedLayout = ({ fetchCartCount }) => {
           />
           <div className="p-4 md:p-6 lg:p-8">
             <Routes>
+              {/* Asosiy */}
               <Route path="/dashboard" element={<DashboardContent />} />
+
+              {/* Hisobotlar */}
               <Route path="/hisobot/to'lovlar" element={<PaymentsContent />} />
               <Route path="/hisobot/lead-statistika" element={<LeadStatisticsContent />} />
               <Route path="/hisobot/kunilik-xarajatlar" element={<DailyExpensesContent />} />
-              <Route path="/hisobot/kunilik-xarajatlar-kategoriyalari" element={<DailyExpenseCategoriesContent />} />
+              <Route
+                path="/hisobot/kunilik-xarajatlar-kategoriyalari"
+                element={<DailyExpenseCategoriesContent />}
+              />
+
+              {/* SMS */}
               <Route path="/sms/shablonlar" element={<SmsTemplatesContent />} />
               <Route path="/sms/sozlamalar" element={<SmsSettingsContent />} />
+
+              {/* Sozlamalar */}
               <Route path="/settings/general" element={<GeneralSettingsContent />} />
               <Route path="/manual" element={<ManualContent />} />
-              <Route path="/storage/documents" element={<DocumentsContent />} />
-              <Route path="/storage/products" element={<ProductsContent />} />
+
+              {/* Ombor / Storage */}
               <Route path="/storage" element={<ProductsContent />} />
+              <Route path="/storage/products" element={<ProductsContent />} />
+              <Route path="/storage/documents" element={<DocumentsContent />} />
               <Route path="/storage/categories" element={<CategoriesContent />} />
               <Route path="/storage/brands" element={<BrandsContent />} />
               <Route path="/storage/units" element={<UnitsContent />} />
               <Route path="/storage/suppliers" element={<SuppliersContent />} />
               <Route path="/storage/usage" element={<ProductUsageContent />} />
+
+              {/* Buyurtmalar / BTS */}
               <Route path="/orders" element={<OrderList />} />
               <Route path="/yetkazibberish" element={<Yetkazibberish />} />
+              <Route path="/cards" element={<Cards />} />
+              <Route path="/MahsulotQoshish" element={<MahsulotQoshish />} />
+
+              {/* Dentago Store */}
+              <Route path="/DentagoStore" element={<DentagoStore />} />
+              <Route path="/savat" element={<Savat />} />
+              <Route path="/mahsulot/:id" element={<ProductDetail />} />
+
+              {/* Boshqa sahifalar */}
+              <Route path="/addproduct" element={<Addproduct />} />
               <Route path="/result" element={<Results />} />
               <Route path="/profile" element={<ProfileContent />} />
               <Route path="/payments/app" element={<AppPaymentsContent />} />
               <Route path="/payments/tariffs" element={<TariffsContent />} />
-              <Route path="/cards" element={<Cards />} />
-              <Route path="/addproduct" element={<Addproduct />} />
-              <Route path="/MahsulotQoshish" element={<MahsulotQoshish />} />
               <Route path="/my-information" element={<MyInformation />} />
               <Route path="/bemorlarim" element={<Bemorlarim />} />
+
+              {/* Dentago Store qo'shimcha sahifalar */}
               <Route path="/elonlar" element={<Elonlar />} />
-              <Route path="/texniklar" element={<Texniklar />} />
-              <Route path="/ustalar" element={<Ustalar />} />
               <Route path="/kurs" element={<Kurs />} />
+              <Route path="/ustalar" element={<Ustalar />} />
+              <Route path="/texniklar" element={<Texniklar />} />
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
-              {/* Dentago Store sahifalari */}
-              <Route path="/DentagoStore" element={<DentagoStore />} />
-              <Route path="/savat" element={<Savat />} />
-              {/* Dinamik mahsulot batafsil sahifasi */}
-              <Route path="/mahsulot/:id" element={<ProductDetail />} />
+
               {/* 404 */}
               <Route path="*" element={<div className="text-center text-3xl mt-20 text-gray-500">404 — Sahifa topilmadi</div>} />
             </Routes>
           </div>
         </main>
       </div>
+
       <FloatingButton />
     </>
   );
 };
+
 const App = () => {
   return (
     <DataProvider>
@@ -221,10 +218,10 @@ const App = () => {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
-        {/* Protected barcha sahifalar */}
         <Route path="/*" element={<ProtectedLayout />} />
       </Routes>
     </DataProvider>
   );
 };
+
 export default App;

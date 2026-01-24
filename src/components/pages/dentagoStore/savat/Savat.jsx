@@ -128,7 +128,6 @@ const Savat = () => {
         return;
       }
 
-
       const response = await axios.get(`${BASE_URL}/api/cart`, {
         headers: { 'Authorization': `Bearer ${token}` },
         timeout: 10000
@@ -169,7 +168,10 @@ const Savat = () => {
   };
   const handleUpdateQuantity = async (itemId, change) => {
     if (!checkAuth(navigate)) return;
-
+    setTimeout(() => {
+      window.location.href = window.location.href; // yoki:
+      // window.location.reload(true); // force reload
+    }, 100);
     // 1. Savatdan mahsulotni topamiz
     const item = apiCartItems.find(i => i.id === itemId);
     if (!item) return;
@@ -190,8 +192,7 @@ const Savat = () => {
       );
 
       if (result.success) {
-        // 3. Agar backend muvaffaqiyatli qabul qilsa, UI-ni yangilash uchun savatni qayta yuklaymiz
-        // Bu eng xavfsiz yo'li, chunki backenddagi jami summani aniq olib keladi
+      
         await fetchCartFromAPI(false);
 
         // Agar Context ishlatayotgan bo'lsangiz:
@@ -207,7 +208,9 @@ const Savat = () => {
   };
   const handleRemoveFromCart = async (itemId) => {
     if (!checkAuth(navigate)) return;
-
+    setTimeout(() => {
+      window.location.href = window.location.href; 
+    }, 10);
     try {
       setRemoving(prev => ({ ...prev, [itemId]: true }));
       setApiCartItems(prev => prev.filter(i => i.id !== itemId));
@@ -233,7 +236,9 @@ const Savat = () => {
   const handleClearCart = async () => {
     if (!checkAuth(navigate)) return;
     if (apiCartItems.length === 0) return;
-
+    setTimeout(() => {
+      window.location.href = window.location.href; 
+    }, 100);
     try {
       setClearing(true);
       const oldItems = [...apiCartItems];
@@ -248,7 +253,6 @@ const Savat = () => {
           timeout: 5000
         })
       ));
-
 
       clearCart();
     } catch (error) {
@@ -332,7 +336,6 @@ const Savat = () => {
         </div>
       </div>
 
-
       <div className="space-y-2">
         {apiCartItems.map(item => (
           <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-start relative hover:shadow-md transition-shadow">
@@ -363,7 +366,7 @@ const Savat = () => {
                   {item.category}{item.company && ` • ${item.company}`}
                 </p>
               )}
-
+             
 
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="font-black text-lg text-gray-900">
@@ -416,9 +419,8 @@ const Savat = () => {
             <span className="font-bold text-lg text-black">Jami</span>
             <span className="font-black text-2xl text-black">{jamiSumma.toLocaleString()} so'm</span>
           </div>
-
+         
         </div>
-
 
         <button
           onClick={() => navigate('/checkout')}

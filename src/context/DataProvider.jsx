@@ -1,5 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import { translations } from '../constants/translations';
+
+const BASE_URL = "https://app.dentago.uz";
 
 const initialData = {
     staff: [
@@ -171,7 +174,7 @@ const initialData = {
             materials: []
         },
     ],
-    user: null  // <<< Muhim: Boshida null qilamiz, chunki real user login orqali keladi
+    user: null
 };
 
 const DataContext = createContext();
@@ -184,113 +187,100 @@ export const DataProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authLoaded, setAuthLoaded] = useState(false);
 
-    const [data, setData] = useState(() => {
-        // localStorage'dan umumiy ma'lumotlarni o'qish
-        const saved = localStorage.getItem('clinic_app_data');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                return {
-                    ...initialData,
-                    ...parsed,
-                    user: null // User har doim API dan keladi
-                };
-            } catch (e) {
-                console.error('Maʼlumotlar oʻqishda xato:', e);
-            }
-        }
-        return initialData;
-    });
+    // SAVAT UCHUN
+    const [cartItems, setCartItems] = useState([]);     // to'liq savat array
+    const [cartCount, setCartCount] = useState(0);      // jami dona (quantity yig'indisi)
 
-    const fetchUser = async (token) => {
+    const getToken = () => localStorage.getItem('accessToken');
+
+    // Savatni to'liq yuklash va jami sonni hisoblash
+    const fetchCart = async () => {
+        const token = getToken();
+        if (!token || !isAuthenticated) {
+            setCartItems([]);
+            setCartCount(0);
+            return;
+        }
+
         try {
-            const response = await fetch('https://app.dentago.uz/api/auth/me', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            const res = await axios.get(`${BASE_URL}/api/cart`, {
+                headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (response.ok) {
-                const meData = await response.json();
-                if (meData.user) {
-                    const userForApp = {
-                        name: meData.user.username,
-                        role: meData.user.role || meData.role || ''
-                    };
-                    setData(prev => ({ ...prev, user: userForApp }));
-                }
+            if (res.data?.success && res.data?.data?.items) {
+                const items = res.data.data.items || [];
+                setCartItems(items);
+
+                // Jami dona sonini hisoblash
+                const totalQty = items.reduce((acc, item) => {
+                    return acc + (Number(item.quantity) || 1);
+                }, 0);
+                setCartCount(totalQty);
+            } else {
+                setCartItems([]);
+                setCartCount(0);
             }
         } catch (error) {
-            console.error('User fetch error:', error);
+            console.error("Savat yuklash xatosi:", error);
+            setCartItems([]);
+            setCartCount(0);
         }
     };
 
-    // === YANGI: Sahifa ochilganda user ma'lumotlarini yuklash ===
+    // Login / auth o'zgarganda savatni yangilash
+    useEffect(() => {
+        if (isAuthenticated && getToken()) {
+            fetchCart();
+        } else {
+            setCartItems([]);
+            setCartCount(0);
+        }
+    }, [isAuthenticated]);
+
+    // Auth tekshiruvi (sizning eski kodingiz)
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
         const savedPhone = localStorage.getItem('userPhone');
 
         if (accessToken && savedPhone) {
             setIsAuthenticated(true);
-            // userData ni localStoragedan o'qimaymiz, API dan olamiz
-            fetchUser(accessToken);
+            // fetchUser(accessToken);   // agar user ma'lumotlari kerak bo'lsa
         }
-
         setAuthLoaded(true);
     }, []);
 
-    // === YANGI: loginWithPhone – endi user obyekti qabul qiladi ===
     const loginWithPhone = (phone, userObj = null) => {
         localStorage.setItem('userPhone', phone);
         setIsAuthenticated(true);
-
         if (userObj) {
-            setData(prev => ({ ...prev, user: userObj }));
-        } else {
-            const token = localStorage.getItem('accessToken');
-            if (token) fetchUser(token);
+            // user saqlash logikasi
         }
+        fetchCart(); // login bo'lganda savatni yangilash
     };
 
-    // === Logout – to'liq tozalash ===
     const logout = () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userPhone');
-        // userData ni o'chirish shart emas, chunki u yo'q
-
         setIsAuthenticated(false);
-        setData(prev => ({ ...prev, user: null })); // Kontekstdan ham o'chiramiz
+        setCartItems([]);
+        setCartCount(0);
     };
 
     const t = (key) => translations[locale][key] || key;
 
-    useEffect(() => {
-        localStorage.setItem('app_locale', locale);
-    }, [locale]);
-
+    useEffect(() => { localStorage.setItem('app_locale', locale); }, [locale]);
     useEffect(() => {
         localStorage.setItem('app_theme', theme);
         document.documentElement.classList.toggle('dark', theme === 'dark');
     }, [theme]);
 
     useEffect(() => {
-        // Umumiy ma'lumotlarni saqlash (user bundan tashqari alohida boshqariladi)
         localStorage.setItem('clinic_app_data', JSON.stringify({
-            ...data,
-            user: null // user ni bu yerga saqlamaymiz, chunki u alohida localStorage'da
+            ...initialData, // yoki data, qaysi biri bo'lsa
+            user: null
         }));
-    }, [data]);
-
-    const switchLocale = (newLocale) => setLocale(newLocale);
-    const switchTheme = (newTheme) => setTheme(newTheme);
-
-    // updateData funksiyasi (hozircha o'zgartirmaymiz)
-    const updateData = (type, item, action = 'ADD') => {
-        setData(prev => {
-            return { ...prev };
-        });
-    };
+    }, [/* data o'zgarishi kerak bo'lsa */]);
 
     if (!authLoaded) {
         return <div className="flex h-screen items-center justify-center">Yuklanmoqda...</div>;
@@ -298,16 +288,20 @@ export const DataProvider = ({ children }) => {
 
     return (
         <DataContext.Provider value={{
-            data,
-            updateData,
             locale,
-            switchLocale,
+            switchLocale: setLocale,
             theme,
-            switchTheme,
+            switchTheme: setTheme,
             t,
             isAuthenticated,
             loginWithPhone,
-            logout
+            logout,
+
+            // Savat qiymatlari
+            cartCount,           // ← floating button shu bilan ishlaydi
+            cartItems,
+            setCartItems,
+            fetchCart,           // savatni qayta yuklash uchun
         }}>
             {children}
         </DataContext.Provider>

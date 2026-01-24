@@ -8,13 +8,9 @@ import {
     Truck,          // Yetkazilmoqda
     PackageCheck,   // Yetkazib berildi
     Calendar,
-    Users,
     ChevronRight,
-    ShieldCheck,
-    Briefcase
+    ShieldCheck
 } from 'lucide-react';
-import { MdMedicalServices } from "react-icons/md";
-import { FaUserDoctor } from "react-icons/fa6";
 import { useData } from '../context/DataProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -30,6 +26,8 @@ const DashboardContent = () => {
     const [orderStats, setOrderStats] = useState(null);
     const [loadingStats, setLoadingStats] = useState(true);
     const [showOfferModal, setShowOfferModal] = useState(false);
+    const [services, setServices] = useState([]);
+    const [payments, setPayments] = useState([]);
 
     const BASE_URL = "https://app.dentago.uz";
 
@@ -53,12 +51,48 @@ const DashboardContent = () => {
         }
     };
 
+    // Servislarni yuklash
+    const fetchServices = async () => {
+        try {
+            const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+            const response = await axios.get(`${BASE_URL}/api/services`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                setServices(response.data.data || []);
+            }
+        } catch (err) {
+            console.error("Servislarni yuklashda xatolik:", err);
+        }
+    };
+
+    // To'lovlarni yuklash
+    const fetchPayments = async () => {
+        try {
+            const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+            const response = await axios.get(`${BASE_URL}/api/payments`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.data.success) {
+                setPayments(response.data.data || []);
+            }
+        } catch (err) {
+            console.error("To'lovlarni yuklashda xatolik:", err);
+        }
+    };
+
     useEffect(() => {
         const accepted = localStorage.getItem('offerAccepted');
         if (!accepted) {
             setShowOfferModal(true);
         }
+        
+        // Barcha ma'lumotlarni yuklash
         fetchOrderStats();
+        fetchServices();
+        fetchPayments();
     }, []);
 
     const handleAcceptOffer = () => {
@@ -71,15 +105,7 @@ const DashboardContent = () => {
         navigate('/login');
     };
 
-    // Data Processing
-    const services = data.services || [];
-    const payments = data.payments || [];
-    const staff = data.staff || [];
-
-    const dentistsCount = staff.filter(s => s.position === 'Shifokor').length;
-    const staffCount = staff.length;
-
-    // API'dan kelgan ma'lumotlarga asoslangan 6 ta karta
+    // API'dan kelgan ma'lumotlarga asoslangan karta ma'lumotlari
     const topStats = [
         {
             title: "Jami Buyurtmalar",
@@ -123,25 +149,36 @@ const DashboardContent = () => {
             link: "#",
             color: "#22c55e"
         },
-        {
-            title: "test",
-            value: orderStats?.shipped || 0,
-            icon:  PackageCheck,
-            color: "#22c55e"
+    ];
+
+    // To'lovlar statistikasi
+    const chartData = [
+        { 
+            name: t('cash') || 'Naqd', 
+            value: payments
+                .filter(p => p.payment_type === 'cash' || p.type === 'Naqd')
+                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0) 
         },
-        {
-            title: "test",
-            value: orderStats?.delivered || 0,
-            icon: PackageCheck,
-            color: "#22c55e"
+        { 
+            name: t('card') || 'Karta', 
+            value: payments
+                .filter(p => p.payment_type === 'card' || p.type === 'Karta')
+                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0) 
+        },
+        { 
+            name: 'Bank', 
+            value: payments
+                .filter(p => p.payment_type === 'bank' || p.type === 'Hisob raqam' || p.type === 'Bank')
+                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0) 
         },
     ];
 
-    const chartData = [
-        { name: t('cash') || 'Naqd', value: payments.filter(p => p.type === 'Naqd').reduce((s, p) => s + (parseInt(p.amount) || 0), 0) },
-        { name: t('card') || 'Karta', value: payments.filter(p => p.type === 'Karta').reduce((s, p) => s + (parseInt(p.amount) || 0), 0) },
-        { name: 'Bank', value: payments.filter(p => p.type === 'Hisob raqam' || p.type === 'Bank').reduce((s, p) => s + (parseInt(p.amount) || 0), 0) },
-    ];
+    // Servislarni formatlash - agar kerak bo'lsa
+    const formattedServices = services.map(service => ({
+        id: service.id || service._id,
+        name: service.name || service.service_name || "Noma'lum xizmat",
+        price: service.price || service.cost || service.amount || 0
+    }));
 
     return (
         <div className="bg-[#f8fdff] min-h-screen font-sans">
@@ -160,7 +197,7 @@ const DashboardContent = () => {
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-auto p-8 space-y-6 text-slate-700">
-                             <p>Oferta matni...</p>
+                            <p>Oferta matni...</p>
                         </div>
                         <div className="p-6 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row gap-4">
                             <button onClick={handleRejectOffer} className="flex-1 py-4 px-8 text-slate-500 font-bold rounded-2xl border border-slate-200">Bekor qilish</button>
@@ -171,7 +208,7 @@ const DashboardContent = () => {
             )}
 
             <div className="p-4 md:p-8 space-y-6">
-                {/* Dashboard Kartalari - 6 ta karta grid tizimida */}
+                {/* Dashboard Kartalari */}
                 <section className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                     {topStats.map((stat, index) => (
                         <Link
@@ -184,10 +221,7 @@ const DashboardContent = () => {
                                     className="p-4 rounded-2xl transition-all duration-300 group-hover:rotate-6"
                                     style={{ backgroundColor: `${stat.color}15`, color: stat.color }}
                                 >
-
-<stat.icon size={32} strokeWidth={2} />
-
-
+                                    <stat.icon size={32} strokeWidth={2} />
                                 </div>
                                 <div>
                                     {loadingStats ? (
@@ -214,13 +248,22 @@ const DashboardContent = () => {
                     <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 tracking-tight">{t('payments')}</h3>
+                                <h3 className="text-lg font-bold text-slate-800 tracking-tight">{t('payments') || "To'lovlar"}</h3>
                                 <p className="text-xs text-slate-400 font-medium">To'lovlar dinamikasi</p>
                             </div>
-                            <button onClick={() => dateInputRef.current?.showPicker()} className="flex items-center gap-2 px-4 py-2 bg-[#e6f8fc] rounded-xl text-xs font-bold text-[#00BCE4]">
+                            <button 
+                                onClick={() => dateInputRef.current?.showPicker()} 
+                                className="flex items-center gap-2 px-4 py-2 bg-[#e6f8fc] rounded-xl text-xs font-bold text-[#00BCE4]"
+                            >
                                 <Calendar className="w-4 h-4" />
                                 <span>{selectedDate}</span>
-                                <input type="date" ref={dateInputRef} className="absolute opacity-0 pointer-events-none" onChange={(e) => setSelectedDate(e.target.value)} />
+                                <input 
+                                    type="date" 
+                                    ref={dateInputRef} 
+                                    className="absolute opacity-0 pointer-events-none" 
+                                    onChange={(e) => setSelectedDate(e.target.value)} 
+                                    value={selectedDate}
+                                />
                             </button>
                         </div>
                         <div className="h-80 w-full">
@@ -233,10 +276,28 @@ const DashboardContent = () => {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                                    <XAxis 
+                                        dataKey="name" 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fontSize: 12, fill: '#94a3b8' }} 
+                                    />
                                     <YAxis hide />
-                                    <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                                    <Area type="monotone" dataKey="value" stroke="#00BCE4" strokeWidth={4} fill="url(#colorValue)" />
+                                    <Tooltip 
+                                        contentStyle={{ 
+                                            borderRadius: '16px', 
+                                            border: 'none', 
+                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' 
+                                        }} 
+                                        formatter={(value) => [`${value} so'm`, 'To\'lov']}
+                                    />
+                                    <Area 
+                                        type="monotone" 
+                                        dataKey="value" 
+                                        stroke="#00BCE4" 
+                                        strokeWidth={4} 
+                                        fill="url(#colorValue)" 
+                                    />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -244,19 +305,34 @@ const DashboardContent = () => {
 
                     {/* Ommabop xizmatlar */}
                     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                        <h3 className="text-lg font-bold text-slate-800 mb-6">{t('top_services') || "Ommabop xizmatlar"}</h3>
+                        <h3 className="text-lg font-bold text-slate-800 mb-6">
+                            {t('top_services') || "Ommabop xizmatlar"}
+                        </h3>
                         <div className="space-y-3">
-                            {services.slice(0, 6).map((service, index) => (
-                                <div key={index} className="flex items-center justify-between p-4 rounded-2xl bg-[#fcfdfe] border border-slate-50 transition-colors hover:bg-slate-50">
+                            {formattedServices.slice(0, 6).map((service, index) => (
+                                <div 
+                                    key={service.id || index} 
+                                    className="flex items-center justify-between p-4 rounded-2xl bg-[#fcfdfe] border border-slate-50 transition-colors hover:bg-slate-50"
+                                >
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-[#00BCE4] flex items-center justify-center text-white text-xs font-bold">
                                             {index + 1}
                                         </div>
-                                        <p className="text-sm font-bold text-slate-800 truncate w-32">{service.name}</p>
+                                        <p className="text-sm font-bold text-slate-800 truncate w-32">
+                                            {service.name}
+                                        </p>
                                     </div>
-                                    <p className="text-sm font-black text-slate-700">{(service.price || 0).toLocaleString()} so'm</p>
+                                    <p className="text-sm font-black text-slate-700">
+                                        {service.price.toLocaleString()} so'm
+                                    </p>
                                 </div>
                             ))}
+                            
+                            {formattedServices.length === 0 && (
+                                <div className="text-center py-8 text-slate-400">
+                                    Xizmatlar mavjud emas
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

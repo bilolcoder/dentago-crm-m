@@ -78,18 +78,18 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     if (!product) return;
-
+  
     const token = localStorage.getItem("accessToken");
     if (!token) {
       alert("Savatga qo'shish uchun tizimga kirish kerak!");
       navigate("/login");
       return;
     }
-
+  
     const priceNumber = product.price
       ? parseInt(product.price.replace(/\s|so'm/g, ""), 10)
       : 0;
-
+  
     try {
       await axios.post(
         `${BASE_URL}/api/cart/add`,
@@ -103,13 +103,17 @@ const ProductDetail = () => {
           timeout: 8000,
         }
       );
-
-      alert("Mahsulot savatga qo'shildi!");
+  
+      // To'g'ri reload qilish
+      setTimeout(() => {
+        window.location.href = window.location.href; // yoki:
+        // window.location.reload(true); // force reload
+      }, 1500);
+  
     } catch (err) {
       alert("Savatga qo'shishda xato: " + (err.response?.data?.message || "Server bilan muammo"));
     }
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
