@@ -805,9 +805,7 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await onAddToCart(product);
-    setTimeout(() => {
-      window.location.href = window.location.href; 
-    }, 10);
+  
   };
 
   return (

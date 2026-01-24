@@ -168,10 +168,7 @@ const Savat = () => {
   };
   const handleUpdateQuantity = async (itemId, change) => {
     if (!checkAuth(navigate)) return;
-    setTimeout(() => {
-      window.location.href = window.location.href; // yoki:
-      // window.location.reload(true); // force reload
-    }, 100);
+ 
     // 1. Savatdan mahsulotni topamiz
     const item = apiCartItems.find(i => i.id === itemId);
     if (!item) return;
@@ -208,9 +205,7 @@ const Savat = () => {
   };
   const handleRemoveFromCart = async (itemId) => {
     if (!checkAuth(navigate)) return;
-    setTimeout(() => {
-      window.location.href = window.location.href; 
-    }, 10);
+   
     try {
       setRemoving(prev => ({ ...prev, [itemId]: true }));
       setApiCartItems(prev => prev.filter(i => i.id !== itemId));
@@ -236,9 +231,7 @@ const Savat = () => {
   const handleClearCart = async () => {
     if (!checkAuth(navigate)) return;
     if (apiCartItems.length === 0) return;
-    setTimeout(() => {
-      window.location.href = window.location.href; 
-    }, 100);
+   
     try {
       setClearing(true);
       const oldItems = [...apiCartItems];

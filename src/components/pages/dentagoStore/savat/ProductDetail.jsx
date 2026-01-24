@@ -104,11 +104,7 @@ const ProductDetail = () => {
         }
       );
   
-      // To'g'ri reload qilish
-      setTimeout(() => {
-        window.location.href = window.location.href; // yoki:
-        // window.location.reload(true); // force reload
-      }, 1500);
+   
   
     } catch (err) {
       alert("Savatga qo'shishda xato: " + (err.response?.data?.message || "Server bilan muammo"));
