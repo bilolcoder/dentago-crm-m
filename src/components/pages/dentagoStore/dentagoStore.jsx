@@ -438,7 +438,6 @@ function Boshsaxifa() {
       });
 
       console.log("Savatga qo'shildi:", response.data);
-      alert("Mahsulot savatga qo'shildi!");
     } catch (error) {
       console.error("Savat xatosi:", error);
       alert("Xato: " + (error.response?.data?.message || "Server bilan muammo"));
