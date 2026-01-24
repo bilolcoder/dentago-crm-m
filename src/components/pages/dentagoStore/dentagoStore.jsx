@@ -464,7 +464,7 @@ function Boshsaxifa() {
 
   return (
     <div className="min-h-screen bg-white relative">
-      <div className="max-w-7xl mx-auto">
+      <div className=" mx-auto">
         {/* HEADER */}
         <header className="sticky top-0 bg-white z-30 p-4">
           <div className="flex items-center gap-4">
