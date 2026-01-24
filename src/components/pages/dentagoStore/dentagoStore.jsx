@@ -25,7 +25,7 @@ const CategoryIcon = ({ className = "w-5 h-5", color = "#0891b2" }) => (
   >
     <path
       fill={color}
-      d="M296 32h192c13.255 0 24 10.745 24 24v160c0 13.255-10.745 24-24 24H296c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24zm-80 0H24C10.745 32 0 42.745 0 56v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24zM0 296v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V296c0 13.255 10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm296 184h192c13.255 0 24-10.745 24-24V296c0 13.255-10.745-24-24-24H296c-13.255 0-24 10.745-24 24v160c0 13.255 10.745 24 24 24z"
+      d="M296 32h192c13.255 0 24 10.745 24 24v160c0 13.255-10.745 24-24 24H296c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24zm-80 0H24C10.745 32 0 42.745 0 56v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V56c0-13.255 10.745-24-24-24zM0 296v160c0 13.255 10.745 24 24 24h192c13.255 0 24-10.745 24-24V296c0 13.255 10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm296 184h192c13.255 0 24-10.745 24-24V296c0 13.255-10.745-24-24-24H296c-13.255 0-24 10.745-24 24v160c0 13.255 10.745 24 24 24z"
     ></path>
   </svg>
 );
@@ -36,10 +36,9 @@ const categories = [
   { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
   { id: 'texniklar', label: 'Texniklar', Icon: RiToothLine, path: '/texniklar' },
   { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
-  // { id: 'kurslar', label: 'kurslar', Icon: Users, path: '/kurs' },
 ];
 
-// Dropdown uchun mahsulot kategoriyalari - SIZ BERGANLARGA O'ZGARTIRDIM
+// Dropdown uchun mahsulot kategoriyalari
 const productCategories = [
   {
     id: 'stomatologik-materiallar',
@@ -82,8 +81,6 @@ const productCategories = [
       { id: 'Sterilizatsiya uskunalari', label: 'Sterilizatsiya uskunalari', icon: CategoryIcon },
       { id: 'Moylash mashinalari', label: 'Moylash mashinalari', icon: CategoryIcon },
       { id: 'Jihoz', label: 'Jihoz', icon: CategoryIcon }
-
-
     ]
   },
   {
@@ -100,8 +97,6 @@ const productCategories = [
       { id: 'Sterilizatsiya uskunalari', label: 'Sterilizatsiya uskunalari', icon: CategoryIcon },
       { id: 'Moylash mashinalari', label: 'Moylash mashinalari', icon: CategoryIcon },
       { id: 'Jihoz', label: 'Jihoz', icon: CategoryIcon }
-
-
     ]
   },
   {
@@ -149,6 +144,7 @@ function Boshsaxifa() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
@@ -163,7 +159,11 @@ function Boshsaxifa() {
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [subcategoryProducts, setSubcategoryProducts] = useState([]);
   const [subcategoryLoading, setSubcategoryLoading] = useState(false);
-  const [currentView, setCurrentView] = useState('subcategories'); // 'subcategories' yoki 'products'
+  const [currentView, setCurrentView] = useState('subcategories');
+
+  // Filter state'lari
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState("");
+  const [searchFilter, setSearchFilter] = useState("");
 
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
@@ -176,129 +176,7 @@ function Boshsaxifa() {
     { title: "Professional stomatologiya\nasboblari", description: "Yuqori sifatli texnika va ishonchli xizmat." },
   ];
 
-  // Dropdown tashqariga bosilganda yopish
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Modal tashqariga bosilganda yopish
-  useEffect(() => {
-    const handleClickOutsideModal = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setIsModalOpen(false);
-      }
-      if (subcategoryModalRef.current && !subcategoryModalRef.current.contains(event.target)) {
-        setIsSubcategoryModalOpen(false);
-        setCurrentView('subcategories'); // Modal yopilganda view ni reset qilish
-      }
-    };
-
-    if (isModalOpen || isSubcategoryModalOpen) {
-      document.addEventListener('mousedown', handleClickOutsideModal);
-    }
-
-    return () => document.removeEventListener('mousedown', handleClickOutsideModal);
-  }, [isModalOpen, isSubcategoryModalOpen]);
-
-  // Inputni bosganda dropdownni ochish
-  const handleInputClick = () => {
-    setIsDropdownOpen(true);
-  };
-
-  // Inputga yozish - FAKAT QIDIRISH UCHUN
-  const handleInputChange = (e) => {
-    setSearchQuery(e.target.value);
-    setIsDropdownOpen(true);
-  };
-
-  // Kategoriyani tanlash - INPUTGA YOZILMASIN
-  const handleCategorySelect = (category) => {
-    // INPUTGA YOZILMAYDI, FAKAT SAQLANADI
-    setSelectedCategory(category);
-
-    // SUBCATEGORY MODALINI OCHISH
-    openSubcategoryModal(category);
-
-    setIsDropdownOpen(false);
-  };
-
-  // Subcategory modalini ochish
-  const openSubcategoryModal = async (category) => {
-    setSelectedSubcategory(category);
-    setIsSubcategoryModalOpen(true);
-    setCurrentView('subcategories'); // Avval subkategoriyalar ko'rinishi
-    setSubcategoryProducts([]); // Oldingi mahsulotlarni tozalash
-  };
-
-  // Subcategory tanlash (masalan: Endodontik asboblar)
-  const handleSubcategorySelect = async (subcategory) => {
-    console.log("Tanlangan subkategoriya:", subcategory);
-    setSelectedSubcategory(prev => ({ ...prev, selectedSub: subcategory }));
-    setCurrentView('products'); // Mahsulotlar ko'rinishiga o'tish
-
-    // Subkategoriya bo'yicha mahsulotlarni filterlash
-    await fetchProductsBySubcategory(subcategory);
-  };
-
-  // Orqaga qaytish (subkategoriyalar ko'rinishiga)
-  const handleBackToSubcategories = () => {
-    setCurrentView('subcategories');
-    setSubcategoryProducts([]);
-  };
-
-  // Subkategoriya bo'yicha mahsulotlarni filterlash
-  const fetchProductsBySubcategory = async (subcategory) => {
-    try {
-      setSubcategoryLoading(true);
-
-      // API dan kelgan mahsulotlarni subkategoriya nomi bo'yicha filterlash
-      const filtered = products.filter(product => {
-        const productCategory = product.category || product.categoryName || '';
-        const productName = product.name || '';
-        const subcategoryLabel = subcategory.label || '';
-
-        return (
-          productCategory.toLowerCase().includes(subcategoryLabel.toLowerCase()) ||
-          productName.toLowerCase().includes(subcategoryLabel.toLowerCase())
-        );
-      });
-
-      setSubcategoryProducts(filtered);
-
-      if (filtered.length === 0) {
-        // Agar hech qanday mahsulot topilmasa, xabar ko'rsatish
-        console.log(`"${subcategory.label}" bo'yicha mahsulot topilmadi`);
-        // Boshlang'ich ma'lumotni saqlab qolish
-      }
-    } catch (err) {
-      console.error("Subkategoriya mahsulotlarini yuklash xatosi:", err);
-      // Xatolikda bo'sh qilish
-      setSubcategoryProducts([]);
-    } finally {
-      setSubcategoryLoading(false);
-    }
-  };
-
-  // Kategoriyani tozalash
-  const clearCategory = () => {
-    setSelectedCategory(null);
-    setSearchQuery("");
-    setIsDropdownOpen(false);
-  };
-
-  // Filterlangan kategoriyalar
-  const filteredCategories = productCategories.filter(category =>
-    category.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+  // Mahsulotlarni yuklash
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -325,21 +203,26 @@ function Boshsaxifa() {
           name: product.name || "Nomsiz mahsulot",
           price: product.price ? `${Number(product.price).toLocaleString('uz-UZ')} so'm` : "Narx yo'q",
           img: product.imageUrl?.[0] ? `${BASE_URL}images/${product.imageUrl[0]}` : "",
-          category: product.category || "Umumiy"
+          category: product.category || "Umumiy",
+          categoryName: product.categoryName || product.category || "Umumiy"
         }));
 
         setProducts(formattedProducts);
+        setFilteredProducts(formattedProducts); // Boshlang'ich filteredProducts
         console.log("Yuklangan mahsulotlar:", formattedProducts);
       } catch (err) {
         console.error("Mahsulot yuklash xatosi:", err);
         setError("Mahsulotlarni yuklab bo'lmadi");
-        setProducts([{
+        const demoProducts = [{
           id: 'demo1',
           name: 'Dental Chair Pro',
           price: '15 000 000 so\'m',
           img: '',
-          category: 'Stomatologiya uskunalari'
-        }]);
+          category: 'Stomatologiya uskunalari',
+          categoryName: 'Stomatologiya uskunalari'
+        }];
+        setProducts(demoProducts);
+        setFilteredProducts(demoProducts);
       } finally {
         setLoading(false);
       }
@@ -347,6 +230,185 @@ function Boshsaxifa() {
 
     fetchProducts();
   }, []);
+
+  // Filter qilish funksiyasi
+  const applyFilters = () => {
+    let result = [...products];
+
+    // 1. Kategoriya bo'yicha filter
+    if (selectedFilterCategory) {
+      const selectedCat = productCategories.find(cat => cat.id === selectedFilterCategory);
+      if (selectedCat) {
+        result = result.filter(product => {
+          // Mahsulot kategoriyasini tekshirish
+          const productCat = product.categoryName?.toLowerCase() || product.category?.toLowerCase() || '';
+          const catLabel = selectedCat.label.toLowerCase();
+          
+          // Kategoriya label'i va subkategoriyalarni tekshirish
+          const matchesMainCategory = productCat.includes(catLabel);
+          const matchesSubcategory = selectedCat.subcategories?.some(subcat => 
+            productCat.includes(subcat.label.toLowerCase())
+          );
+          
+          return matchesMainCategory || matchesSubcategory;
+        });
+      }
+    }
+
+    // 2. Qidiruv bo'yicha filter
+    if (searchFilter.trim() !== "") {
+      const searchLower = searchFilter.toLowerCase().trim();
+      result = result.filter(product => {
+        const productName = product.name?.toLowerCase() || '';
+        const productCategory = product.categoryName?.toLowerCase() || product.category?.toLowerCase() || '';
+        const productDesc = product.description?.toLowerCase() || '';
+        
+        return (
+          productName.includes(searchLower) ||
+          productCategory.includes(searchLower) ||
+          productDesc.includes(searchLower)
+        );
+      });
+    }
+
+    setFilteredProducts(result);
+  };
+
+  // Filter o'zgarganida applyFilters ni chaqirish
+  useEffect(() => {
+    applyFilters();
+  }, [selectedFilterCategory, searchFilter, products]);
+
+  // Filterlarni tozalash
+  const clearFilters = () => {
+    setSelectedFilterCategory("");
+    setSearchFilter("");
+  };
+
+  // Dropdown tashqariga bosilganda yopish
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Modal tashqariga bosilganda yopish
+  useEffect(() => {
+    const handleClickOutsideModal = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setIsModalOpen(false);
+      }
+      if (subcategoryModalRef.current && !subcategoryModalRef.current.contains(event.target)) {
+        setIsSubcategoryModalOpen(false);
+        setCurrentView('subcategories');
+      }
+    };
+
+    if (isModalOpen || isSubcategoryModalOpen) {
+      document.addEventListener('mousedown', handleClickOutsideModal);
+    }
+
+    return () => document.removeEventListener('mousedown', handleClickOutsideModal);
+  }, [isModalOpen, isSubcategoryModalOpen]);
+
+  // Inputni bosganda dropdownni ochish
+  const handleInputClick = () => {
+    setIsDropdownOpen(true);
+  };
+
+  // Inputga yozish - FAKAT QIDIRISH UCHUN
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+    setIsDropdownOpen(true);
+  };
+
+  // Kategoriyani tanlash
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    openSubcategoryModal(category);
+    setIsDropdownOpen(false);
+  };
+
+  // Subcategory modalini ochish
+  const openSubcategoryModal = async (category) => {
+    setSelectedSubcategory(category);
+    setIsSubcategoryModalOpen(true);
+    setCurrentView('subcategories');
+    setSubcategoryProducts([]);
+  };
+
+  // Subcategory tanlash
+  const handleSubcategorySelect = async (subcategory) => {
+    console.log("Tanlangan subkategoriya:", subcategory);
+    setSelectedSubcategory(prev => ({ ...prev, selectedSub: subcategory }));
+    setCurrentView('products');
+
+    // Subkategoriya bo'yicha mahsulotlarni filterlash
+    await fetchProductsBySubcategory(subcategory);
+  };
+
+  // Orqaga qaytish (subkategoriyalar ko'rinishiga)
+  const handleBackToSubcategories = () => {
+    setCurrentView('subcategories');
+    setSubcategoryProducts([]);
+  };
+
+  // Subkategoriya bo'yicha mahsulotlarni filterlash
+  const fetchProductsBySubcategory = async (subcategory) => {
+    try {
+      setSubcategoryLoading(true);
+
+      // Subkategoriya label'ini tekshirish
+      const subcategoryLabel = subcategory.label.toLowerCase();
+      
+      // Mahsulotlarni filterlash
+      const filtered = products.filter(product => {
+        const productCategory = (product.categoryName || product.category || '').toLowerCase();
+        const productName = (product.name || '').toLowerCase();
+        const productDescription = (product.description || '').toLowerCase();
+
+        // Keng qidiruv: kategoriya, nom yoki tavsifda borligini tekshirish
+        return (
+          productCategory.includes(subcategoryLabel) ||
+          productName.includes(subcategoryLabel) ||
+          productDescription.includes(subcategoryLabel) ||
+          // Asosiy kategoriyalar uchun tekshirish
+          (subcategoryLabel.includes('material') && productCategory.includes('material')) ||
+          (subcategoryLabel.includes('uskuna') && productCategory.includes('uskuna')) ||
+          (subcategoryLabel.includes('asbob') && productCategory.includes('asbob'))
+        );
+      });
+
+      setSubcategoryProducts(filtered);
+
+      if (filtered.length === 0) {
+        console.log(`"${subcategory.label}" bo'yicha mahsulot topilmadi`);
+      }
+    } catch (err) {
+      console.error("Subkategoriya mahsulotlarini yuklash xatosi:", err);
+      setSubcategoryProducts([]);
+    } finally {
+      setSubcategoryLoading(false);
+    }
+  };
+
+  // Kategoriyani tozalash
+  const clearCategory = () => {
+    setSelectedCategory(null);
+    setSearchQuery("");
+    setIsDropdownOpen(false);
+  };
+
+  // Filterlangan kategoriyalar
+  const filteredCategories = productCategories.filter(category =>
+    category.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    category.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleAddToCartAPI = async (product) => {
     try {
@@ -366,7 +428,8 @@ function Boshsaxifa() {
         quantity: 1,
         price: priceNumber
       };
-        const response = await axios.post(`${BASE_URL}api/cart/add`, cartData, {
+      
+      const response = await axios.post(`${BASE_URL}api/cart/add`, cartData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -375,6 +438,7 @@ function Boshsaxifa() {
       });
 
       console.log("Savatga qo'shildi:", response.data);
+      alert("Mahsulot savatga qo'shildi!");
     } catch (error) {
       console.error("Savat xatosi:", error);
       alert("Xato: " + (error.response?.data?.message || "Server bilan muammo"));
@@ -390,6 +454,8 @@ function Boshsaxifa() {
   // Modal ochish funksiyasi
   const openModal = () => {
     setIsModalOpen(true);
+    // Modal ochilganda filtrlarni tozalash
+    clearFilters();
     setTimeout(() => {
       if (modalRef.current) {
         modalRef.current.scrollTop = 0;
@@ -445,8 +511,6 @@ function Boshsaxifa() {
                       </span>
                     </div>
 
-
-
                     {/* Kategoriyalar ro'yxati */}
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                       {filteredCategories.length > 0 ? (
@@ -491,11 +555,6 @@ function Boshsaxifa() {
                           <p className="text-gray-500">Hech qanday kategoriya topilmadi</p>
                         </div>
                       )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-
                     </div>
                   </div>
                 </div>
@@ -551,7 +610,7 @@ function Boshsaxifa() {
         <div className="flex items-center justify-between px-4 md:px-8 mb-6">
           <h1 className="font-bold text-[22px] md:text-[25px]">Ommabop mahsulotlar</h1>
           <div onClick={openModal} className="px-6 py-2 font-medium text-[16px] bg-[#BDF3FF] rounded-[10px] cursor-pointer text-black hover:bg-[#a2e9f7] transition-colors">
-            Barchasi
+            Barchasi ({filteredProducts.length})
           </div>
         </div>
 
@@ -574,9 +633,9 @@ function Boshsaxifa() {
         )}
 
         {/* Products */}
-        {!loading && !error && products.length > 0 && (
+        {!loading && !error && filteredProducts.length > 0 && (
           <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-8 mt-6 pb-10">
-            {products.slice(0, 4).map((product) => (
+            {filteredProducts.slice(0, 4).map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -588,7 +647,7 @@ function Boshsaxifa() {
           </div>
         )}
 
-        {/* SUBCATEGORY MODAL - Kategoriya ichidagi kataloglar */}
+        {/* SUBCATEGORY MODAL */}
         {isSubcategoryModalOpen && selectedSubcategory && (
           <div className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-start justify-center p-0 md:p-4 overflow-y-auto">
             <div
@@ -634,7 +693,6 @@ function Boshsaxifa() {
               </div>
 
               <div className="p-4 md:p-6">
-
                 {currentView === 'subcategories' ? (
                   /* SUBKATEGORIYALAR */
                   <div>
@@ -657,7 +715,6 @@ function Boshsaxifa() {
                                   {subcat.label}
                                 </h4>
                                 <p className="text-xs text-gray-500 mt-1">
-                                  {/* Subkategoriya tavsiflari */}
                                   {subcat.id === 'endodontik-asboblar' && 'Endodontik davolash uchun asboblar'}
                                   {subcat.id === 'gigiyena-uskunalari' && `Og'iz bo'shlig'i gigiyenasi uchun uskunalar`}
                                   {subcat.id === 'gips-va-modellashtirish' && 'Gips va modellashtirish materiallari'}
@@ -738,10 +795,13 @@ function Boshsaxifa() {
                   <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-xl">
                     <ArrowLeft size={28} />
                   </button>
-                  <h2 className="text-2xl font-bold text-gray-800">Barcha Mahsulotlar ({products.length})</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">Barcha Mahsulotlar ({filteredProducts.length})</h2>
                 </div>
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    clearFilters();
+                  }}
                   className="p-2 hover:bg-gray-100 rounded-xl"
                 >
                   <X size={24} />
@@ -753,43 +813,107 @@ function Boshsaxifa() {
                   <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Kategoriya bo'yicha</label>
-                      <select className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500">
+                      <select 
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500"
+                        value={selectedFilterCategory}
+                        onChange={(e) => setSelectedFilterCategory(e.target.value)}
+                      >
                         <option value="">Barcha kategoriyalar</option>
                         {productCategories.map(cat => (
                           <option key={cat.id} value={cat.id}>{cat.label}</option>
                         ))}
                       </select>
                     </div>
+                   
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Saralash</label>
-                      <select className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500">
-                        <option value="popular">Ommabop</option>
-                        <option value="new">Yangi</option>
-                        <option value="price-low">Arzon narx</option>
-                        <option value="price-high">Qimmat narx</option>
-                      </select>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Qidirish</label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <input
+                          type="text"
+                          placeholder="Mahsulot nomi bo'yicha qidirish..."
+                          className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500"
+                          value={searchFilter}
+                          onChange={(e) => setSearchFilter(e.target.value)}
+                        />
+                        {searchFilter && (
+                          <button
+                            onClick={() => setSearchFilter("")}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          >
+                            <X size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-end">
+                      <button
+                        onClick={clearFilters}
+                        className="px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+                      >
+                        Filtrlarni tozalash
+                      </button>
                     </div>
                   </div>
+                  
+                  {/* Natija ko'rsatkichlari */}
+                  {selectedFilterCategory && (
+                    <div className="mt-4 flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Tanlangan kategoriya:</span>
+                      <span className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm font-medium">
+                        {productCategories.find(c => c.id === selectedFilterCategory)?.label || selectedFilterCategory}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Mahsulotlar */}
-                {products.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    {products.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        navigate={navigate}
-                        onAddToCart={handleAddToCartAPI}
-                        isLoading={cartLoading[product.id] || false}
-                      />
-                    ))}
-                  </div>
+                {filteredProducts.length > 0 ? (
+                  <>
+                    {/* Natija soni */}
+                    <div className="mb-4 text-gray-600">
+                      {selectedFilterCategory || searchFilter ? (
+                        <p>
+                          <span className="font-semibold">{filteredProducts.length}</span> ta mahsulot topildi
+                          {selectedFilterCategory && ` (${productCategories.find(c => c.id === selectedFilterCategory)?.label})`}
+                          {searchFilter && ` ("${searchFilter}" bo'yicha)`}
+                        </p>
+                      ) : (
+                        <p>Jami <span className="font-semibold">{filteredProducts.length}</span> ta mahsulot</p>
+                      )}
+                    </div>
+
+                    {/* Mahsulotlar grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                      {filteredProducts.map((product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          navigate={navigate}
+                          onAddToCart={handleAddToCartAPI}
+                          isLoading={cartLoading[product.id] || false}
+                        />
+                      ))}
+                    </div>
+                  </>
                 ) : (
                   <div className="text-center py-16">
-                    <div className="text-gray-400 text-6xl mb-4">📦</div>
+                    <div className="text-gray-400 text-6xl mb-4">🔍</div>
                     <h3 className="text-xl font-semibold text-gray-700 mb-2">Mahsulotlar topilmadi</h3>
-                    <p className="text-gray-500">Hozircha bu kategoriyada mahsulotlar mavjud emas</p>
+                    <p className="text-gray-500 mb-6">
+                      {selectedFilterCategory || searchFilter 
+                        ? "Tanlangan filterlar bo'yicha hech qanday mahsulot topilmadi"
+                        : "Hozircha mahsulotlar mavjud emas"}
+                    </p>
+                    {(selectedFilterCategory || searchFilter) && (
+                      <button
+                        onClick={clearFilters}
+                        className="px-6 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors"
+                      >
+                        Filtrlarni tozalash
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -805,7 +929,6 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await onAddToCart(product);
-  
   };
 
   return (
@@ -827,10 +950,10 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
       <h3 className="text-gray-800 font-semibold text-[14px] md:text-[17px] mb-2 leading-tight min-h-[40px] line-clamp-2">
         {product.name}
       </h3>
-      {product.category && (
+      {product.categoryName && (
         <div className="mb-2">
           <span className="inline-block px-2 py-1 text-xs bg-cyan-100 text-cyan-700 rounded-full">
-            {product.category}
+            {product.categoryName}
           </span>
         </div>
       )}
