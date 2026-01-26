@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
+import { TiTick } from "react-icons/ti";
 
 function Bemorlarim() {
   const [appointments, setAppointments] = useState([]);
@@ -415,6 +416,14 @@ function Bemorlarim() {
                     </svg>
                     To'liq ko'rish
                   </button>
+
+                  <button
+                      // onClick={() => handleCancel(appointment._id)}
+                      className="bg-green-50 hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                      title="Qabul qilish"
+                    >
+<TiTick />
+                    </button>
 
                   {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                     <button
