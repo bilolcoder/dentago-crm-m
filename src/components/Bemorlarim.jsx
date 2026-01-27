@@ -259,12 +259,69 @@ function Bemorlarim() {
   const getStatusText = (status) => {
     switch (status?.toLowerCase()) {
       case 'pending': return 'Kutilmoqda';
-      case 'confirmed': return 'Tasdiqlangan';
+      case 'confirmed': return 'Qabul qilingan';
       case 'completed': return 'Bajarildi';
       case 'cancelled': return 'Bekor qilingan';
       default: return status || 'Noma\'lum';
     }
   };
+
+
+  // Tasdiqlash (qabul qilish) funksiyasi
+const handleConfirm = async (id) => {
+  if (!window.confirm("Bu bemorni qabul qilasizmi?")) {
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert("Token topilmadi. Iltimos qayta kirish qiling.");
+      return;
+    }
+
+    const response = await axios.put(
+      `https://app.dentago.uz/api/admin/appointments/${id}/status`,
+      { status: "confirmed" },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 5000,
+      }
+    );
+
+    if (response.data?.success || response.status === 200) {
+      // Ro'yxatni yangilash
+      setAppointments(prev =>
+        prev.map(app =>
+          app._id === id ? { ...app, status: 'confirmed' } : app
+        )
+      );
+
+      // Agar modalda bo'lsa, uni ham yangilash
+      if (selectedAppointment && selectedAppointment._id === id) {
+        setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
+      }
+
+      // alert("Bemor qabul qilindi!");
+    } else {
+      alert("Statusni o‘zgartirib bo‘lmadi");
+    }
+  } catch (err) {
+    console.error("Tasdiqlash xatosi:", err);
+    let msg = "Xato yuz berdi";
+    if (err.response) {
+      msg = err.response.data?.message || `Server xatosi: ${err.response.status}`;
+    } else if (err.request) {
+      msg = "Server bilan aloqa yo‘q";
+    } else {
+      msg = err.message;
+    }
+    alert(msg);
+  }
+};
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -370,21 +427,21 @@ function Bemorlarim() {
         </div>
       ) : viewMode === 'card' ? (
         // CARD VIEW
-        <div className="grid grid-cols-3 md:grid-cols-1 sm:grid-cols-2 max-sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-1 max-[725px]:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {appointments.map((appointment) => (
             <div
               key={appointment._id}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 group"
             >
               <div className="p-6">
-                <div className="flex justify-between items-start mb-5">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-[#00BCE4] transition-colors">
+                <div className="flex justify-center items-start mb-5 h-[100px]">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-[#00BCE4] transition-colors">
                       {appointment.patient?.fullName || 'Noma\'lum bemor'}
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">{appointment.patient?.phone || '—'}</p>
                   </div>
-                  <span className={`px-3 py-1.5 rounded-full text-xs font-semibold text-white ${getStatusStyle(appointment.status)}`}>
+                  <span className={`px-2 py-1.5 rounded-[10px] text-xs font-semibold text-white ${getStatusStyle(appointment.status)}`}>
                     {getStatusText(appointment.status)}
                   </span>
                 </div>
@@ -407,23 +464,25 @@ function Bemorlarim() {
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleViewDetails(appointment)}
-                    className="flex-1 bg-[#00BCE4] hover:bg-[#00a8cc] text-white py-3 px-4 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    To'liq ko'rish
-                  </button>
+                          onClick={() => handleViewDetails(appointment)}
+                          className="text-[#00BCE4] flex items-center justify-center hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-3 w-12 h-12 rounded-lg transition-all duration-300"
+                          title="To'liq ko'rish"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </button>
 
-                  <button
-                      // onClick={() => handleCancel(appointment._id)}
+                  {appointment.status === 'pending' && (   // faqat pending bo'lsa ko'rsatish yaxshi
+                    <button
+                      onClick={() => handleConfirm(appointment._id)}
                       className="bg-green-50 hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
                       title="Qabul qilish"
                     >
-<TiTick />
+                      <TiTick size={28} />
                     </button>
+                  )}
 
                   {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                     <button
@@ -556,6 +615,16 @@ function Bemorlarim() {
                             </svg>
                           </button>
                         )}
+
+                        {appointment.status === 'pending' && (
+  <button
+    onClick={() => handleConfirm(appointment._id)}
+    className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-all duration-300"
+    title="Tasdiqlash"
+  >
+    <TiTick size={20} />
+  </button>
+)}
 
                         <button
                           onClick={() => handleDelete(appointment._id)}
