@@ -23,6 +23,11 @@ function Bemorlarim() {
   const [cancelId, setCancelId] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false); // ✅ Yangi loading state
 
+  // Tasdiqlash modali uchun state'lar
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [confirmId, setConfirmId] = useState(null);
+  const [isConfirming, setIsConfirming] = useState(false);
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -276,20 +281,23 @@ function Bemorlarim() {
 
 
   // Yakunlash (qabul qilish) funksiyasi
-  const handleConfirm = async (id) => {
-    if (!window.confirm("Bu bemorni yakunladingizmi?")) {
-      return;
-    }
-
+  const handleConfirm = (id) => {
+    setConfirmId(id);
+    setIsConfirmModalOpen(true);
+  };
+  
+  // Tasdiqlash so'rovini yuborish
+  const confirmAppointment = async () => {
     try {
+      setIsConfirming(true);
       const token = localStorage.getItem('accessToken');
       if (!token) {
         alert("Token topilmadi. Iltimos qayta kirish qiling.");
         return;
       }
-
+  
       const response = await axios.put(
-        `https://app.dentago.uz/api/admin/appointments/${id}/status`,
+        `https://app.dentago.uz/api/admin/appointments/${confirmId}/status`,
         { status: "confirmed" },
         {
           headers: {
@@ -299,23 +307,24 @@ function Bemorlarim() {
           timeout: 5000,
         }
       );
-
+  
       if (response.data?.success || response.status === 200) {
         // Ro'yxatni yangilash
         setAppointments(prev =>
           prev.map(app =>
-            app._id === id ? { ...app, status: 'confirmed' } : app
+            app._id === confirmId ? { ...app, status: 'confirmed' } : app
           )
         );
-
+  
         // Agar modalda bo'lsa, uni ham yangilash
-        if (selectedAppointment && selectedAppointment._id === id) {
+        if (selectedAppointment && selectedAppointment._id === confirmId) {
           setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
         }
-
-        // alert("Bemor qabul qilindi!");
+  
+        setIsConfirmModalOpen(false);
+        setConfirmId(null);
       } else {
-        alert("Statusni o‘zgartirib bo‘lmadi");
+        alert("Statusni o'zgartirib bo'lmadi");
       }
     } catch (err) {
       console.error("Tasdiqlash xatosi:", err);
@@ -323,12 +332,20 @@ function Bemorlarim() {
       if (err.response) {
         msg = err.response.data?.message || `Server xatosi: ${err.response.status}`;
       } else if (err.request) {
-        msg = "Server bilan aloqa yo‘q";
+        msg = "Server bilan aloqa yo'q";
       } else {
         msg = err.message;
       }
       alert(msg);
+    } finally {
+      setIsConfirming(false);
     }
+  };
+  
+  const closeConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+    setConfirmId(null);
+    setIsConfirming(false);
   };
 
   if (loading) return (
@@ -830,6 +847,53 @@ function Bemorlarim() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TASDIQLASH MODALI ================= */}
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fadeIn">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-gray-800">Bu bemorni qabul qilasizmi?</h2>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={closeConfirmModal}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isConfirming}
+                >
+                  Yo'q
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmAppointment}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-green-600"
+                  disabled={isConfirming}
+                >
+                  {isConfirming ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Yuborilmoqda...
+                    </>
+                  ) : (
+                    'Ha'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
