@@ -199,6 +199,9 @@ const ProtectedLayout = () => {
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
 
+              {/* settings general */}
+              {/* <Route path="/settings/general" element={<GeneralSettingsContent />} /> */}
+
               {/* 404 */}
               <Route path="*" element={<div className="text-center text-3xl mt-20 text-gray-500">404 — Sahifa topilmadi</div>} />
             </Routes>

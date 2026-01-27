@@ -15,6 +15,8 @@ function Bemorlarim() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState('');
+  // Mavjud state'lar orasiga qo‘shing
+  const [statusFilter, setStatusFilter] = useState(['all', 'pending', 'confirmed', 'cancelled']); // 'all' | 'pending' | 'confirmed' | 'cancelled'
 
   // Bekor qilish modali uchun state'lar
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -26,6 +28,12 @@ function Bemorlarim() {
   useEffect(() => {
     fetchAppointments();
   }, []);
+
+  // filter 
+  const filteredAppointments = appointments.filter(app => {
+    if (statusFilter === 'all') return true;
+    return app.status?.toLowerCase() === statusFilter;
+  });
 
   const fetchAppointments = async () => {
     try {
@@ -259,7 +267,7 @@ function Bemorlarim() {
   const getStatusText = (status) => {
     switch (status?.toLowerCase()) {
       case 'pending': return 'Kutilmoqda';
-      case 'confirmed': return 'Qabul qilingan';
+      case 'confirmed': return 'Yakunlangan';
       case 'completed': return 'Bajarildi';
       case 'cancelled': return 'Bekor qilingan';
       default: return status || 'Noma\'lum';
@@ -267,61 +275,61 @@ function Bemorlarim() {
   };
 
 
-  // Tasdiqlash (qabul qilish) funksiyasi
-const handleConfirm = async (id) => {
-  if (!window.confirm("Bu bemorni qabul qilasizmi?")) {
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert("Token topilmadi. Iltimos qayta kirish qiling.");
+  // Yakunlash (qabul qilish) funksiyasi
+  const handleConfirm = async (id) => {
+    if (!window.confirm("Bu bemorni yakunladingizmi?")) {
       return;
     }
 
-    const response = await axios.put(
-      `https://app.dentago.uz/api/admin/appointments/${id}/status`,
-      { status: "confirmed" },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        timeout: 5000,
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        alert("Token topilmadi. Iltimos qayta kirish qiling.");
+        return;
       }
-    );
 
-    if (response.data?.success || response.status === 200) {
-      // Ro'yxatni yangilash
-      setAppointments(prev =>
-        prev.map(app =>
-          app._id === id ? { ...app, status: 'confirmed' } : app
-        )
+      const response = await axios.put(
+        `https://app.dentago.uz/api/admin/appointments/${id}/status`,
+        { status: "confirmed" },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 5000,
+        }
       );
 
-      // Agar modalda bo'lsa, uni ham yangilash
-      if (selectedAppointment && selectedAppointment._id === id) {
-        setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
-      }
+      if (response.data?.success || response.status === 200) {
+        // Ro'yxatni yangilash
+        setAppointments(prev =>
+          prev.map(app =>
+            app._id === id ? { ...app, status: 'confirmed' } : app
+          )
+        );
 
-      // alert("Bemor qabul qilindi!");
-    } else {
-      alert("Statusni o‘zgartirib bo‘lmadi");
+        // Agar modalda bo'lsa, uni ham yangilash
+        if (selectedAppointment && selectedAppointment._id === id) {
+          setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
+        }
+
+        // alert("Bemor qabul qilindi!");
+      } else {
+        alert("Statusni o‘zgartirib bo‘lmadi");
+      }
+    } catch (err) {
+      console.error("Tasdiqlash xatosi:", err);
+      let msg = "Xato yuz berdi";
+      if (err.response) {
+        msg = err.response.data?.message || `Server xatosi: ${err.response.status}`;
+      } else if (err.request) {
+        msg = "Server bilan aloqa yo‘q";
+      } else {
+        msg = err.message;
+      }
+      alert(msg);
     }
-  } catch (err) {
-    console.error("Tasdiqlash xatosi:", err);
-    let msg = "Xato yuz berdi";
-    if (err.response) {
-      msg = err.response.data?.message || `Server xatosi: ${err.response.status}`;
-    } else if (err.request) {
-      msg = "Server bilan aloqa yo‘q";
-    } else {
-      msg = err.message;
-    }
-    alert(msg);
-  }
-};
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -364,7 +372,7 @@ const handleConfirm = async (id) => {
             </h1>
             <p className="text-gray-500 mt-1 flex items-center gap-2">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-              Jami: <span className="font-semibold text-gray-800">{appointments.length} ta</span>
+              Jami: <span className="font-semibold text-gray-800">{filteredAppointments.length} ta</span>
             </p>
           </div>
 
@@ -374,11 +382,10 @@ const handleConfirm = async (id) => {
             <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
               <button
                 onClick={() => setViewMode('card')}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${
-                  viewMode === 'card'
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'card'
                     ? 'bg-white text-[#00BCE4] shadow-sm'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -388,11 +395,10 @@ const handleConfirm = async (id) => {
 
               <button
                 onClick={() => setViewMode('table')}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${
-                  viewMode === 'table'
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'table'
                     ? 'bg-white text-[#00BCE4] shadow-sm'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -413,6 +419,50 @@ const handleConfirm = async (id) => {
             </button>
           </div>
         </div>
+
+          {/* Status filter tugmalari */}
+      <div className="flex mt-8 bg-gray-100 p-1 rounded-xl border border-gray-200 lg:w-[473px] md:w-[473px] sm:w-[398px] max-sm:w-[315px]">
+        <button
+          onClick={() => setStatusFilter('all')}
+          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
+              ? 'bg-white text-[#00BCE4] shadow-sm font-medium'
+              : 'text-gray-600 hover:text-gray-800'
+            }`}
+        >
+          <span>Barchasi</span>
+        </button>
+
+        <button
+          onClick={() => setStatusFilter('pending')}
+          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
+              ? 'bg-white text-yellow-600 shadow-sm font-medium'
+              : 'text-gray-600 hover:text-gray-800'
+            }`}
+        >
+          <span>Kutilmoqda</span>
+        </button>
+
+        <button
+          onClick={() => setStatusFilter('confirmed')}
+          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
+              ? 'bg-white text-blue-600 shadow-sm font-medium'
+              : 'text-gray-600 hover:text-gray-800'
+            }`}
+        >
+          <span>Yakunlangan</span>
+        </button>
+
+        <button
+          onClick={() => setStatusFilter('cancelled')}
+          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
+              ? 'bg-white text-red-600 shadow-sm font-medium'
+              : 'text-gray-600 hover:text-gray-800'
+            }`}
+        >
+          <span>Bekor qilingan</span>
+        </button>
+      </div>
+
       </div>
 
       {appointments.length === 0 ? (
@@ -428,7 +478,7 @@ const handleConfirm = async (id) => {
       ) : viewMode === 'card' ? (
         // CARD VIEW
         <div className="grid grid-cols-2 md:grid-cols-1 max-[725px]:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {appointments.map((appointment) => (
+          {filteredAppointments.map((appointment) => (
             <div
               key={appointment._id}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 group"
@@ -464,21 +514,21 @@ const handleConfirm = async (id) => {
 
                 <div className="flex gap-3">
                   <button
-                          onClick={() => handleViewDetails(appointment)}
-                          className="text-[#00BCE4] flex items-center justify-center hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-3 w-12 h-12 rounded-lg transition-all duration-300"
-                          title="To'liq ko'rish"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                        </button>
+                    onClick={() => handleViewDetails(appointment)}
+                    className="text-[#00BCE4] flex items-center justify-center hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-3 w-12 h-12 rounded-lg transition-all duration-300"
+                    title="To'liq ko'rish"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
 
                   {appointment.status === 'pending' && (   // faqat pending bo'lsa ko'rsatish yaxshi
                     <button
                       onClick={() => handleConfirm(appointment._id)}
                       className="bg-green-50 hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
-                      title="Qabul qilish"
+                      title="Yakunlash"
                     >
                       <TiTick size={28} />
                     </button>
@@ -507,26 +557,6 @@ const handleConfirm = async (id) => {
                     </button>
                   )}
 
-                  <button
-                    onClick={() => handleDelete(appointment._id)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
-                    title="O'chirish"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
@@ -617,24 +647,14 @@ const handleConfirm = async (id) => {
                         )}
 
                         {appointment.status === 'pending' && (
-  <button
-    onClick={() => handleConfirm(appointment._id)}
-    className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-all duration-300"
-    title="Tasdiqlash"
-  >
-    <TiTick size={20} />
-  </button>
-)}
-
-                        <button
-                          onClick={() => handleDelete(appointment._id)}
-                          className="text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-all duration-300"
-                          title="O'chirish"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                          <button
+                            onClick={() => handleConfirm(appointment._id)}
+                            className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-all duration-300"
+                            title="Tasdiqlash"
+                          >
+                            <TiTick size={20} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -744,15 +764,6 @@ const handleConfirm = async (id) => {
                         Bekor qilish
                       </button>
                     )}
-                    <button
-                      onClick={() => handleDelete(selectedAppointment._id)}
-                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow hover:shadow-lg flex items-center justify-center gap-2"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      O'chirish
-                    </button>
                   </div>
                 </div>
               ) : null}
