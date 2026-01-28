@@ -47,7 +47,7 @@ const UnitsContent = () => {
     );
 
     return (
-        <div className="p-4 md:p-8 bg-white min-h-screen">
+        <div className="bg-white">
             {/* Header Section */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
@@ -84,11 +84,11 @@ const UnitsContent = () => {
                         placeholder="Birlik nomini yozing (masalan: kg, dona, litr)..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-[24px] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] focus:bg-white transition-all shadow-sm"
+                        className="w-full pl-14 pr-6 py-4.5 bg-white border border-gray-200 rounded-[24px] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] transition-all"
                     />
                 </div>
-                <div className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-xl shadow-slate-100/50">
-                    <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl">
+                <div className="bg-white p-5 rounded-[24px] border border-gray-100 flex items-center justify-between">
+                    <div className="p-3 bg-gray-50 text-[#00BCE4] rounded-2xl">
                         <Layers size={22} strokeWidth={2.5} />
                     </div>
                     <div className="text-right">
@@ -99,21 +99,21 @@ const UnitsContent = () => {
             </div>
 
             {/* Table Section */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-gray-50">
                                 <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID</th>
                                 <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Birlik Nomi</th>
                                 <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
                                 <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-gray-50">
                             {filteredUnits.length > 0 ? (
                                 filteredUnits.map((unit, index) => (
-                                    <tr key={unit.id} className="hover:bg-[#00BCE4]/[0.02] transition-all group">
+                                    <tr key={unit.id} className="hover:bg-gray-50/50 transition-all group">
                                         <td className="px-10 py-6">
                                             <span className="text-xs font-black text-slate-300 font-mono group-hover:text-[#00BCE4] transition-colors">
                                                 {String(index + 1).padStart(2, '0')}
@@ -142,11 +142,11 @@ const UnitsContent = () => {
                                             <div className="flex justify-end gap-2">
                                                 <button
                                                     onClick={() => handleOpenModal(unit)}
-                                                    className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all active:scale-90 border border-transparent hover:border-blue-100"
+                                                    className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-gray-50 rounded-xl transition-all active:scale-90"
                                                 >
                                                     <Edit size={16} strokeWidth={2.5} />
                                                 </button>
-                                                <button className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-90 border border-transparent hover:border-rose-100">
+                                                <button className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-90">
                                                     <Trash2 size={16} strokeWidth={2.5} />
                                                 </button>
                                             </div>
@@ -155,8 +155,8 @@ const UnitsContent = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="py-32 text-center bg-slate-50/30">
-                                        <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-slate-200 border border-slate-100">
+                                    <td colSpan="4" className="py-32 text-center bg-white">
+                                        <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-gray-100">
                                             <Hash className="w-10 h-10 text-slate-200" />
                                         </div>
                                         <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Birliklar topilmadi</h3>
@@ -176,7 +176,7 @@ const UnitsContent = () => {
                 title={currentUnit ? "Birlikni tahrirlash" : "Yangi birlik qo'shish"}
                 footer={
                     <div className="flex gap-4 p-2 w-full">
-                        <button onClick={() => setIsModalOpen(false)} className="flex-1 py-4.5 bg-slate-100 text-slate-500 font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all">
+                        <button onClick={() => setIsModalOpen(false)} className="flex-1 py-4.5 bg-gray-50 text-slate-500 font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all">
                             Bekor qilish
                         </button>
                         <button onClick={handleSave} className="flex-1 py-4.5 bg-[#00BCE4] text-white font-black rounded-2xl shadow-xl shadow-[#00BCE4]/30 text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all hover:brightness-110">
@@ -194,13 +194,13 @@ const UnitsContent = () => {
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                className="w-full pl-12 pr-5 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
+                                className="w-full pl-12 pr-5 py-4.5 bg-gray-50 border border-gray-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
                                 placeholder="Masalan: Kilogramm, Dona..."
                             />
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
                         <div>
                             <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight">Holati</p>
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Tizimda foydalanish imkoniyati</p>

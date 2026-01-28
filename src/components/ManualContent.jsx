@@ -6,21 +6,21 @@ import { useData } from '../context/DataProvider';
 // Video kartochka uchun yangilangan premium komponent
 const VideoCard = ({ title, thumbnailUrl }) => {
     return (
-        <div className="group relative bg-white rounded-[2rem] border border-blue-100 shadow-sm overflow-hidden hover:shadow-xl hover:shadow-[#00BCE4] hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+        <div className="group relative bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-500 cursor-pointer">
             {/* Thumbnail qismi */}
-            <div className="relative h-44 bg-slate-100 overflow-hidden">
+            <div className="relative h-44 bg-white border-b border-gray-50 overflow-hidden">
                 {thumbnailUrl ? (
                     <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-slate-300">
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-gray-300">
                         <Video size={32} strokeWidth={1} />
                         <span className="text-[10px] font-black uppercase tracking-widest">Video preview</span>
                     </div>
                 )}
 
                 {/* Glassmorphism Play Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-[#00BCE4] opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-[2px]">
-                    <div className="bg-white/90 p-4 rounded-full shadow-2xl transform scale-75 group-hover:scale-100 transition-transform duration-500">
+                <div className="absolute inset-0 flex items-center justify-center bg-[#00BCE4]/80 opacity-0 group-hover:opacity-100 transition-all duration-500 backdrop-blur-[2px]">
+                    <div className="bg-white p-4 rounded-full shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-500">
                         <Play className="w-6 h-6 text-[#00BCE4] fill-current" />
                     </div>
                 </div>
@@ -37,17 +37,17 @@ const VideoCard = ({ title, thumbnailUrl }) => {
                     <p className="text-xs font-black text-slate-800 uppercase tracking-tighter leading-tight line-clamp-2 group-hover:text-[#00BCE4] transition-colors">
                         {title}
                     </p>
-                    <button className="text-slate-300 hover:text-[#00BCE4] transition-colors">
+                    <button className="text-gray-300 hover:text-[#00BCE4] transition-colors">
                         <Bookmark size={14} />
                     </button>
                 </div>
 
-                <div className="flex items-center gap-3 pt-2 border-t border-slate-50">
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+                <div className="flex items-center gap-3 pt-2 border-t border-gray-50">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-gray-400">
                         <Clock size={12} />
                         <span>Yangi</span>
                     </div>
-                    <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                    <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
                     <span className="text-[10px] font-black text-[#00BCE4] uppercase tracking-widest">Darslik</span>
                 </div>
             </div>
@@ -60,7 +60,7 @@ const ManualContent = () => {
     const manualSections = data.manualSections || [];
 
     return (
-        <div className="p-4 md:p-8 space-y-12 bg-slate-50 min-h-screen">
+        <div className="space-y-12 bg-white">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -72,8 +72,8 @@ const ManualContent = () => {
                     <h1 className="text-3xl font-black text-slate-800 tracking-tighter italic uppercase">Video Yo'riqnomalar</h1>
                 </div>
 
-                <div className="flex items-center gap-4 bg-white p-2 rounded-[1.5rem] border border-blue-100 shadow-sm">
-                    <div className="px-4 py-2 bg-blue-50 rounded-xl">
+                <div className="flex items-center gap-4 bg-white p-2 rounded-[1.5rem] border border-gray-100">
+                    <div className="px-4 py-2 bg-white border border-gray-50 rounded-xl">
                         <p className="text-[10px] font-black text-[#00BCE4] uppercase tracking-widest">Jami videolar</p>
                         <p className="text-xl font-black text-slate-800 tracking-tighter">24 ta</p>
                     </div>
@@ -88,15 +88,15 @@ const ManualContent = () => {
                             {/* Bo'lim sarlavhasi */}
                             <div className="flex items-center justify-between mb-8">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-[#00BCE4] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#00BCE4]">
+                                    <div className="w-12 h-12 bg-[#00BCE4] rounded-2xl flex items-center justify-center text-white">
                                         <ChevronRight size={24} />
                                     </div>
                                     <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
                                         {section.title}
                                     </h2>
                                 </div>
-                                <div className="hidden md:block h-[2px] flex-1 mx-8 bg-gradient-to-r from-blue-100 to-transparent"></div>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <div className="hidden md:block h-[2px] flex-1 mx-8 bg-gradient-to-r from-gray-100 to-transparent"></div>
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                     {section.videos.length} Video
                                 </span>
                             </div>
@@ -116,13 +116,12 @@ const ManualContent = () => {
                     ))}
                 </div>
             ) : (
-                /* Empty State */
-                <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[4rem] border border-blue-100 shadow-sm border-dashed">
-                    <div className="p-8 bg-blue-50 rounded-[3rem] text-blue-200 mb-6">
+                <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[4rem] border border-gray-100 border-dashed">
+                    <div className="p-8 bg-white border border-gray-50 rounded-[3rem] text-gray-200 mb-6">
                         <HelpCircle size={64} strokeWidth={1} />
                     </div>
                     <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Hali videolar yuklanmadi</h3>
-                    <p className="text-sm text-slate-400 font-bold italic tracking-tight uppercase">Tizim operatori bilan bog'laning</p>
+                    <p className="text-sm text-gray-400 font-bold italic tracking-tight uppercase">Tizim operatori bilan bog'laning</p>
                 </div>
             )}
         </div>

@@ -31,7 +31,7 @@ const navigate = useNavigate();
   }
 
   return (
-    <div className="min-h-screen mt-[60px] bg-white px-4 md:px-10 lg:px-[150px] xl:px-[300px]">
+    <div className="bg-white">
 <FaArrowLeftLong 
 onClick={navigateback}
 className='mb-6 text-[20px] cursor-pointer'

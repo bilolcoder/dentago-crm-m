@@ -119,7 +119,7 @@ function Aperator() {
   }
 
   return (
-    <div className="p-4 md:p-8 bg-white min-h-screen font-sans">
+    <div className="bg-white font-sans">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6">
         <div>
@@ -147,7 +147,7 @@ function Aperator() {
       </div>
 
       {/* Jadval */}
-      <div className="bg-white rounded-[2.5rem] border  border-slate-100 shadow-2xl overflow-visible">
+      <div className="bg-white rounded-[1rem] shadow-2xl overflow-visible">
         <div className="overflow-x-auto overflow-y-visible">
           <table className="w-full min-w-[1100px]   ml-[10px]">
             <thead >

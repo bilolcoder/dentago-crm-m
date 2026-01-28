@@ -213,7 +213,7 @@ const ProfileContent = () => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="bg-white">
       <div className="max-w-4xl mx-auto">
         {/* Sarlavha */}
         <div className="flex items-center justify-between mb-8">
@@ -227,11 +227,11 @@ const ProfileContent = () => {
         </div>
 
         {/* Asosiy kartochka */}
-        <div className="rounded-3xl shadow-xl p-8 md:p-12">
+        <div className="rounded-3xl border border-gray-100 p-8 md:p-12">
           {/* Avatar */}
           <div className="flex flex-col items-center mb-10 relative">
             <div className="relative">
-              <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-[#00BCE4]/20 to-[#00BCE4]/10 border-4 border-white shadow-2xl">
+              <div className="w-32 h-32 rounded-full overflow-hidden bg-white border border-gray-100 shadow-sm">
                 {formData.image ? (
                   <img src={formData.image} alt="Yangi" className="w-full h-full object-cover" />
                 ) : formData.currentImage ? (
@@ -283,8 +283,8 @@ const ProfileContent = () => {
                 placeholder="Qobiljon Solijanov"
                 className={`w-full px-5 py-4 rounded-2xl font-medium transition-all
                   ${isEditing
-                    ? 'bg-gray-50 border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20'
-                    : 'bg-gray-100 text-gray-900'
+                    ? 'bg-white border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20'
+                    : 'bg-white border border-gray-100 text-gray-900'
                   }`}
               />
             </div>
@@ -296,7 +296,7 @@ const ProfileContent = () => {
                 type="text"
                 readOnly
                 value={formData.phone}
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl text-gray-900 font-medium"
+                className="w-full px-5 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-medium"
               />
             </div>
 
@@ -312,8 +312,8 @@ const ProfileContent = () => {
                 autoComplete="organization"
                 className={`w-full px-5 py-4 rounded-2xl italic transition-all
                   ${isEditing
-                    ? 'bg-gray-50 border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20 text-gray-900'
-                    : 'bg-gray-100 text-gray-700'
+                    ? 'bg-white border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20 text-gray-900'
+                    : 'bg-white border border-gray-100 text-gray-700'
                   }`}
               />
             </div>
@@ -325,7 +325,7 @@ const ProfileContent = () => {
                 type="text"
                 readOnly
                 value={formData.role || 'Foydalanuvchi'}
-                className="w-full px-5 py-4 bg-gray-100 rounded-2xl text-gray-900 font-medium cursor-not-allowed opacity-80"
+                className="w-full px-5 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-medium cursor-not-allowed opacity-80"
               />
             </div>
 
@@ -340,8 +340,8 @@ const ProfileContent = () => {
                 placeholder="mm/dd/yyyy"
                 className={`w-full px-5 py-4 rounded-2xl italic transition-all
                   ${isEditing
-                    ? 'bg-gray-50 border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20 text-gray-900'
-                    : 'bg-gray-100 text-gray-700'
+                    ? 'bg-white border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20 text-gray-900'
+                    : 'bg-white border border-gray-100 text-gray-700'
                   }`}
               />
             </div>
@@ -353,7 +353,7 @@ const ProfileContent = () => {
                 <select
                   value={formData.gender}
                   onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
-                  className="w-full px-5 py-4 bg-gray-50 border-2 border-[#00BCE4] rounded-2xl focus:ring-4 focus:ring-[#00BCE4]/20 font-medium"
+                  className="w-full px-5 py-4 bg-white border-2 border-[#00BCE4] rounded-2xl focus:ring-4 focus:ring-[#00BCE4]/20 font-medium"
                 >
                   <option value="male">Erkak</option>
                   <option value="female">Ayol</option>
@@ -363,7 +363,7 @@ const ProfileContent = () => {
                   type="text"
                   readOnly
                   value={formData.gender === 'male' ? 'Erkak' : 'Ayol'}
-                  className="w-full px-5 py-4 bg-gray-100 rounded-2xl text-gray-900 font-medium"
+                  className="w-full px-5 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-medium"
                 />
               )}
             </div>

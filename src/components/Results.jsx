@@ -152,7 +152,7 @@ function Results() {
   };
 
   return (
-    <div className='p-4 md:p-8 space-y-10 min-h-screen'>
+    <div className='space-y-6'>
 
       <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
         <Link to="/" className="hover:text-[#00BCE4] transition-colors">{t('dashboard') || 'Dashboard'}</Link>
@@ -169,7 +169,7 @@ function Results() {
         </p>
       </header>
 
-      <section className="space-y-6 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40">
+      <section className="space-y-6 bg-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-emerald-50 rounded-xl">

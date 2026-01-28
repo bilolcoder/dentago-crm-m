@@ -78,22 +78,19 @@ const CoursesContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 space-y-8 bg-white dark:bg-slate-950 min-h-full">
+        <div className="space-y-8 bg-white">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    {/* <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                        {t('courses_title')}
-                    </h1> */}
                     <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                         <Link to="/" className="hover:text-blue-600 transition-colors capitalize">{t('dashboard')}</Link>
                         <span className="text-slate-300">/</span>
-                        <span className="text-slate-900 dark:text-white capitalize">{t('dental_courses')}</span>
+                        <span className="text-slate-900 capitalize">{t('dental_courses')}</span>
                     </div>
                 </div>
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-95 uppercase tracking-widest text-xs"
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all active:scale-95 uppercase tracking-widest text-xs"
                 >
                     <Plus className="w-5 h-5" />
                     {t('add_course')}
@@ -105,7 +102,7 @@ const CoursesContent = () => {
                 {courses.length > 0 ? courses.map((course) => (
                     <div
                         key={course.id}
-                        className="group flex flex-col bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-blue-50 dark:border-blue-900/10 shadow-2xl shadow-blue-500/5 transition-all hover:-translate-y-2 hover:shadow-blue-500/10"
+                        className="group flex flex-col bg-white rounded-[2.5rem] overflow-hidden border border-blue-50 shadow-sm transition-all hover:-translate-y-2 hover:shadow-md"
                     >
                         {/* Course Image */}
                         <div className="relative h-56 overflow-hidden">
@@ -130,7 +127,7 @@ const CoursesContent = () => {
                         <div className="p-6 flex-1 flex flex-col space-y-4">
                             <div className="flex items-center justify-between text-slate-400">
                                 <div className="flex items-center gap-2">
-                                    <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                    <div className="p-1.5 bg-blue-50 rounded-lg">
                                         <User className="w-4 h-4 text-blue-600" />
                                     </div>
                                     <span className="text-xs font-bold uppercase tracking-wider">{course.teacher}</span>
@@ -142,10 +139,10 @@ const CoursesContent = () => {
                             </div>
 
                             <div className="flex items-center justify-between">
-                                <span className="text-xl font-black text-blue-600 dark:text-blue-500 tracking-tighter">{course.price}</span>
+                                <span className="text-xl font-black text-blue-600 tracking-tighter">{course.price}</span>
                                 <button
                                     onClick={() => handleBuyClick(course)}
-                                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-95 flex items-center gap-2 uppercase tracking-widest"
+                                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black rounded-xl transition-all active:scale-95 flex items-center gap-2 uppercase tracking-widest"
                                 >
                                     <CreditCard className="w-4 h-4" />
                                     {t('buy_now')}
@@ -153,7 +150,7 @@ const CoursesContent = () => {
                             </div>
 
                             {/* Comments Section */}
-                            <div className="pt-4 border-t border-blue-50 dark:border-blue-900/10 space-y-4">
+                            <div className="pt-4 border-t border-blue-50 space-y-4">
                                 <div className="flex items-center gap-2 text-slate-400">
                                     <MessageSquare className="w-4 h-4" />
                                     <span className="text-[10px] font-black uppercase tracking-widest">{t('comments')}</span>
@@ -161,12 +158,12 @@ const CoursesContent = () => {
 
                                 <div className="max-h-32 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-blue-500">
                                     {course.comments && course.comments.map(comment => (
-                                        <div key={comment.id} className="bg-blue-50/50 dark:bg-blue-950/20 p-3 rounded-2xl">
+                                        <div key={comment.id} className="bg-blue-50 p-3 rounded-2xl">
                                             <div className="flex justify-between items-center mb-1">
-                                                <span className="text-[10px] font-black text-blue-600 dark:text-blue-400">{comment.user}</span>
+                                                <span className="text-[10px] font-black text-blue-600">{comment.user}</span>
                                                 <span className="text-[9px] font-bold text-slate-400">{comment.date}</span>
                                             </div>
-                                            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">{comment.text}</p>
+                                            <p className="text-xs text-slate-600 font-medium leading-relaxed">{comment.text}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -178,7 +175,7 @@ const CoursesContent = () => {
                                         placeholder={t('write_comment')}
                                         value={commentText[course.id] || ''}
                                         onChange={(e) => setCommentText(prev => ({ ...prev, [course.id]: e.target.value }))}
-                                        className="flex-1 px-4 py-2 bg-blue-50/30 dark:bg-blue-950/20 border border-blue-100/50 dark:border-blue-900/10 rounded-xl text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 outline-none placeholder:text-slate-400"
+                                        className="flex-1 px-4 py-2 bg-white border border-blue-100 rounded-xl text-xs text-slate-900 focus:ring-2 focus:ring-blue-500/20 outline-none placeholder:text-slate-400"
                                     />
                                     <button
                                         onClick={() => handleAddComment(course.id)}

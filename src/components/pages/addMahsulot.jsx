@@ -287,8 +287,8 @@ function AddMahsulot() {
 
   return (
     <>
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto">
+      <div className="">
+        <div className="">
 
           {/* Header qismi */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

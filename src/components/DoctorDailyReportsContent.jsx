@@ -56,14 +56,14 @@ const DoctorDailyReportsContent = () => {
 
 
     return (
-        <div className="p-4 md:p-8 space-y-6">
+        <div className="space-y-6 bg-white">
             {/* Breadcrumbs va Filterlar */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                         <Link to="/" className="hover:text-blue-600 transition-colors capitalize">{t('dashboard')}</Link>
                         <span className="text-slate-300">/</span>
-                        <span className="text-slate-900 dark:text-white capitalize">{t('doc_daily_reports')}</span>
+                        <span className="text-slate-900 capitalize">{t('doc_daily_reports')}</span>
                     </div>
                 </div>
 
@@ -85,9 +85,9 @@ const DoctorDailyReportsContent = () => {
             </div>
 
             {/* Asosiy Jadval */}
-            <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-x-auto">
+            <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className='bg-gray-50'>
+                    <thead className='bg-white'>
                         <tr>
                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-12">#</th>
                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase min-w-[180px]">Doktor F.I.O</th>
@@ -114,7 +114,7 @@ const DoctorDailyReportsContent = () => {
                 </table>
 
                 {/* Umumiy Summa */}
-                <div className='p-4 bg-gray-50 flex justify-end gap-12 border-t font-bold text-lg'>
+                <div className='p-4 bg-white flex justify-end gap-12 border-t font-bold text-lg'>
                     <div className='text-gray-800'>Jami Daromad: <span className='text-green-600'>{grandTotalIncome.toLocaleString('uz-UZ')} so'm</span></div>
                     <div className='text-gray-800'>Jami Xarajat: <span className='text-red-600'>{grandTotalExpense.toLocaleString('uz-UZ')} so'm</span></div>
                 </div>

@@ -106,7 +106,7 @@ function Cards() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Orqaga tugmasi + Sarlavha */}
         <div className="flex items-center gap-4 mb-8">

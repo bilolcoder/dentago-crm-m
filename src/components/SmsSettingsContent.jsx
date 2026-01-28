@@ -21,7 +21,7 @@ const SmsSettingsContent = () => {
     const setting = settings.length > 0 ? settings[0] : null;
 
     return (
-        <div className="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
+        <div className="space-y-8 bg-white">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -44,7 +44,7 @@ const SmsSettingsContent = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-gray-100">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">ID</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Shifoxona</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">SMS Token</th>
@@ -58,7 +58,7 @@ const SmsSettingsContent = () => {
                                     <td className="px-8 py-8 text-xs font-bold text-slate-300 italic">#{setting.id}</td>
                                     <td className="px-8 py-8">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-[#00BCE4] group-hover:bg-white transition-colors">
+                                            <div className="w-10 h-10 bg-white border border-blue-50 rounded-2xl flex items-center justify-center text-[#00BCE4] group-hover:bg-blue-50 transition-colors">
                                                 <Building2 size={18} />
                                             </div>
                                             <span className="text-sm font-bold text-slate-800 uppercase tracking-tighter">{setting.clinicName}</span>
@@ -67,7 +67,7 @@ const SmsSettingsContent = () => {
                                     <td className="px-8 py-8">
                                         <div className="flex items-center gap-2">
                                             <KeyRound size={14} className="text-slate-400" />
-                                            <code className="bg-slate-100 px-3 py-1 rounded-lg text-xs font-mono text-slate-600 group-hover:bg-blue-100 transition-colors">
+                                            <code className="bg-white border border-slate-100 px-3 py-1 rounded-lg text-xs font-mono text-slate-600 group-hover:bg-blue-50 transition-colors">
                                                 {setting.token ? `••••••••${setting.token.slice(-6)}` : 'Noma’lum'}
                                             </code>
                                         </div>
@@ -91,7 +91,7 @@ const SmsSettingsContent = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="5" className="py-32 text-center">
-                                        <div className="inline-flex p-6 bg-slate-50 rounded-[2.5rem] mb-4 text-slate-200 border border-dashed border-slate-200">
+                                        <div className="inline-flex p-6 bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] mb-4 text-slate-200">
                                             <ShieldCheck size={48} />
                                         </div>
                                         <p className="text-slate-400 font-bold italic mb-4">Sozlamalar topilmadi</p>

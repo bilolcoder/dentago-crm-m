@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { ArrowLeft, Camera, Image as ImageIcon, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-function MalumotBerish() {
+function MalumotBerish({ isEmbedded = false }) {
   const navigate = useNavigate();
   const cameraInputRef = useRef(null);
   const galleryInputRef = useRef(null);
@@ -41,7 +41,7 @@ function MalumotBerish() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-10">
+    <div className={`${isEmbedded ? '' : 'min-h-screen'} bg-white pb-10`}>
       <input
         type="file"
         accept="image/*"
@@ -59,16 +59,18 @@ function MalumotBerish() {
         onChange={handleFileChange}
       />
 
-      <div className="flex items-center py-5 border-b border-gray-200 sticky top-0 bg-white z-50">
-        <div className="w-full flex items-center">
-          <button type="button" onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
-            <ArrowLeft className="w-6 h-6 text-gray-800" />
-          </button>
-          <h1 className="flex-1 text-center text-xl md:text-2xl font-bold text-gray-800 mr-10">
-            Buyurtma berish
-          </h1>
+      {!isEmbedded && (
+        <div className="flex items-center py-5 border-b border-gray-200 sticky top-0 bg-white z-50">
+          <div className="w-full flex items-center">
+            <button type="button" onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
+              <ArrowLeft className="w-6 h-6 text-gray-800" />
+            </button>
+            <h1 className="flex-1 text-center text-xl md:text-2xl font-bold text-gray-800 mr-10">
+              Buyurtma berish
+            </h1>
+          </div>
         </div>
-      </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-4 md:mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -160,7 +162,7 @@ function MalumotBerish() {
 </div>
 
 {/* Yetkazib berish – SELECT */}
-<div className="space-y-3">
+{/* <div className="space-y-3">
   <label className="text-gray-700 font-bold text-sm">Yetkazib berish usuli *</label>
   <select
     {...register("delivery", { required: "Yetkazib berish usulini tanlang" })}
@@ -173,7 +175,7 @@ function MalumotBerish() {
   {errors.delivery && (
     <p className="text-red-500 text-xs mt-1">{errors.delivery.message}</p>
   )}
-</div>
+</div> */}
 
 </div>
 

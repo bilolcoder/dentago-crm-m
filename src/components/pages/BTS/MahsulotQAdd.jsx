@@ -425,7 +425,7 @@ function ProductForm({ productToEdit }) {
   };
 
   return (
-    <div className="min-h-screen p-8 sm:p-12">
+    <div className="bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10">
           <Link

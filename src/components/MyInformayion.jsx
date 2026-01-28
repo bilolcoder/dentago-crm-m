@@ -814,8 +814,8 @@ function MyInformation() {
     const city = doctor.city || '';
 
     return (
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-        <div className="relative h-48 bg-gradient-to-r from-blue-50 to-cyan-50">
+      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300">
+        <div className="relative h-48 bg-gray-50">
           {avatar ? (
             <img
               src={avatar}
@@ -832,15 +832,8 @@ function MyInformation() {
             </div>
           )}
 
-          {/* <div className="absolute top-4 left-4">
-            <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-800 flex items-center gap-1">
-              <MapIcon className="w-3 h-3" />
-              {doctor.clinic?.distanceKm || 2.5} km
-            </span>
-          </div> */}
-
           <div className="absolute top-4 right-4">
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-xl shadow-lg font-bold">
+            <div className="bg-[#00BCE4] text-white px-4 py-2 rounded-xl font-bold">
               {price > 0 ? (
                 <div className="text-center">
                   <div className="text-lg">{price.toLocaleString()}</div>
@@ -858,7 +851,7 @@ function MyInformation() {
         <div className="p-5">
           <div className="mb-4">
             <h3 className="text-xl font-bold text-gray-800 mb-1">{doctorName}</h3>
-            <div className="flex items-center gap-2 text-cyan-600 font-medium">
+            <div className="flex items-center gap-2 text-[#00BCE4] font-medium">
               <BriefcaseMedical className="w-4 h-4" />
               {doctorSpecialty}
             </div>
@@ -885,7 +878,7 @@ function MyInformation() {
             <button
               onClick={() => doctorId && onView(doctorId)}
               disabled={!doctorId}
-              className={`flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
+              className={`flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
             >
               <Eye className="w-4 h-4" />
@@ -894,7 +887,7 @@ function MyInformation() {
 
             <button
               onClick={() => onEdit(doctor)}
-              className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors"
+              className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors"
               title="Tahrirlash"
             >
               <Edit className="w-4 h-4" />
@@ -903,7 +896,7 @@ function MyInformation() {
             <button
               onClick={() => doctorId && onDelete(doctorId)}
               disabled={!doctorId}
-              className={`px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
+              className={`px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               title="O'chirish"
             >
@@ -917,18 +910,18 @@ function MyInformation() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
+      <div className="flex items-center justify-center bg-white">
         <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-white">
+      <div className="">
         {/* Debug info */}
         {debugInfo && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
+          <div className="mb-4 p-3 bg-white border border-blue-200 rounded-lg text-sm text-blue-700">
             <strong>Debug Info:</strong> {debugInfo}
           </div>
         )}
@@ -940,14 +933,14 @@ function MyInformation() {
               <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
                 Shifokorlar Boshqaruvi
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-500 mt-2">
                 {doctors.length} ta shifokor, {filteredDoctors.length} ta topildi
               </p>
             </div>
 
             <button
               onClick={handleAddNewDoctor}
-              className="bg-gradient-to-r from-[#00BCE4] to-[#0099CC] hover:from-[#00A8D4] hover:to-[#0088B3] text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
+              className="bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/10 transition-all"
             >
               <Plus className="w-5 h-5" />
               Yangi Shifokor Qo'shish
@@ -1017,9 +1010,9 @@ function MyInformation() {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Barcha Shifokorlar</h2>
 
           {doctors.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <User className="w-10 h-10 text-gray-400" />
+            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+                <User className="w-10 h-10 text-gray-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">Shifokorlar topilmadi</h3>
               <p className="text-gray-500 mb-4">
@@ -1027,15 +1020,15 @@ function MyInformation() {
               </p>
               <button
                 onClick={fetchDoctors}
-                className="bg-[#00BCE4] hover:bg-[#0099CC] text-white font-semibold py-2 px-6 rounded-xl transition-colors"
+                className="bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2 px-6 rounded-xl transition-colors"
               >
                 Qayta Yuklash
               </button>
             </div>
           ) : paginatedDoctors.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <Search className="w-10 h-10 text-gray-400" />
+            <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+                <Search className="w-10 h-10 text-gray-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">Qidiruv natijasi topilmadi</h3>
               <p className="text-gray-500">
@@ -1102,7 +1095,7 @@ function MyInformation() {
 
         {/* Forma qismi */}
         {showForm && (
-          <div ref={formRef} className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100 mb-8">
+          <div ref={formRef} className="bg-white rounded-2xl border border-gray-200 mb-8 p-6">
             {/* Form sarlavhasi */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -1119,7 +1112,7 @@ function MyInformation() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsFormCollapsed(!isFormCollapsed)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  className="p-2 hover:bg-gray-50 rounded-lg transition"
                   title={isFormCollapsed ? "Formani ko'rsatish" : "Formani yashirish"}
                 >
                   {isFormCollapsed ? <ArrowUp className="w-5 h-5 transform rotate-180" /> : <ArrowUp className="w-5 h-5" />}
@@ -1127,7 +1120,7 @@ function MyInformation() {
 
                 <button
                   onClick={handleCloseForm}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  className="p-2 hover:bg-gray-50 rounded-lg transition"
                   title="Formani yopish"
                 >
                   <X className="w-5 h-5" />
@@ -1142,7 +1135,7 @@ function MyInformation() {
                 <div className="flex flex-col items-center mb-8">
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-32 h-32 rounded-[10px] overflow-hidden bg-gray-200 cursor-pointer hover:opacity-90 transition border-2 border-[#00BCE4] relative shadow-md"
+                    className="w-32 h-32 rounded-[10px] overflow-hidden bg-white cursor-pointer hover:opacity-90 transition border-2 border-[#00BCE4] relative"
                   >
                     {previewUrl ? (
                       <img
@@ -1155,13 +1148,13 @@ function MyInformation() {
                         }}
                       />
                     ) : (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <UserCircle className="w-10 h-10 mb-1" />
                         <span className="text-xs">Rasm yuklash</span>
                       </div>
                     )}
                   </div>
-                  <p className="mt-3 text-sm text-gray-600">
+                  <p className="mt-3 text-sm text-gray-500">
                     {selectedFile ? selectedFile.name : (isEditing && selectedDoctor?.avatar) ? 'Joriy rasm' : 'Shifokor rasmini tanlang'}
                   </p>
                   <input
@@ -1454,7 +1447,7 @@ function MyInformation() {
 
 
                   <div className="grid md:grid-cols-2 gap-4">
-                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-gray-100 transition">
+                    <label className="flex items-center gap-3 p-3 bg-white rounded-xl border cursor-pointer hover:bg-gray-50 transition">
                       <input
                         type="checkbox"
                         {...register('isAvailable24x7')}
@@ -1466,7 +1459,7 @@ function MyInformation() {
                       </div>
                     </label>
 
-                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-gray-100 transition">
+                    <label className="flex items-center gap-3 p-3 bg-white rounded-xl border cursor-pointer hover:bg-gray-50 transition">
                       <input
                         type="checkbox"
                         {...register('isActive')}
@@ -1519,15 +1512,15 @@ function MyInformation() {
           </div>
         )}
 
-        {/* Shifokorni ko'rish modal oynasi */}
+        {/* Shifokorni ko'rsh modal oynasi */}
         {isViewModalOpen && viewDoctor && (
-          <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+          <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
+              <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800">Shifokor Profili</h2>
                 <button
                   onClick={() => setIsViewModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-400"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1537,7 +1530,7 @@ function MyInformation() {
                 {/* Profil ma'lumotlari */}
                 <div className="flex flex-col md:flex-row gap-6 mb-8">
                   <div className="flex-shrink-0">
-                    <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-50 to-cyan-50 border-4 border-white shadow-lg">
+                    <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gray-50 border-4 border-white shadow-md">
                       {viewDoctor.avatar || viewDoctor.profileImage || viewDoctor.image ? (
                         <img
                           src={viewDoctor.avatar || viewDoctor.profileImage || viewDoctor.image}
@@ -1560,36 +1553,36 @@ function MyInformation() {
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">
                       {viewDoctor.fullName || viewDoctor.name || 'Noma\'lum Shifokor'}
                     </h3>
-                    <div className="flex items-center gap-3 text-cyan-600 font-semibold mb-4">
+                    <div className="flex items-center gap-3 text-[#00BCE4] font-semibold mb-4">
                       <BriefcaseMedical className="w-5 h-5" />
                       {viewDoctor.specialty || viewDoctor.specialization || 'Mutaxassislik kiritilmagan'}
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium">
+                      <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium">
                         {viewDoctor.gender === 'male' ? 'Erkak' : 'Ayol'}
                       </div>
-                      <div className="bg-green-50 text-green-700 px-3 py-1 rounded-lg text-sm font-medium">
+                      <div className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-sm font-medium">
                         {viewDoctor.experienceYears || viewDoctor.experience || 0} yil tajriba
                       </div>
                       {viewDoctor.region && (
-                        <div className="bg-purple-50 text-purple-700 px-3 py-1 rounded-lg text-sm font-medium">
+                        <div className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium border border-gray-100">
                           {viewDoctor.region}
                         </div>
                       )}
                       {viewDoctor.city && (
-                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-sm font-medium">
+                        <div className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium border border-gray-100">
                           {viewDoctor.city}
                         </div>
                       )}
                       {viewDoctor.isAvailable24x7 && (
-                        <div className="bg-yellow-50 text-yellow-700 px-3 py-1 rounded-lg text-sm font-medium">
+                        <div className="bg-amber-50 text-amber-600 px-3 py-1 rounded-lg text-sm font-medium border border-amber-100">
                           24/7 Mavjud
                         </div>
                       )}
                       <div className={`px-3 py-1 rounded-lg text-sm font-medium ${viewDoctor.isActive !== false
-                        ? 'bg-green-50 text-green-700'
-                        : 'bg-red-50 text-red-700'
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : 'bg-rose-50 text-rose-600'
                         }`}>
                         {viewDoctor.isActive !== false ? 'Faol' : 'Faol emas'}
                       </div>
@@ -1599,19 +1592,17 @@ function MyInformation() {
 
                 {/* Statistikalar */}
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
-
-
-                  <div className="bg-gray-50 p-4 rounded-xl text-center">
+                  <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl text-center">
                     <div className="text-2xl font-bold text-gray-800 mb-1">
                       {viewDoctor.price ? `${viewDoctor.price.toLocaleString()} so'm` : 'N/A'}
                     </div>
-                    <div className="text-sm text-gray-600">Narx</div>
+                    <div className="text-sm text-gray-500 font-bold uppercase tracking-widest">Narx</div>
                   </div>
                 </div>
 
                 {/* Kontakt ma'lumotlari */}
                 <div className="space-y-4 mb-8">
-                  <h4 className="text-lg font-semibold text-gray-800 border-l-4 border-cyan-500 pl-3">
+                  <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
                     Kontakt Ma'lumotlari
                   </h4>
 
@@ -1619,24 +1610,22 @@ function MyInformation() {
                     {viewDoctor.phone && (
                       <div className="flex items-center gap-3">
                         <Phone className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-700">{viewDoctor.phone}</span>
+                        <span className="text-gray-700 font-bold">{viewDoctor.phone}</span>
                       </div>
                     )}
-
-
                   </div>
                 </div>
 
                 {/* Klinika ma'lumotlari */}
                 <div className="space-y-4 mb-8">
-                  <h4 className="text-lg font-semibold text-gray-800 border-l-4 border-cyan-500 pl-3">
+                  <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
                     Klinika Ma'lumotlari
                   </h4>
 
-                  <div className="bg-gray-50 p-5 rounded-xl">
+                  <div className="bg-white border border-gray-100 p-5 rounded-xl">
                     <div className="flex items-center gap-3 mb-3">
-                      <Building className="w-5 h-5 text-cyan-600" />
-                      <span className="font-semibold text-gray-800">
+                      <Building className="w-5 h-5 text-[#00BCE4]" />
+                      <span className="font-bold text-gray-800">
                         {viewDoctor.clinic?.name || viewDoctor.hospitalName || 'Klinika nomi kiritilmagan'}
                       </span>
                     </div>
@@ -1644,10 +1633,9 @@ function MyInformation() {
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                       <div>
-                        <p className="text-gray-700">
+                        <p className="text-gray-600">
                           {viewDoctor.clinic?.address || viewDoctor.address || 'Manzil kiritilmagan'}
                         </p>
-                        
                       </div>
                     </div>
                   </div>
@@ -1655,21 +1643,21 @@ function MyInformation() {
 
                 {/* Ish vaqti */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-800 border-l-4 border-cyan-500 pl-3">
+                  <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
                     Ish Vaqti
                   </h4>
 
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-green-500" />
-                      <span className="font-medium">
+                      <Clock className="w-5 h-5 text-emerald-500" />
+                      <span className="font-bold text-gray-700">
                         {viewDoctor.workTime?.start || viewDoctor.workHours?.start || '09:00'}
                       </span>
                     </div>
-                    <div className="text-gray-400">—</div>
+                    <div className="text-gray-300">—</div>
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-red-500" />
-                      <span className="font-medium">
+                      <Clock className="w-5 h-5 text-rose-500" />
+                      <span className="font-bold text-gray-700">
                         {viewDoctor.workTime?.end || viewDoctor.workHours?.end || '18:00'}
                       </span>
                     </div>
@@ -1678,21 +1666,21 @@ function MyInformation() {
 
                 {/* Tavsif */}
                 {viewDoctor.description && (
-                  <div className="mt-8 p-4 bg-blue-50 rounded-xl">
-                    <h4 className="font-semibold text-gray-800 mb-2">Qo'shimcha Ma'lumot</h4>
-                    <p className="text-gray-700">{viewDoctor.description}</p>
+                  <div className="mt-8 p-4 bg-gray-50 border border-gray-100 rounded-xl">
+                    <h4 className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-widest">Qo'shimcha Ma'lumot</h4>
+                    <p className="text-gray-600 italic">{viewDoctor.description}</p>
                   </div>
                 )}
               </div>
 
-              <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6">
+              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6">
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
                       setIsViewModalOpen(false);
                       handleEditDoctor(viewDoctor);
                     }}
-                    className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md"
+                    className="flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
                   >
                     <Edit className="w-4 h-4" />
                     Tahrirlash
@@ -1703,7 +1691,7 @@ function MyInformation() {
                       setIsViewModalOpen(false);
                       handleDeleteDoctor(viewDoctor._id || viewDoctor.id);
                     }}
-                    className="px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-xl transition-colors flex items-center gap-2"
+                    className="px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
                     <Trash2 className="w-4 h-4" />
                     O'chirish

@@ -62,7 +62,7 @@ const GeneralSettingsContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
+        <div className="space-y-8 bg-white">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -94,7 +94,7 @@ const GeneralSettingsContent = () => {
                             className="relative group cursor-pointer mb-6"
                         >
                             <div className="absolute inset-0 bg-[#00BCE4] rounded-[2.5rem] blur-2xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                            <div className="relative w-40 h-40 bg-slate-50 border-2 border-dashed border-[#00BCE4] rounded-[3rem] flex items-center justify-center overflow-hidden group-hover:border-[#00BCE4] transition-all">
+                            <div className="relative w-40 h-40 bg-white border-2 border-dashed border-[#00BCE4] rounded-[3rem] flex items-center justify-center overflow-hidden group-hover:border-[#00BCE4] transition-all">
                                 {formData.logoUrl ? (
                                     <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                                 ) : (
@@ -135,7 +135,7 @@ const GeneralSettingsContent = () => {
                                         id="companyName"
                                         value={formData.companyName || ''}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
+                                        className="w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
                                         placeholder="Klinika yoki firma nomi"
                                     />
                                 </div>
@@ -150,7 +150,7 @@ const GeneralSettingsContent = () => {
                                         id="phone1"
                                         value={formData.phone1 || ''}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
+                                        className="w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
                                         placeholder="+998 00 000 00 00"
                                     />
                                 </div>
@@ -165,7 +165,7 @@ const GeneralSettingsContent = () => {
                                         id="phone2"
                                         value={formData.phone2 || ''}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
+                                        className="w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
                                     />
                                 </div>
 
@@ -179,7 +179,7 @@ const GeneralSettingsContent = () => {
                                         id="email"
                                         value={formData.email || ''}
                                         onChange={handleChange}
-                                        className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
+                                        className="w-full px-6 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300"
                                         placeholder="info@example.com"
                                     />
                                 </div>
@@ -195,7 +195,7 @@ const GeneralSettingsContent = () => {
                                     rows="3"
                                     value={formData.address || ''}
                                     onChange={handleChange}
-                                    className="w-full px-6 py-4 bg-slate-50 border-none rounded-3xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300 resize-none"
+                                    className="w-full px-6 py-4 bg-white border border-slate-200 rounded-3xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#00BCE4] transition-all placeholder:text-slate-300 resize-none"
                                     placeholder="To'liq manzilni kiriting..."
                                 />
                             </div>

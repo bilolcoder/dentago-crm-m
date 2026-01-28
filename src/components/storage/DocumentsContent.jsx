@@ -23,7 +23,7 @@ const DocumentsContent = () => {
     );
 
     return (
-        <div className="p-4 md:p-8 bg-white min-h-screen">
+        <div className="bg-white">
             {/* Breadcrumbs & Actions */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
@@ -44,7 +44,7 @@ const DocumentsContent = () => {
 
                 <button
                     onClick={() => handleOpenAddEditModal(null)}
-                    className="flex items-center gap-2 bg-[#00BCE4] text-white px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#00BCE4]/20 active:scale-95 font-black text-[10px] uppercase tracking-widest hover:brightness-110"
+                    className="flex items-center gap-2 bg-[#00BCE4] text-white px-8 py-4 rounded-2xl transition-all active:scale-95 font-black text-[10px] uppercase tracking-widest hover:brightness-110"
                 >
                     <Plus className="w-5 h-5" strokeWidth={3} />
                     {t('add') || "Yangi Hujjat Qo'shish"}
@@ -52,10 +52,10 @@ const DocumentsContent = () => {
             </div>
 
             {/* Main Content Card */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden">
 
                 {/* Search & Statistics Bar */}
-                <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50/30">
+                <div className="p-8 border-b border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6 bg-white">
                     <div className="relative w-full md:w-96 group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#00BCE4] transition-colors" />
                         <input
@@ -63,12 +63,12 @@ const DocumentsContent = () => {
                             placeholder={t('search') || "Hujjat nomini qidirish..."}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full border border-slate-200 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold bg-white outline-none focus:border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/5 transition-all text-slate-700 placeholder:text-slate-400 focus:text-[#00BCE4]"
+                            className="w-full border border-gray-200 rounded-2xl py-4 pl-12 pr-6 text-sm font-bold bg-white outline-none focus:border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/5 transition-all text-slate-700 placeholder:text-slate-400 focus:text-[#00BCE4]"
                         />
                     </div>
 
-                    <div className="flex items-center gap-4 bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-sm">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 text-slate-400">
+                    <div className="flex items-center gap-4 bg-white px-6 py-3 rounded-2xl border border-gray-100">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 text-slate-400">
                             <FolderOpen size={20} />
                         </div>
                         <div>
@@ -90,9 +90,9 @@ const DocumentsContent = () => {
                                 <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-gray-50">
                             {filteredDocuments.map((doc) => (
-                                <tr key={doc.id} className="hover:bg-[#00BCE4]/[0.02] transition-all group">
+                                <tr key={doc.id} className="hover:bg-gray-50/50 transition-all group">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-2 text-[#00BCE4]">
                                             <Hash size={14} strokeWidth={3} />
@@ -103,7 +103,7 @@ const DocumentsContent = () => {
                                     </td>
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-slate-100 rounded-lg text-slate-400 group-hover:bg-[#00BCE4]/10 group-hover:text-[#00BCE4] transition-all">
+                                            <div className="p-2 bg-gray-50 rounded-lg text-slate-400 group-hover:bg-[#00BCE4]/10 group-hover:text-[#00BCE4] transition-all">
                                                 <FileText size={16} />
                                             </div>
                                             <span className="text-sm font-bold text-slate-700 group-hover:text-[#00BCE4] transition-colors">
@@ -112,7 +112,7 @@ const DocumentsContent = () => {
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
-                                        <span className="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-tight">
+                                        <span className="px-3 py-1 bg-gray-50 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-tight">
                                             {doc.supplier}
                                         </span>
                                     </td>
@@ -122,20 +122,20 @@ const DocumentsContent = () => {
                                     <td className="px-8 py-5">
                                         <div className="flex justify-end items-center gap-2">
                                             <button
-                                                className="w-10 h-10 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-xl transition-all shadow-sm active:scale-90"
+                                                className="w-10 h-10 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-xl transition-all active:scale-90"
                                                 title="Yuklab olish"
                                             >
                                                 <Download className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleOpenAddEditModal(doc)}
-                                                className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 hover:bg-[#00BCE4] hover:text-white rounded-xl transition-all shadow-sm active:scale-90"
+                                                className="w-10 h-10 flex items-center justify-center bg-gray-50 text-slate-400 hover:bg-[#00BCE4] hover:text-white rounded-xl transition-all active:scale-90"
                                                 title="Tahrirlash"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
                                             <button
-                                                className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm active:scale-90"
+                                                className="w-10 h-10 flex items-center justify-center bg-gray-50 text-slate-400 hover:bg-rose-500 hover:text-white rounded-xl transition-all active:scale-90"
                                                 title="O'chirish"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -150,8 +150,8 @@ const DocumentsContent = () => {
 
                 {/* Empty State Illustration */}
                 {filteredDocuments.length === 0 && (
-                    <div className="py-32 flex flex-col items-center justify-center bg-slate-50/50">
-                        <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center mb-6 shadow-xl shadow-slate-200 border border-slate-100">
+                    <div className="py-32 flex flex-col items-center justify-center bg-white">
+                        <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-6 border border-gray-100">
                             <FolderOpen className="text-slate-200 w-10 h-10" />
                         </div>
                         <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Hujjat topilmadi</h3>

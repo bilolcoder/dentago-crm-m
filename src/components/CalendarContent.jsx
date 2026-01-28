@@ -55,16 +55,16 @@ const CalendarContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 space-y-6 bg-white">
+        <div className="space-y-6 bg-white">
             {/* Breadcrumbs va Sana Navigatsiyasi */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                     <Link to="/" className="hover:text-blue-600 transition-colors capitalize">{t('dashboard')}</Link>
                     <span className="text-slate-300">/</span>
-                    <span className="text-slate-900 dark:text-white capitalize">{t('calendar')}</span>
+                    <span className="text-slate-900 capitalize">{t('calendar')}</span>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 w-full sm:w-auto">
+                <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200 w-full sm:w-auto">
                     <button className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition">
                         <ChevronLeft className="w-5 h-5" />
                     </button>
@@ -82,19 +82,19 @@ const CalendarContent = () => {
             </div>
 
             {/* Asosiy Taqvim Jadvali */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-md border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full border-collapse">
                         <thead>
                             <tr>
-                                <th className="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest border-b border-r border-gray-200 dark:border-gray-800 w-40 bg-slate-50/50 dark:bg-slate-800/50">
+                                <th className="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-r border-gray-200 w-40 bg-white">
                                     Sana
                                 </th>
                                 {doctors.map((doctor, index) => (
                                     <th
                                         key={index}
-                                        className={`px-6 py-4 text-center text-sm font-black uppercase tracking-widest border-b border-r border-gray-200 dark:border-gray-800 min-w-[200px] ${doctor.name === 'Junior Mateo' ? 'bg-white dark:bg-slate-900' : 'bg-emerald-50/70 dark:bg-emerald-900/20'
-                                            } text-slate-700 dark:text-slate-200`}
+                                        className={`px-6 py-4 text-center text-sm font-black uppercase tracking-widest border-b border-r border-gray-200 min-w-[200px] ${doctor.name === 'Junior Mateo' ? 'bg-white' : 'bg-white'
+                                            } text-slate-700`}
                                     >
                                         {doctor.name}
                                     </th>
@@ -103,18 +103,18 @@ const CalendarContent = () => {
                         </thead>
                         <tbody>
                             <tr className="h-32">
-                                <td className="px-6 py-4 text-center text-sm font-bold text-slate-900 dark:text-white border-r border-gray-200 dark:border-gray-800 bg-slate-50/30 dark:bg-slate-800/30">
+                                <td className="px-6 py-4 text-center text-sm font-bold text-slate-900 border-r border-gray-200 bg-white">
                                     {selectedDate}
                                 </td>
                                 {doctors.map((doctor, docIndex) => (
                                     <td
                                         key={docIndex}
-                                        className="relative p-0 border-r border-gray-200 dark:border-gray-800 transition-colors cursor-pointer group"
+                                        className="relative p-0 border-r border-gray-200 transition-colors cursor-pointer group"
                                         onMouseEnter={() => setHoveredCell(docIndex)}
                                         onMouseLeave={() => setHoveredCell(null)}
                                         onClick={() => handleCellClick(doctor)}
                                     >
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 bg-blue-50/30 dark:bg-blue-900/10">
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 bg-blue-50/30">
                                             <Plus className="w-8 h-8 text-blue-500" />
                                         </div>
                                     </td>

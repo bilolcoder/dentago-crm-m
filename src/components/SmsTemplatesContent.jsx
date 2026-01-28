@@ -33,7 +33,7 @@ const SmsTemplatesContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
+        <div className="space-y-8 bg-white">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -59,7 +59,7 @@ const SmsTemplatesContent = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-gray-100">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest w-20">ID</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('name')}</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Turi</th>
@@ -77,14 +77,14 @@ const SmsTemplatesContent = () => {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-blue-50 rounded-xl text-[#00BCE4] group-hover:bg-white transition-colors">
+                                                <div className="p-2 bg-white border border-blue-50 rounded-xl text-[#00BCE4] group-hover:bg-blue-50 transition-colors">
                                                     <MessageSquare size={16} />
                                                 </div>
                                                 <span className="text-[13px] font-bold text-slate-800 uppercase tracking-tighter">{template.name}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="px-3 py-1 text-[10px] font-black uppercase tracking-tighter rounded-lg bg-slate-100 text-slate-500 border border-slate-200">
+                                            <span className="px-3 py-1 text-[10px] font-black uppercase tracking-tighter rounded-lg bg-white border border-slate-200 text-slate-500">
                                                 {template.type}
                                             </span>
                                         </td>
@@ -138,7 +138,7 @@ const SmsTemplatesContent = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="6" className="py-32 text-center">
-                                        <div className="inline-flex p-6 bg-slate-50 rounded-[2.5rem] mb-4 text-slate-200 border border-dashed border-slate-200">
+                                        <div className="inline-flex p-6 bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] mb-4 text-slate-200">
                                             <MessageSquare size={48} />
                                         </div>
                                         <p className="text-slate-400 font-bold italic">Shablonlar mavjud emas</p>

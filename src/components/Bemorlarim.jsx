@@ -349,8 +349,8 @@ function Bemorlarim() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
+    <div className="flex items-center justify-center">
+      <div className="text-center py-20">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00BCE4] mb-4"></div>
         <p className="text-gray-600">Yuklanmoqda...</p>
       </div>
@@ -359,7 +359,7 @@ function Bemorlarim() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-lg text-center max-w-md w-full border border-gray-100">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -379,7 +379,7 @@ function Bemorlarim() {
   }
 
   return (
-    <div className="min-h-screen pb-5">
+    <div className="pb-5">
       <div className="mb-8 md:mb-10">
         <div className="flex flex-col lg:flex-row justify-between border-b pb-4 gap-4">
           {/* Sarlavha qismi */}
@@ -442,7 +442,7 @@ function Bemorlarim() {
         <button
           onClick={() => setStatusFilter('all')}
           className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
-              ? 'bg-white text-[#00BCE4] shadow-sm font-medium'
+              ? 'bg-white text-[#00BCE4] shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
             }`}
         >
@@ -452,7 +452,7 @@ function Bemorlarim() {
         <button
           onClick={() => setStatusFilter('pending')}
           className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
-              ? 'bg-white text-yellow-600 shadow-sm font-medium'
+              ? 'bg-white text-yellow-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
             }`}
         >
@@ -462,7 +462,7 @@ function Bemorlarim() {
         <button
           onClick={() => setStatusFilter('confirmed')}
           className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
-              ? 'bg-white text-blue-600 shadow-sm font-medium'
+              ? 'bg-white text-blue-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
             }`}
         >
@@ -472,7 +472,7 @@ function Bemorlarim() {
         <button
           onClick={() => setStatusFilter('cancelled')}
           className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
-              ? 'bg-white text-red-600 shadow-sm font-medium'
+              ? 'bg-white text-red-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
             }`}
         >
@@ -584,8 +584,8 @@ function Bemorlarim() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
+              <thead>
+                <tr className="bg-white border-b">
                   <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Bemor
                   </th>
@@ -716,7 +716,7 @@ function Bemorlarim() {
               ) : selectedAppointment ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-blue-50 p-5 rounded-xl">
+                    <div className="bg-white border border-blue-50 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-1">Bemor</p>
                       <p className="font-bold text-lg text-gray-800">{selectedAppointment.patient?.fullName || '—'}</p>
                       <p className="text-gray-600 mt-2">
@@ -724,7 +724,7 @@ function Bemorlarim() {
                       </p>
                     </div>
 
-                    <div className="bg-blue-50 p-5 rounded-xl">
+                    <div className="bg-white border border-blue-50 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-1">Holati</p>
                       <span className={`inline-block px-4 py-2 rounded-full font-semibold text-white ${getStatusStyle(selectedAppointment.status)}`}>
                         {getStatusText(selectedAppointment.status)}
@@ -733,14 +733,14 @@ function Bemorlarim() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gray-50 p-5 rounded-xl">
+                    <div className="bg-white border border-gray-100 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-1">Sana va vaqt</p>
                       <p className="font-medium text-lg">
                         {formatDate(selectedAppointment.appointmentDate)} • {formatTime(selectedAppointment.appointmentTime)}
                       </p>
                     </div>
 
-                    <div className="bg-gray-50 p-5 rounded-xl">
+                    <div className="bg-white border border-gray-100 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-1">Xizmat turi</p>
                       <p className="font-medium text-lg">{selectedAppointment.service || '—'}</p>
                     </div>
@@ -757,7 +757,7 @@ function Bemorlarim() {
                   {selectedAppointment.comment && (
                     <div className="bg-white border border-gray-200 p-5 rounded-xl">
                       <p className="text-gray-500 text-sm mb-2">Izoh</p>
-                      <p className="text-gray-700 whitespace-pre-wrap break-words bg-gray-50 p-4 rounded-lg">{selectedAppointment.comment}</p>
+                      <p className="text-gray-700 whitespace-pre-wrap break-words bg-white border border-gray-100 p-4 rounded-lg">{selectedAppointment.comment}</p>
                     </div>
                   )}
                   {selectedAppointment.doctor?.clinic && (

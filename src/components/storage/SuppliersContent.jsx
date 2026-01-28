@@ -49,7 +49,7 @@ const SuppliersContent = () => {
     );
 
     return (
-        <div className="p-4 md:p-8 bg-white min-h-screen">
+        <div className="bg-white">
             {/* Header Section */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
@@ -86,10 +86,10 @@ const SuppliersContent = () => {
                         placeholder="Kompaniya nomi yoki aloqa raqami orqali qidirish..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-[24px] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] focus:bg-white transition-all shadow-sm"
+                        className="w-full pl-14 pr-6 py-4.5 bg-white border border-gray-200 rounded-[24px] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] transition-all"
                     />
                 </div>
-                <div className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-xl shadow-slate-100/50">
+                <div className="bg-white p-5 rounded-[24px] border border-gray-100 flex items-center justify-between">
                     <div className="p-3 bg-emerald-50 text-emerald-500 rounded-2xl">
                         <ShieldCheck size={22} strokeWidth={2.5} />
                     </div>
@@ -103,24 +103,24 @@ const SuppliersContent = () => {
             </div>
 
             {/* Table Container */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden">
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-gray-100">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kompaniya / ID</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Aloqa Ma'lumotlari</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-gray-50">
                             {filteredSuppliers.length > 0 ? (
                                 filteredSuppliers.map((supplier) => (
-                                    <tr key={supplier.id} className="hover:bg-[#00BCE4]/[0.02] transition-all group">
+                                    <tr key={supplier.id} className="hover:bg-gray-50 transition-all group">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-all border border-transparent group-hover:border-blue-100">
+                                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-all border border-gray-100">
                                                     <Building2 size={20} strokeWidth={2.5} />
                                                 </div>
                                                 <div>
@@ -131,7 +131,7 @@ const SuppliersContent = () => {
                                         </td>
                                         <td className="px-8 py-5">
                                             <div className="flex flex-col items-center">
-                                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 group-hover:border-blue-100 transition-all shadow-sm">
+                                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 group-hover:border-blue-100 transition-all shadow-sm">
                                                     <Phone size={13} className="text-[#00BCE4]" strokeWidth={3} />
                                                     <span className="text-xs font-black text-slate-600 tracking-wider">{supplier.phone || '—'}</span>
                                                 </div>
@@ -152,11 +152,11 @@ const SuppliersContent = () => {
                                             <div className="flex justify-end gap-2">
                                                 <button
                                                     onClick={() => handleOpenModal(supplier)}
-                                                    className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all active:scale-90 shadow-sm border border-transparent hover:border-blue-100"
+                                                    className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all active:scale-90 shadow-sm border border-gray-100 hover:border-blue-100"
                                                 >
                                                     <Edit size={16} strokeWidth={2.5} />
                                                 </button>
-                                                <button className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-90 shadow-sm border border-transparent hover:border-rose-100">
+                                                <button className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-90 shadow-sm border border-gray-100 hover:border-rose-100">
                                                     <Trash2 size={16} strokeWidth={2.5} />
                                                 </button>
                                             </div>
@@ -165,8 +165,8 @@ const SuppliersContent = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="py-32 text-center bg-slate-50/30">
-                                        <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-slate-200 border border-slate-100">
+                                    <td colSpan="4" className="py-32 text-center bg-white">
+                                        <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-md border border-gray-100">
                                             <Globe className="w-10 h-10 text-slate-200" />
                                         </div>
                                         <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Hamkorlar bazasi bo'sh</h3>

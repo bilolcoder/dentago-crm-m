@@ -73,10 +73,10 @@ function Elonlar() {
                 className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none text-[16px]"
               />
             </div>
-            <button className="p-3 bg-gray-100 rounded-xl cursor-pointer">
+            {/* <button className="p-3 bg-gray-100 rounded-xl cursor-pointer">
               <Bell size={24} className="text-gray-600"
               onClick={notification}/>
-            </button>
+            </button> */}
           </div>
         </header>
 
@@ -141,7 +141,7 @@ function Elonlar() {
 
         {/* 3. CATEGORIES (Grid ko'rinishi) */}
         <section className="px-4 md:px-8 pb-12">
-          <div className="grid grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-4 max-sm:grid-cols-2 gap-4 md:gap-8">
             {categories.map(({ id, label, Icon, path }) => (
               <Link key={id} to={path} onClick={() => setActiveTab(id)} className="flex flex-col items-center gap-3">
                 <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex border-2 items-center justify-center transition-all

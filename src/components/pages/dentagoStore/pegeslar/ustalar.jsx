@@ -93,8 +93,8 @@ function Ustalar() {
   }, [slides.length]);
 
   return (
-    <div className="min-h-screen bg-white pb-24 font-sans">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-white pb-24 font-sans">
+      <div className="">
         {/* HEADER */}
         <header className="p-4 sticky top-0 bg-white z-30">
           <div className="flex items-center gap-4">
@@ -102,9 +102,9 @@ function Ustalar() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input type="text" placeholder="Qidiruv..." className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none" />
             </div>
-            <button onClick={notification} className="p-3 bg-gray-100 rounded-xl cursor-pointer">
+            {/* <button onClick={notification} className="p-3 bg-gray-100 rounded-xl cursor-pointer">
               <Bell size={24} className="text-gray-600" />
-            </button>
+            </button> */}
           </div>
         </header>
 
@@ -172,7 +172,7 @@ function Ustalar() {
 
         {/* CATEGORIES */}
         <section className="px-4 md:px-8 pb-8">
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 max-sm:grid-cols-2 gap-4 md:gap-8">
             {categories.map(({ id, label, Icon, path }) => (
               <Link key={id} to={path} onClick={() => setActiveTab(id)} className="flex flex-col items-center gap-2 text-center">
                 <div className={`w-14 h-14 md:w-20 md:h-20 rounded-full flex border-2 items-center justify-center transition-all
@@ -190,7 +190,7 @@ function Ustalar() {
           <h1 className="font-bold text-[20px] md:text-[28px] text-gray-800 mb-6">Muammo haqida murojaat qiling</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="block text-gray-700 font-semibold text-sm">Uskuna nomi <span className="text-red-500">*</span></label>
               <input {...register("uskunaNomi", { required: true })} placeholder="Kiriting" className={`w-full p-4 bg-gray-50 border ${errors.uskunaNomi ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`} />
             </div>
@@ -203,36 +203,37 @@ function Ustalar() {
             <div className="space-y-2">
               <label className="block text-gray-700 font-semibold text-sm">Ishlab chiqaruvchi</label>
               <input {...register("ishlabChiqaruvchi")} placeholder="Kiriting" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" />
-            </div>
+            </div> */}
+              {/* RASM YUKLASH */}
+              <div className="space-y-2">
+                <label className="block text-gray-700 font-semibold text-sm">Muammoga doir rasmlar bo'lsa yuklang</label>
+                <div className="flex flex-wrap gap-3">
+                  {selectedImages.map((img, index) => (
+                    <div key={index} className="relative w-24 h-24 border border-gray-100 rounded-2xl overflow-hidden group">
+                      <img src={img.preview} alt="upload" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  {selectedImages.length < 3 && (
+                    <label className="w-24 h-24 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-100">
+                      <Plus className="text-gray-400" size={32} />
+                      <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} />
+                    </label>
+                  )}
+                </div>
+              </div>
 
             <div className="space-y-2">
               <label className="block text-gray-700 font-semibold text-sm">Muammo haqida batafsil yozing <span className="text-red-500">*</span></label>
               <textarea {...register("muammo", { required: true })} placeholder="Kiriting" rows="4" className={`w-full p-4 bg-gray-50 border ${errors.muammo ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none resize-none`} />
             </div>
 
-            {/* RASM YUKLASH */}
-            <div className="space-y-2">
-              <label className="block text-gray-700 font-semibold text-sm">Muammoga doir rasmlar bo'lsa yuklang</label>
-              <div className="flex flex-wrap gap-3">
-                {selectedImages.map((img, index) => (
-                  <div key={index} className="relative w-24 h-24 border border-gray-100 rounded-2xl overflow-hidden group">
-                    <img src={img.preview} alt="upload" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-                {selectedImages.length < 3 && (
-                  <label className="w-24 h-24 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-100">
-                    <Plus className="text-gray-400" size={32} />
-                    <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} />
-                  </label>
-                )}
-              </div>
-            </div>
 
             {/* TEL RAQAM */}
-            <div className="space-y-2">
+            <div className="space-y-2 grid grid-cols-2 gap-4">
+              <div className="">
               <label className="block text-gray-700 font-semibold text-sm">Tel. raqamingiz <span className="text-red-500">*</span></label>
               <input
                 {...register("telRaqam", { required: "Telefon raqam kiritish shart", minLength: { value: 17, message: "Raqam to'liq emas" } })}
@@ -240,15 +241,30 @@ function Ustalar() {
                 placeholder="+998-90-123-45-67"
                 onChange={(e) => { e.target.value = formatPhoneNumber(e.target.value); }}
                 className={`w-full p-4 bg-gray-50 border ${errors.telRaqam ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`}
-              />
+                />
+                </div>
+
+              <div className="">
+              {/* no2  */}
+                <label className="block text-gray-700 font-semibold text-sm">Tel. raqamingiz 2<span className="text-red-500">*</span></label>
+              <input
+                {...register("telRaqam2", { required: "Telefon raqam kiritish shart", minLength: { value: 17, message: "Raqam to'liq emas" } })}
+                type="tel"
+                placeholder="+998-90-123-45-67"
+                onChange={(e) => { e.target.value = formatPhoneNumber(e.target.value); }}
+                className={`w-full p-4 bg-gray-50 border ${errors.telRaqam2 ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`}
+                />
+                </div>
+
               {errors.telRaqam && <span className="text-red-500 text-xs">{errors.telRaqam.message}</span>}
+              {errors.telRaqam2 && <span className="text-red-500 text-xs">{errors.telRaqam2.message}</span>}
             </div>
 
             {/* MANZIL */}
-            <div className="space-y-2 pb-6">
+            {/* <div className="space-y-2 pb-6">
               <label className="block text-gray-700 font-semibold text-sm">Manzilingiz</label>
               <input {...register("manzil")} placeholder="Manzilingizni kiriting" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-[#00C2FF]" />
-            </div>
+            </div> */}
 
             <button type="submit" className="w-full bg-[#00C2FF] text-white py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition-all">
               Yuborish

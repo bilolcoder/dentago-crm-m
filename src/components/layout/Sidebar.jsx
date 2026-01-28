@@ -204,7 +204,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full bg-blue-50 z-50
+                fixed top-0 left-0 h-full bg-white z-50
                 transition-all duration-500 ease-in-out
                 w-72 flex flex-col justify-between border-r border-blue-50
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}

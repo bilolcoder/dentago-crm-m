@@ -64,7 +64,7 @@ const PaymentsContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 bg-white min-h-screen">
+        <div className="bg-white">
             {/* Header */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
@@ -99,7 +99,7 @@ const PaymentsContent = () => {
                         <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-[0.03] group-hover:scale-150 transition-transform duration-700 bg-current`} />
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between">
-                                <div className={`p-3 rounded-2xl bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all duration-300`}>
+                                <div className={`p-3 rounded-2xl bg-white border border-slate-100 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all duration-300`}>
                                     {card.icon}
                                 </div>
                                 <ArrowUpRight className="text-slate-200" size={20} />
@@ -122,7 +122,7 @@ const PaymentsContent = () => {
                         placeholder="Bemor ismi orqali qidirish..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-slate-100 rounded-[2rem] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] focus:bg-white transition-all shadow-sm"
+                        className="w-full pl-16 pr-6 py-5 bg-white border border-slate-200 rounded-[2rem] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] transition-all shadow-sm"
                     />
                 </div>
                 <div className="flex flex-1 gap-4">
@@ -130,7 +130,7 @@ const PaymentsContent = () => {
                         <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#00BCE4]" />
                         <input
                             type="date"
-                            className="w-full pl-12 pr-5 py-5 bg-slate-50 border border-slate-100 rounded-[2rem] text-xs font-black text-slate-500 uppercase outline-none focus:border-[#00BCE4] transition-all cursor-pointer"
+                            className="w-full pl-12 pr-5 py-5 bg-white border border-slate-200 rounded-[2rem] text-xs font-black text-slate-500 uppercase outline-none focus:border-[#00BCE4] transition-all cursor-pointer"
                         />
                     </div>
                     <button className="px-6 py-5 bg-slate-800 text-white rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200">
@@ -144,7 +144,7 @@ const PaymentsContent = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-slate-50">
                                 <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kvitansiya</th>
                                 <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Bemor</th>
                                 <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">To'lov Summasi</th>
@@ -184,7 +184,7 @@ const PaymentsContent = () => {
                                         </div>
                                     </td>
                                     <td className="px-10 py-6 text-right">
-                                        <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 bg-slate-50 px-4 py-2 rounded-xl group-hover:bg-white transition-colors">
+                                        <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 bg-white border border-slate-100 px-4 py-2 rounded-xl group-hover:bg-slate-50 transition-colors">
                                             <Calendar size={12} strokeWidth={3} className="text-[#00BCE4]" />
                                             {p.date}
                                         </div>
@@ -206,7 +206,7 @@ const PaymentsContent = () => {
                             <select
                                 value={formData.patientId}
                                 onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
-                                className="w-full pl-12 pr-5 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm appearance-none"
+                                className="w-full pl-12 pr-5 py-4.5 bg-white border border-slate-200 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] transition-all font-bold text-sm appearance-none"
                             >
                                 <option value="">Ro'yxatdan tanlang...</option>
                                 {patients.map(p => <option key={p.id} value={p.id}>{p.name} {p.familya}</option>)}
@@ -222,7 +222,7 @@ const PaymentsContent = () => {
                                 type="number"
                                 value={formData.amount}
                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                className="w-full pl-12 pr-5 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
+                                className="w-full pl-12 pr-5 py-4.5 bg-white border border-slate-200 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] transition-all font-bold text-sm"
                                 placeholder="0.00"
                             />
                         </div>

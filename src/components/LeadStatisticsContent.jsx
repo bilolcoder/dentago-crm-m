@@ -67,7 +67,7 @@ const LeadStatisticsContent = () => {
     );
 
     return (
-        <div className="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
+        <div className="space-y-8 bg-white">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
@@ -88,7 +88,7 @@ const LeadStatisticsContent = () => {
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="py-2 px-4 bg-slate-50 border-none rounded-2xl text-xs font-bold text-slate-600 outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            className="py-2 px-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                         />
                     </div>
                     <div className="flex items-center text-slate-300">
@@ -99,7 +99,7 @@ const LeadStatisticsContent = () => {
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="py-2 px-4 bg-slate-50 border-none rounded-2xl text-xs font-bold text-slate-600 outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            className="py-2 px-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-600 outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                         />
                     </div>
                 </div>
@@ -123,8 +123,8 @@ const LeadStatisticsContent = () => {
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className='bg-slate-50/50'>
-                            <tr>
+                        <thead>
+                            <tr className='bg-white border-b'>
                                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">#</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('patient')}</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('doctor')}</th>
@@ -152,7 +152,7 @@ const LeadStatisticsContent = () => {
                                             </span>
                                         </td>
                                         <td className="px-8 py-5 whitespace-nowrap text-right">
-                                            <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                                            <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 bg-white px-3 py-1.5 rounded-xl border border-slate-100">
                                                 <Calendar size={12} className="text-[#00BCE4]" />
                                                 {item.date}
                                             </div>
@@ -162,7 +162,7 @@ const LeadStatisticsContent = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="5" className="py-24 text-center">
-                                        <div className="w-20 h-20 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200">
+                                        <div className="w-20 h-20 bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] flex items-center justify-center mx-auto mb-4">
                                             <Briefcase className="w-10 h-10 text-slate-200" />
                                         </div>
                                         <p className="text-slate-400 font-bold italic tracking-tight">Tanlangan muddatda ma'lumot topilmadi</p>

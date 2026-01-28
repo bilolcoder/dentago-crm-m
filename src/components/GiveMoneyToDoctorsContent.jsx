@@ -38,8 +38,8 @@ const SalaryCard = ({ title, staffList, isDoctor = false }) => {
         };
 
         return (
-            <div className="fixed inset-0 z-50 bg-[rgb(0,0,0,0.5)] bg-opacity-50 flex items-center justify-center">
-                <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm space-y-4">
+            <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+                <div className="bg-white rounded-xl p-6 w-full max-w-sm space-y-4 shadow-xl">
                     <h4 className="text-xl font-bold border-b pb-2">Maosh to'lash</h4>
                     <p>Kimga: <span className='font-semibold text-blue-600'>{selectedStaff.FIO}</span></p>
                     <input
@@ -47,7 +47,7 @@ const SalaryCard = ({ title, staffList, isDoctor = false }) => {
                         placeholder="Summani kiriting (so'm)"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg"
+                        className="w-full p-3 border border-gray-300 rounded-lg bg-white"
                     />
                     <div className="flex justify-end gap-3">
                         <button onClick={() => setModalOpen(false)} className="py-2 px-4 text-gray-600 hover:bg-gray-100 rounded-lg">Bekor qilish</button>
@@ -61,7 +61,7 @@ const SalaryCard = ({ title, staffList, isDoctor = false }) => {
     };
 
     return (
-        <div className="space-y-4 bg-white rounded-xl shadow-md border border-gray-100 p-4 min-h-[400px]">
+        <div className="space-y-4 bg-white rounded-xl border border-gray-100 p-4 min-h-[400px]">
             <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <User className={`w-5 h-5 ${isDoctor ? 'text-blue-600' : 'text-green-600'}`} /> {title} ({staffList.length} kishi)
             </h3>
@@ -106,14 +106,14 @@ const GiveMoneyToDoctorsContent = () => {
     const technicians = data.staff.filter(s => s.lavozim === 'Texnik' || s.lavozim === 'Qabulxona xodimi'); // Texniklar deb umumlashtiramiz
 
     return (
-        <div className="p-4 md:p-8 space-y-6">
+        <div className="space-y-6 bg-white">
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
                         <Link to="/" className="hover:text-blue-600 transition-colors capitalize">{t('dashboard')}</Link>
                         <span className="text-slate-300">/</span>
-                        <span className="text-slate-900 dark:text-white capitalize">{t('give_money_docs')}</span>
+                        <span className="text-slate-900 capitalize">{t('give_money_docs')}</span>
                     </div>
                 </div>
             </div>

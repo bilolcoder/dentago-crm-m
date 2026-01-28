@@ -52,7 +52,7 @@ const LeadCategoriesContent = () => {
     );
 
     return (
-        <div className="p-4 md:p-8 bg-white min-h-screen">
+        <div className="bg-white">
             {/* Header Section */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
@@ -73,7 +73,7 @@ const LeadCategoriesContent = () => {
 
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-3 bg-[#00BCE4] text-white px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#00BCE4]/20 active:scale-95 font-black text-[10px] uppercase tracking-widest hover:brightness-110"
+                    className="flex items-center gap-3 bg-[#00BCE4] text-white px-8 py-4 rounded-2xl transition-all active:scale-95 font-black text-[10px] uppercase tracking-widest hover:brightness-110"
                 >
                     <Plus className="w-5 h-5" strokeWidth={3} />
                     Yangi bosqich qo'shish
@@ -89,10 +89,10 @@ const LeadCategoriesContent = () => {
                         placeholder="Kategoriya nomini qidirish..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-16 pr-6 py-5 bg-slate-50 border border-slate-100 rounded-[2rem] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] focus:bg-white transition-all shadow-sm"
+                        className="w-full pl-16 pr-6 py-5 bg-white border border-gray-200 rounded-[2rem] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] transition-all"
                     />
                 </div>
-                <div className="bg-white p-5 rounded-[2rem] border border-slate-100 flex items-center justify-around shadow-xl shadow-slate-200/40">
+                <div className="bg-white p-5 rounded-[2rem] border border-slate-100 flex items-center justify-around">
                     <div className="text-center">
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Jami bosqich</p>
                         <p className="text-xl font-black text-slate-800 tracking-tighter">{categories.length}</p>
@@ -106,11 +106,11 @@ const LeadCategoriesContent = () => {
             </div>
 
             {/* Table Layout */}
-            <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden">
+            <div className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-slate-50">
                                 <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sira</th>
                                 <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Bosqich Nomi</th>
                                 <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
@@ -121,7 +121,7 @@ const LeadCategoriesContent = () => {
                             {filteredCategories.map((cat, index) => (
                                 <tr key={cat.id} className="hover:bg-[#00BCE4]/[0.02] transition-all group">
                                     <td className="px-10 py-7">
-                                        <div className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
+                                        <div className="w-8 h-8 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
                                             {index + 1}
                                         </div>
                                     </td>

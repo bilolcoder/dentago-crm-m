@@ -181,7 +181,7 @@ const DashboardContent = () => {
     }));
 
     return (
-        <div className="bg-[#f8fdff] min-h-screen font-sans">
+        <div className="bg-white font-sans">
             {/* Oferta Modal */}
             {showOfferModal && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -199,7 +199,7 @@ const DashboardContent = () => {
                         <div className="flex-1 overflow-y-auto p-8 space-y-6 text-slate-700">
                             <p>Oferta matni...</p>
                         </div>
-                        <div className="p-6 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row gap-4">
+                        <div className="p-6 border-t border-slate-100 bg-white flex flex-col sm:flex-row gap-4">
                             <button onClick={handleRejectOffer} className="flex-1 py-4 px-8 text-slate-500 font-bold rounded-2xl border border-slate-200">Bekor qilish</button>
                             <button onClick={handleAcceptOffer} className="flex-[2] py-4 px-8 bg-[#00BCE4] text-white font-bold rounded-2xl shadow-lg">Roziman va davom etish</button>
                         </div>
@@ -207,25 +207,25 @@ const DashboardContent = () => {
                 </div>
             )}
 
-            <div className="p-4 md:p-8 space-y-6">
+            <div className="space-y-6">
                 {/* Dashboard Kartalari */}
                 <section className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                     {topStats.map((stat, index) => (
                         <Link
                             to={stat.link}
                             key={index}
-                            className="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm flex justify-between items-center transition-all duration-300 hover:scale-[1.02] hover:shadow-lg group"
+                            className="p-6 rounded-2xl bg-white border border-gray-100 flex justify-between items-center transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
                         >
                             <div className="flex items-center gap-5">
                                 <div
                                     className="p-4 rounded-2xl transition-all duration-300 group-hover:rotate-6"
-                                    style={{ backgroundColor: `${stat.color}15`, color: stat.color }}
+                                    style={{ backgroundColor: `${stat.color}10`, color: stat.color }}
                                 >
                                     <stat.icon size={32} strokeWidth={2} />
                                 </div>
                                 <div>
                                     {loadingStats ? (
-                                        <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-md mb-1"></div>
+                                        <div className="h-8 w-12 bg-gray-50 animate-pulse rounded-md mb-1"></div>
                                     ) : (
                                         <p className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
                                             {stat.value}
@@ -236,7 +236,7 @@ const DashboardContent = () => {
                                     </p>
                                 </div>
                             </div>
-                            <div className="bg-slate-50 p-2 rounded-full group-hover:bg-[#00BCE4]/10 transition-colors">
+                            <div className="bg-white p-2 rounded-full group-hover:bg-[#00BCE4]/10 transition-colors">
                                 <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#00BCE4]" />
                             </div>
                         </Link>
@@ -245,7 +245,7 @@ const DashboardContent = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* To'lovlar Grafigi */}
-                    <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                    <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 p-6">
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-800 tracking-tight">{t('payments') || "To'lovlar"}</h3>
@@ -253,7 +253,7 @@ const DashboardContent = () => {
                             </div>
                             <button 
                                 onClick={() => dateInputRef.current?.showPicker()} 
-                                className="flex items-center gap-2 px-4 py-2 bg-[#e6f8fc] rounded-xl text-xs font-bold text-[#00BCE4]"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl text-xs font-bold text-[#00BCE4]"
                             >
                                 <Calendar className="w-4 h-4" />
                                 <span>{selectedDate}</span>
@@ -271,7 +271,7 @@ const DashboardContent = () => {
                                 <AreaChart data={chartData}>
                                     <defs>
                                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#00BCE4" stopOpacity={0.2} />
+                                            <stop offset="5%" stopColor="#00BCE4" stopOpacity={0.1} />
                                             <stop offset="95%" stopColor="#00BCE4" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
@@ -287,7 +287,7 @@ const DashboardContent = () => {
                                         contentStyle={{ 
                                             borderRadius: '16px', 
                                             border: 'none', 
-                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' 
+                                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' 
                                         }} 
                                         formatter={(value) => [`${value} so'm`, 'To\'lov']}
                                     />
@@ -295,7 +295,7 @@ const DashboardContent = () => {
                                         type="monotone" 
                                         dataKey="value" 
                                         stroke="#00BCE4" 
-                                        strokeWidth={4} 
+                                        strokeWidth={3} 
                                         fill="url(#colorValue)" 
                                     />
                                 </AreaChart>
@@ -304,7 +304,7 @@ const DashboardContent = () => {
                     </div>
 
                     {/* Ommabop xizmatlar */}
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                    <div className="bg-white rounded-3xl border border-gray-100 p-6">
                         <h3 className="text-lg font-bold text-slate-800 mb-6">
                             {t('top_services') || "Ommabop xizmatlar"}
                         </h3>
@@ -312,7 +312,7 @@ const DashboardContent = () => {
                             {formattedServices.slice(0, 6).map((service, index) => (
                                 <div 
                                     key={service.id || index} 
-                                    className="flex items-center justify-between p-4 rounded-2xl bg-[#fcfdfe] border border-slate-50 transition-colors hover:bg-slate-50"
+                                    className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-50 transition-colors hover:bg-gray-50"
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-lg bg-[#00BCE4] flex items-center justify-center text-white text-xs font-bold">

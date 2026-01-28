@@ -59,7 +59,7 @@ const ProductUsageContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 bg-white min-h-screen">
+        <div className="bg-white">
             {/* Header Section */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
@@ -96,11 +96,11 @@ const ProductUsageContent = () => {
                         placeholder="Shifokor, bemor yoki mahsulot bo'yicha qidirish..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-[24px] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] focus:bg-white transition-all shadow-sm placeholder:text-slate-400"
+                        className="w-full pl-14 pr-6 py-4.5 bg-white border border-gray-200 rounded-[24px] text-slate-700 font-bold outline-none focus:ring-4 focus:ring-[#00BCE4]/5 focus:border-[#00BCE4] transition-all placeholder:text-slate-400"
                     />
                 </div>
-                <div className="bg-white p-5 rounded-[24px] border border-slate-100 flex items-center justify-between shadow-xl shadow-slate-100/50">
-                    <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl">
+                <div className="bg-white p-5 rounded-[24px] border border-gray-100 flex items-center justify-between">
+                    <div className="p-3 bg-gray-50 text-[#00BCE4] rounded-2xl">
                         <ClipboardList size={22} strokeWidth={2.5} />
                     </div>
                     <div className="text-right">
@@ -111,11 +111,11 @@ const ProductUsageContent = () => {
             </div>
 
             {/* Table Container */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden">
+            <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-50">
+                            <tr className="bg-white border-b border-gray-50">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('doctor')}</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('patient')}</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('product')}</th>
@@ -124,13 +124,13 @@ const ProductUsageContent = () => {
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Boshqaruv</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-gray-50">
                             {filteredUsage.length > 0 ? (
                                 filteredUsage.map((item) => (
-                                    <tr key={item.id} className="hover:bg-[#00BCE4]/[0.02] transition-all group">
+                                    <tr key={item.id} className="hover:bg-gray-50/50 transition-all group">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                                                <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-[#00BCE4]/10 group-hover:text-[#00BCE4] transition-all">
                                                     <Stethoscope size={18} strokeWidth={2.5} />
                                                 </div>
                                                 <span className="text-sm font-black text-slate-700 tracking-tight uppercase italic">{item.doctorName}</span>
@@ -143,18 +143,18 @@ const ProductUsageContent = () => {
                                             </div>
                                         </td>
                                         <td className="px-8 py-5">
-                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg">
                                                 <Package size={14} className="text-[#00BCE4]" />
                                                 <span className="text-xs font-black text-[#00BCE4] uppercase tracking-tighter">{item.productName}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-5 text-center">
-                                            <span className="text-sm font-black text-slate-800 bg-slate-100 px-4 py-1.5 rounded-xl">
+                                            <span className="text-sm font-black text-slate-800 bg-gray-50 px-4 py-1.5 rounded-xl">
                                                 {item.quantity}
                                             </span>
                                         </td>
                                         <td className="px-8 py-5 text-right">
-                                            <div className="inline-flex items-center gap-2 text-[11px] font-black text-slate-400 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 group-hover:border-[#00BCE4]/20 transition-all">
+                                            <div className="inline-flex items-center gap-2 text-[11px] font-black text-slate-400 bg-white px-4 py-2 rounded-xl border border-gray-100 group-hover:border-[#00BCE4]/20 transition-all">
                                                 <Calendar size={13} strokeWidth={2.5} />
                                                 {item.date}
                                             </div>
@@ -171,8 +171,8 @@ const ProductUsageContent = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="py-32 text-center bg-slate-50/30">
-                                        <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-slate-200 border border-slate-100">
+                                    <td colSpan="6" className="py-32 text-center bg-white">
+                                        <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-gray-100">
                                             <ClipboardList className="w-10 h-10 text-slate-200" />
                                         </div>
                                         <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter italic">Sarf topilmadi</h3>
@@ -192,7 +192,7 @@ const ProductUsageContent = () => {
                 title="Yangi sarf yozuvi"
                 footer={
                     <div className="flex gap-4 p-2 w-full">
-                        <button onClick={() => setIsModalOpen(false)} className="flex-1 py-4.5 bg-slate-100 text-slate-500 font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all">
+                        <button onClick={() => setIsModalOpen(false)} className="flex-1 py-4.5 bg-gray-50 text-slate-500 font-black rounded-2xl text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all">
                             {t('cancel')}
                         </button>
                         <button onClick={handleAddUsage} className="flex-1 py-4.5 bg-[#00BCE4] text-white font-black rounded-2xl shadow-xl shadow-[#00BCE4]/30 text-[10px] uppercase tracking-[0.2em] active:scale-95 transition-all hover:brightness-110">
@@ -220,7 +220,7 @@ const ProductUsageContent = () => {
                                     type="text"
                                     value={formData[field.key]}
                                     onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                                    className="w-full pl-12 pr-5 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
+                                    className="w-full pl-12 pr-5 py-4.5 bg-gray-50 border border-gray-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
                                     placeholder={`${field.label}ni kiriting...`}
                                 />
                             </div>
@@ -234,7 +234,7 @@ const ProductUsageContent = () => {
                                 type="date"
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full pl-12 pr-5 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
+                                className="w-full pl-12 pr-5 py-4.5 bg-gray-50 border border-gray-100 rounded-2xl text-slate-700 outline-none focus:border-[#00BCE4] focus:bg-white transition-all font-bold text-sm"
                             />
                         </div>
                     </div>

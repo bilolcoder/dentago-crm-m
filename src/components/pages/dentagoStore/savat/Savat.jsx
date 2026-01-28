@@ -310,7 +310,7 @@ const Savat = () => {
   }
 
   return (
-    <div className="min-h-screen pb-72 p-4">
+    <div className="min-h-screen pb-10 p-4">
       <button onClick={handleBackMinus} className='p-3 text-gray-400 bg-gray-100 cursor-pointer rounded-2xl text-2xl'><IoMdArrowRoundBack /></button>
       <div className="flex items-center justify-between mb-6 sticky top-0 z-10 py-2">
         <h1 className="text-center text-xl font-bold text-gray-800">Korzinka</h1>
@@ -389,33 +389,26 @@ const Savat = () => {
         ))}
       </div>
 
-      <div className="fixed bottom-0 right-0 left-70 
-    bg-white p-4 sm:p-6
-      
-   
-    z-40 border-t border-gray-200
+      <div className="w-full flex justify-center">
 
-  "
->
-        <div className="space-y-2 mb-1  text-sm">
-        
-           
+      <div className="fixed bottom-0 rounded-lg bg-white py-0 px-5 sm:p-6 z-40 border border-gray-200">
+        <div className="space-y-2 mb-3 text-sm">
           <div className="flex justify-between items-center     border-gray-300 mt-2">
             <span className="font-bold text-lg text-black">Jami</span>
             <span className="font-medium text-2xl text-black">{jamiSumma.toLocaleString()} so'm</span>
           </div>
-         
         </div>
 
         <button
-          onClick={() => navigate('/checkout')}
-          className="w-full py-3 bg-gradient-to-r from-[#00C2FF] to-[#0099DD] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+          // onClick={() => navigate('/checkout')}
+          className="w-full py-3 px-3 bg-gradient-to-r from-[#00C2FF] to-[#0099DD] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
           disabled={clearing}
-        >
+          >
           {clearing ? 'Kutilmoqda...' : `Sotib olish (${jamiSumma.toLocaleString()} so'm)`}
         </button>
 
-      
+      </div>
+
       </div>
     </div>
   );

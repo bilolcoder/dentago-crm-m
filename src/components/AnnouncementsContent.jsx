@@ -104,27 +104,30 @@ const AnnouncementsContent = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 space-y-6 bg-white">
+        <div className="space-y-6 bg-white">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
-                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                        <Link to="/" className="hover:text-blue-600 transition-colors capitalize">{t('dashboard')}</Link>
+                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        <Link to="/" className="hover:text-[#00BCE4] transition-colors capitalize">{t('dashboard')}</Link>
                         <span className="text-slate-300">/</span>
-                        <span className="text-slate-900 dark:text-white capitalize">{t('announcements')}</span>
+                        <span className="text-[#00BCE4] capitalize">{t('announcements')}</span>
                     </div>
+                    <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic mt-2">
+                        E'lonlar <span className="text-[#00BCE4]">Boshqaruvi</span>
+                    </h1>
                 </div>
 
                 <button
                     onClick={() => handleOpenModal(null)}
-                    className='flex items-center gap-2 py-2.5 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors whitespace-nowrap'
+                    className='flex items-center gap-2 py-4 px-8 bg-[#00BCE4] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:brightness-110 shadow-xl shadow-[#00BCE4]/20 transition-all active:scale-95 whitespace-nowrap'
                 >
                     <Plus className='w-5 h-5' /> {t('add')} {t('announcement')}
                 </button>
             </div>
 
             {/* E'lonlar Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {announcements.length > 0 ? (
                     announcements.map((announcement) => {
                         const expired = isExpired(announcement.expiresAt);
@@ -133,42 +136,42 @@ const AnnouncementsContent = () => {
                         return (
                             <div
                                 key={announcement.id}
-                                className={`bg-white dark:bg-gray-800 rounded-xl shadow-md border ${expired ? 'border-red-300 dark:border-red-700' : 'border-gray-100 dark:border-gray-700'} overflow-hidden transition-all hover:shadow-lg`}
+                                className={`bg-white rounded-2xl border ${expired ? 'border-rose-200 bg-rose-50/10' : 'border-gray-100'} overflow-hidden transition-all hover:border-gray-200 group`}
                             >
                                 {/* Rasm */}
-                                <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
+                                <div className="relative h-56 bg-gray-50">
                                     <img
                                         src={announcement.image}
                                         alt="E'lon rasmi"
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         onError={(e) => {
                                             e.target.src = 'https://via.placeholder.com/400x300?text=Rasm+Topilmadi';
                                         }}
                                     />
                                     {expired && (
-                                        <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                        <div className="absolute top-4 right-4 bg-rose-500 text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest">
                                             Muddati tugagan
                                         </div>
                                     )}
                                     {!expired && (
-                                        <div className="absolute top-2 right-2 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                        <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest">
                                             {daysLeft} kun qoldi
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Mazmun */}
-                                <div className="p-4">
-                                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 line-clamp-3">
+                                <div className="p-6">
+                                    <p className="text-sm font-bold text-slate-700 mb-4 line-clamp-3 leading-relaxed">
                                         {announcement.description}
                                     </p>
 
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                                            <Calendar className="w-3 h-3 inline mr-1" />
+                                    <div className="flex items-center justify-between mb-6">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                            <Calendar className="w-3.5 h-3.5" />
                                             {announcement.createdAt}
                                         </span>
-                                        <span className={`text-xs px-2 py-1 rounded-full ${announcement.paymentStatus === 'To\'landi' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
+                                        <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${announcement.paymentStatus === 'To\'landi' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
                                             {announcement.paymentStatus}
                                         </span>
                                     </div>
@@ -177,21 +180,21 @@ const AnnouncementsContent = () => {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleViewAnnouncement(announcement)}
-                                            className='flex-1 p-2 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition flex items-center justify-center gap-1'
+                                            className='flex-1 py-3 rounded-xl text-slate-400 bg-gray-50 hover:bg-[#00BCE4] hover:text-white transition-all flex items-center justify-center'
                                             title="Ko'rish"
                                         >
                                             <Eye className='w-4 h-4' />
                                         </button>
                                         <button
                                             onClick={() => handleOpenModal(announcement)}
-                                            className='flex-1 p-2 rounded-lg text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30 transition flex items-center justify-center gap-1'
+                                            className='flex-1 py-3 rounded-xl text-slate-400 bg-gray-50 hover:bg-[#00BCE4] hover:text-white transition-all flex items-center justify-center'
                                             title="Tahrirlash"
                                         >
                                             <Edit className='w-4 h-4' />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(announcement.id, announcement.description)}
-                                            className='flex-1 p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 transition flex items-center justify-center gap-1'
+                                            className='flex-1 py-3 rounded-xl text-slate-400 bg-gray-50 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center'
                                             title="O'chirish"
                                         >
                                             <Trash2 className='w-4 h-4' />
@@ -202,7 +205,7 @@ const AnnouncementsContent = () => {
                                     {expired && (
                                         <button
                                             onClick={() => handleExtendLimit(announcement)}
-                                            className='w-full mt-3 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition text-sm'
+                                            className='w-full mt-3 py-3 bg-amber-500 text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:brightness-110 transition-all'
                                         >
                                             Limitni uzaytirish (+7 kun)
                                         </button>
@@ -212,8 +215,13 @@ const AnnouncementsContent = () => {
                         );
                     })
                 ) : (
-                    <div className="col-span-full text-center py-20 text-gray-500 dark:text-gray-400">
-                        E'lonlar topilmadi. Yangi e'lon qo'shing!
+                    <div className="col-span-full text-center py-32 bg-gray-50 rounded-[2rem] border border-gray-100">
+                        <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                            <Plus className="w-10 h-10 text-slate-200" />
+                        </div>
+                        <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest italic">
+                            E'lonlar topilmadi. Yangi e'lon qo'shing!
+                        </p>
                     </div>
                 )}
             </div>
@@ -230,16 +238,16 @@ const AnnouncementsContent = () => {
                 footer={
                     <button
                         onClick={handleSave}
-                        className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                        className="w-full py-4 bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest rounded-xl hover:brightness-110 transition-all shadow-xl shadow-[#00BCE4]/20 active:scale-95"
                     >
                         {editingAnnouncement ? t('save') : "E'lonni yaratish"}
                     </button>
                 }
             >
-                <div className="space-y-4">
+                <div className="space-y-6 py-4">
                     {/* Rasm URL */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
                             E'lon rasmi (URL)*
                         </label>
                         <input
@@ -247,13 +255,13 @@ const AnnouncementsContent = () => {
                             value={formData.image}
                             onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                             placeholder="https://example.com/image.jpg"
-                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+                            className="w-full p-4 border border-gray-100 rounded-xl bg-gray-50 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#00BCE4] focus:bg-white transition-all"
                         />
                         {formData.image && (
                             <img
                                 src={formData.image}
                                 alt="Preview"
-                                className="mt-2 w-full h-40 object-cover rounded-lg"
+                                className="mt-4 w-full h-48 object-cover rounded-2xl border border-gray-100"
                                 onError={(e) => {
                                     e.target.src = 'https://via.placeholder.com/400x200?text=Noto\'g\'ri+URL';
                                 }}
@@ -263,7 +271,7 @@ const AnnouncementsContent = () => {
 
                     {/* Tavsif */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
                             Tavsif (E'lon matni)*
                         </label>
                         <textarea
@@ -271,25 +279,25 @@ const AnnouncementsContent = () => {
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="E'lon haqida batafsil ma'lumot yozing..."
                             rows={4}
-                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+                            className="w-full p-4 border border-gray-100 rounded-xl bg-gray-50 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#00BCE4] focus:bg-white transition-all resize-none"
                         />
                     </div>
 
                     {/* To'lov holati (placeholder) */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            To'lov holati (Hozircha placeholder)
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
+                            To'lov holati
                         </label>
                         <select
                             value={formData.paymentStatus}
                             onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value })}
-                            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
+                            className="w-full p-4 border border-gray-100 rounded-xl bg-gray-50 text-sm font-bold text-slate-700 focus:outline-none focus:border-[#00BCE4] focus:bg-white transition-all appearance-none"
                         >
                             <option value="Kutilmoqda">Kutilmoqda</option>
                             <option value="To'landi">To'landi</option>
                             <option value="Bekor qilindi">Bekor qilindi</option>
                         </select>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-2 ml-1">
                             * To'lov tizimi keyinchalik API orqali ulanadi
                         </p>
                     </div>
