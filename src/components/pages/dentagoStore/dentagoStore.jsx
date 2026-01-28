@@ -448,7 +448,7 @@ function Boshsaxifa() {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  const notification = () => navigate('/notification');
+  // const notification = () => navigate('/notification');
 
   // Modal ochish funksiyasi
   const openModal = () => {
@@ -560,9 +560,9 @@ function Boshsaxifa() {
               )}
             </div>
 
-            <button onClick={notification} className="p-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
+            {/* <button onClick={notification} className="p-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
               <Bell />
-            </button>
+            </button> */}
           </div>
         </header>
 
@@ -938,7 +938,7 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
       <button className="absolute right-3 top-3 z-10 p-1 rounded-full bg-white/80 hover:bg-red-100 text-gray-500 hover:text-red-500 transition-all">
         <Heart size={20} />
       </button>
-      <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-[15px] md:rounded-[20px] overflow-hidden mb-3 md:mb-4 flex items-center justify-center h-32 md:h-48">
+      <div className="bg-gradient-to-br  rounded-[15px] md:rounded-[20px] overflow-hidden mb-3 md:mb-4 flex items-center justify-center h-32 md:h-48">
         <img
           src={product.img}
           alt={product.name}

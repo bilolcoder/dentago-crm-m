@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Bell, Megaphone, Users, Home, ShoppingBag, User, Plus, X } from "lucide-react";
+import { Search, Bell, Megaphone, Users, Home, ShoppingBag, User, Plus, X, ArrowLeft } from "lucide-react";
 import { RiToothLine } from "react-icons/ri";
 import { MdGridView } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,12 +24,12 @@ function Ustalar() {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  // 1. Sahifaga o'tish funksiyasi
+  // Sahifaga o'tish funksiyasi
   const notification = () => {
     navigate('/notification');
   };
 
-  // 2. Telefon raqamni formatlash (Siz aytgan +998-XX-XXX-XX-XX holati)
+  // Telefon raqamni formatlash (+998-XX-XXX-XX-XX)
   const formatPhoneNumber = (value) => {
     let digits = value.replace(/\D/g, "");
     if (digits.length > 0 && !digits.startsWith("998")) {
@@ -47,7 +47,7 @@ function Ustalar() {
     return formatted;
   };
 
-  // 3. Rasm tanlash
+  // Rasm tanlash
   const handleImageChange = (e) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files).map((file) => ({
@@ -59,13 +59,13 @@ function Ustalar() {
     e.target.value = "";
   };
 
-  // 4. Rasmni o'chirish
+  // Rasmni o'chirish
   const removeImage = (index) => {
     URL.revokeObjectURL(selectedImages[index].preview);
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  // 5. Formani yuborish
+  // Formani yuborish
   const onSubmit = (data) => {
     const finalData = { ...data, images: selectedImages.map(img => img.file) };
     console.log("Yuborilayotgan ma'lumotlar:", finalData);
@@ -74,12 +74,14 @@ function Ustalar() {
 
   const slides = [
     {
-      title: "Muammo haqida xabar bering",
-      description: "Uskunangiz nosoz bo’lsa uni tuzatishga yordam beramiz",
+      title: "Ustalar sizning yordamingizda",
+      description: "Uskuna nosoz bo'lsa, tez va ishonchli usta toping!",
+      img: Chair,
     },
     {
-      title: "Muammo haqida xabar bering",
-      description: "Uskunangiz nosoz bo’lsa uni tuzatishga yordam beramiz",
+      title: "Tez ta'mirlash xizmati",
+      description: "Butun O'zbekiston bo'ylab tajribali ustalar bilan bog'laning",
+      img: Chair,
     },
   ];
 
@@ -106,23 +108,65 @@ function Ustalar() {
           </div>
         </header>
 
-        {/* HERO BANNER */}
+        {/* HERO BANNER – barcha sahifalarda bir xil dizayn */}
         <section className="px-4 md:px-8 py-6">
-          <div className="relative group overflow-hidden rounded-[30px] shadow-sm">
-            <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-              {slides.map((slide, index) => (
-                <div key={index} className="w-full flex-shrink-0 bg-gradient-to-r from-[#c4f5e9] to-[#66bba6] p-8 md:p-16 h-[250px] md:h-[400px] flex items-center relative text-white">
-                  <div className="z-10 w-full md:w-1/2">
-                    <img src={Logo} alt="dentaGo" className="w-24 md:w-48 mb-4" />
-                    <h2 className="font-bold text-[#009571] text-xl md:text-4xl leading-tight mb-2 whitespace-pre-line">{slide.title}</h2>
-                    <p className="text-xs md:text-lg text-gray-600 opacity-90 max-w-md">{slide.description}</p>
+          <div className="relative group">
+            <div className="overflow-hidden rounded-3xl shadow-lg">
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {slides.map((slide, index) => (
+                  <div key={index} className="w-full flex-shrink-0">
+                    <div className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-[300px] md:h-[450px] p-8 md:p-16 flex items-center relative overflow-hidden">
+                      {/* Chap taraf – logo + text */}
+                      <div className="w-full md:w-1/2 z-10">
+                        <img
+                          src={Logo}
+                          className="w-52 transform max-sm:w-32 translate-x-[-12px] mb-4 md:mb-6"
+                          alt="Logo"
+                        />
+                        <h2 className="text-2xl md:text-5xl text-white mb-4 leading-tight whitespace-pre-line font-bold max-h-[140px] md:max-h-[200px] overflow-hidden">
+                          {slide.title}
+                        </h2>
+                        <p className="text-sm md:text-lg text-cyan-50 mb-8 max-w-md line-clamp-3 md:line-clamp-none">
+                          {slide.description}
+                        </p>
+                      </div>
+
+                      {/* O'ng taraf – rasm */}
+                      <div className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 w-1/2 flex justify-end">
+                        <img
+                          src={slide.img}
+                          alt={slide.title}
+                          className="h-48 md:h-[350px] object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = Chair;
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 w-1/3 flex justify-end">
-                    <img src={Chair} alt="Chair" className="h-32 md:h-[320px] object-contain" />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
+            {/* Oldinga / Orqaga tugmalar */}
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <ArrowLeft className="text-white" size={24} />
+            </button>
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
+            >
+              <ArrowLeft className="text-white" size={24} />
+            </button>
+
+         
           </div>
         </section>
 
@@ -212,7 +256,6 @@ function Ustalar() {
           </form>
         </div>
       </div>
-
     </div>
   );
 }

@@ -64,12 +64,7 @@ function DetailDoctors() {
     }
   ];
 
-  const materiallar = [
-    { id: 1, name: "Metall", icon: <Settings className="text-[#00BCD4] w-6 h-6" /> },
-    { id: 2, name: "Keramika", icon: <FlaskConical className="text-[#00BCD4] w-6 h-6" /> },
-    { id: 3, name: "Plastmassa", icon: <Trash2 className="text-[#00BCD4] w-6 h-6" /> },
-    { id: 4, name: "Boshqa", icon: <MoreHorizontal className="text-[#00BCD4] w-6 h-6" /> },
-  ];
+
 
   return (
     <div className="w-full bg-white min-h-screen flex flex-col px-4 md:px-8">
@@ -160,25 +155,7 @@ function DetailDoctors() {
           </div>
         </section>
 
-        {/* MATERIALLAR BO'LIMI */}
-        <section className="mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#333] mb-6">Materiallar</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {materiallar.map((mat) => (
-                <Link to="/malumot" key={mat.id} className="block">
-              <div
-                key={mat.id}
-                className="bg-white rounded-2xl p-4 md:p-6 flex items-center gap-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-50 hover:border-cyan-200 transition-all cursor-pointer"
-                >
-                <div className="bg-[#F8F9FA] p-3 rounded-xl">
-                  {mat.icon}
-                </div>
-                <span className="text-sm md:text-lg font-bold text-gray-700">{mat.name}</span>
-              </div>
-                  </Link>
-            ))}
-          </div>
-        </section>
+      
       </div>
 
       {/* BUYURTMA BERISH TUGMASI */}

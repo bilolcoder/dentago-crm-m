@@ -389,43 +389,33 @@ const Savat = () => {
         ))}
       </div>
 
-      <div
-  className="
-    fixed bottom-0 inset-x-0
-    md:inset-x-auto md:right-5 md:w-[78%]
+      <div className="fixed bottom-0 right-0 left-70 
     bg-white p-4 sm:p-6
-    rounded-t-3xl md:rounded-t-3xl
-    shadow-[0_-6px_20px_rgba(0,0,0,0.1)]
+      
+   
     z-40 border-t border-gray-200
+
   "
 >
-        <div className="space-y-2 mb-6 text-sm">
-          <div className="flex justify-between text-gray-400">
-            <span>Tovarlar ({jamiTovarlar} dona)</span>
-            <span className="font-bold text-black">{jamiSumma.toLocaleString()} so'm</span>
-          </div>
-          <div className="flex justify-between text-gray-400">
-            <span>Yetkazib berish</span>
-            <span className="text-green-500 font-bold">Bepul</span>
-          </div>
-          <div className="flex justify-between items-center pt-2 border-t border-gray-300 mt-2">
+        <div className="space-y-2 mb-1  text-sm">
+        
+           
+          <div className="flex justify-between items-center     border-gray-300 mt-2">
             <span className="font-bold text-lg text-black">Jami</span>
-            <span className="font-black text-2xl text-black">{jamiSumma.toLocaleString()} so'm</span>
+            <span className="font-medium text-2xl text-black">{jamiSumma.toLocaleString()} so'm</span>
           </div>
          
         </div>
 
         <button
           onClick={() => navigate('/checkout')}
-          className="w-full py-4 bg-gradient-to-r from-[#00C2FF] to-[#0099DD] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+          className="w-full py-3 bg-gradient-to-r from-[#00C2FF] to-[#0099DD] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
           disabled={clearing}
         >
           {clearing ? 'Kutilmoqda...' : `Sotib olish (${jamiSumma.toLocaleString()} so'm)`}
         </button>
 
-        <p className="text-center text-gray-400 text-xs mt-3">
-          Yetkazib berish 2-5 ish kunida
-        </p>
+      
       </div>
     </div>
   );

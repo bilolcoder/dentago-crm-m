@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 // import 'swiper/css';
 import 'swiper/css/pagination';
@@ -9,11 +7,12 @@ import 'swiper/css/navigation';
 import Chair from "../../../../../assets/usta.png";
 import Logo from "../../../../../assets/logo.png";
 import DoctorCard from "./DoctorCard"; // Shu fayl mavjudligini tekshiring
-import { Search, Users, Megaphone, Bell } from "lucide-react";
+import { Search, Users, Megaphone, Bell, ArrowLeft } from "lucide-react";
 import { RiToothLine } from "react-icons/ri";
 import { MdGridView } from "react-icons/md";
 
-// MA'LUMOTLAR BO'LISHI SHART
+
+
 const doctors = [
   {
     id: 1,
@@ -109,19 +108,29 @@ const categories = [
 function DentoGoApp() {
   const [activeTab, setActiveTab] = useState("texniklar");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
     {
-      title: "Tish-texniklar sizning xizmatingizda",
-      description: "Sifatli va qulay  tish yasashda bizga ishonsangiz bo’ladi!",
+      title: "Tish-texniklar sizning\nxizmatingizda",
+      description: "Sifatli va qulay tish yasashda bizga ishonsangiz bo’ladi!",
+      img: Chair,
     },
     {
-      title: "Tish-texniklar sizning xizmatingizda",
-      description: "Sifatli va qulay  tish yasashda bizga ishonsangiz bo’ladi!",
+      title: "Professional texniklar\nva aniq natijalar",
+      description: "Tajribali mutaxassislar bilan tez va sifatli xizmat!",
+      img: Chair,
     },
   ];
 
-  // Qidiruv mantiqi
+  // Avtomatik slayder (5 sekundda o'tadi)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   const filteredDoctors = doctors.filter((doctor) =>
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -147,35 +156,64 @@ function DentoGoApp() {
           </div>
         </header>
 
-        {/* SWIPER BANNER */}
-        <section className="px-4 md:px-8 py-6">
-          <Swiper
-            spaceBetween={30}
-            centeredSlides={true}
-            autoplay={{ delay: 3500, disableOnInteraction: false }}
-            pagination={{ clickable: true }}
-            navigation={true}
-            modules={[Autoplay, Pagination, Navigation]}
-            className="rounded-[32px] overflow-hidden shadow-xl"
-          >
-            {slides.map((slide, index) => (
-              <SwiperSlide key={index}>
-                <div className="bg-[#D8F8FF] h-[300px] md:h-[450px] p-8 md:p-16 flex items-center relative overflow-hidden">
-                  <div className="w-full md:w-1/2 z-10">
-                    <img src={Logo} className="w-40 md:w-52 mb-4 -ml-2" alt="Logo" />
-                    <h2 className="text-2xl md:text-5xl   text-[#009571] mb-4 leading-tight">
-                      {slide.title}
-                    </h2>
-                    <p className="text-sm md:text-lg text-gray-600 mb-8 max-w-md">{slide.description}</p>
-                  </div>
-                  <div className="absolute right-0 md:right-16 top-1/2 -translate-y-1/2 w-1/2 flex justify-end">
-                    <img src={Chair} alt="Chair" className="h-48 md:h-[380px] object-contain" />
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </section>
+       {/* HERO BANNER – Barcha sahifalarda bir xil dizayn uslubi */}
+<section className="px-4 md:px-8 py-6">
+  <div className="relative group">
+    <div className="overflow-hidden rounded-3xl shadow-lg">
+      <div
+        className="flex transition-transform duration-700 ease-in-out"
+        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+      >
+        {slides.map((slide, index) => (
+          <div key={index} className="w-full flex-shrink-0">
+            <div className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-[300px] md:h-[450px] p-8 md:p-16 flex items-center relative overflow-hidden">
+              {/* Chap taraf – logo + text */}
+              <div className="w-full md:w-1/2 z-10">
+                <img
+                  src={Logo}
+                  className="w-52 transform max-sm:w-32 translate-x-[-12px] mb-4 md:mb-6"
+                  alt="Logo"
+                />
+                <h2 className="text-2xl md:text-5xl text-white mb-4 leading-tight whitespace-pre-line font-bold max-h-[140px] md:max-h-[200px] overflow-hidden">
+                  {slide.title}
+                </h2>
+                <p className="text-sm md:text-lg text-cyan-50 mb-8 max-w-md line-clamp-3 md:line-clamp-none">
+                  {slide.description}
+                </p>
+              </div>
+
+              {/* O'ng taraf – rasm (tish texnikasi bilan ishlashga mos) */}
+              <div className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 w-1/2 flex justify-end">
+                <img
+                  src={slide.img || Chair}
+                  alt={slide.title}
+                  className="h-48 md:h-[350px] object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => { e.target.src = Chair; }} // agar rasm yuklanmasa fallback
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Oldinga / Orqaga tugmalar */}
+    <button
+      onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+      className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+    >
+      <ArrowLeft className="text-white" size={24} />
+    </button>
+    <button
+      onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
+      className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
+    >
+      <ArrowLeft className="text-white" size={24} />
+    </button>
+
+ 
+  </div>
+</section>
 
          {/* 3. CATEGORIES (Grid ko'rinishi) */}
          <section className="px-4 md:px-8 pb-12">

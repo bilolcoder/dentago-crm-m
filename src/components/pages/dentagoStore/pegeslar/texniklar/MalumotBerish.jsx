@@ -139,44 +139,43 @@ function MalumotBerish() {
             />
           </div>
 
-          {/* TO'LOV + YETKAZIB BERISH (flex yonma-yon) */}
-          <div className="md:col-span-2 flex flex-col md:flex-row gap-6">
+         {/* TO'LOV QILUVCHI + YETKAZIB BERISH – ikkalasi ham chiroyli select */}
+<div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* To'lov qiluvchi */}
-            <div className="flex-1 space-y-3">
-              <label className="text-gray-700 font-bold text-sm">To'lov qiluvchi *</label>
-              <div className="flex flex-col gap-3">
-                <label className="flex items-center gap-3 p-4 bg-gray-50 border rounded-2xl cursor-pointer">
-                  <input type="radio" value="zub_texnik" {...register("payer", { required: true })} />
-                  Zub texnik
-                </label>
-                <label className="flex items-center gap-3 p-4 bg-gray-50 border rounded-2xl cursor-pointer">
-                  <input type="radio" value="stamatolog" {...register("payer", { required: true })} />
-                  Stamatolog
-                </label>
-                <label className="flex items-center gap-3 p-4 bg-gray-50 border rounded-2xl cursor-pointer">
-                  <input type="radio" value="ikkisixam" {...register("payer", { required: true })} />
-                  Ikkisixam
-                </label>
-              </div>
-            </div>
+{/* To'lov qiluvchi – SELECT */}
+<div className="space-y-3">
+  <label className="text-gray-700 font-bold text-sm">To'lov qiluvchi *</label>
+  <select
+    {...register("payer", { required: "To'lov qiluvchini tanlang" })}
+    className={`w-full p-3 mt-2.5 bg-gray-50 border ${errors.payer ? 'border-red-500' : 'border-gray-200'} rounded-2xl outline-none focus:ring-2 focus:ring-[#00B4D8] appearance-none cursor-pointer`}
+  >
+    <option value="" disabled selected hidden>Tanlang...</option>
+    <option value="zub_texnik">Zub texnik</option>
+    <option value="stamatolog">Stomatolog</option>
+    <option value="ikkisixam">Ikkalasiga ham</option>
+  </select>
+  {errors.payer && (
+    <p className="text-red-500 text-xs mt-1">{errors.payer.message}</p>
+  )}
+</div>
 
-            {/* Yetkazib berish */}
-            <div className="flex-1 space-y-3">
-              <label className="text-gray-700 font-bold text-sm">Yetkazib berish *</label>
-              <div className="flex flex-col gap-3">
-                <label className="flex items-center gap-3 p-4 bg-gray-50 border rounded-2xl cursor-pointer">
-                  <input type="radio" value="btc" {...register("delivery", { required: true })} />
-                  BTC
-                </label>
-                <label className="flex items-center gap-3 p-4 bg-gray-50 border rounded-2xl cursor-pointer">
-                  <input type="radio" value="yandex_go" {...register("delivery", { required: true })} />
-                  YandexGo
-                </label>
-              </div>
-            </div>
+{/* Yetkazib berish – SELECT */}
+<div className="space-y-3">
+  <label className="text-gray-700 font-bold text-sm">Yetkazib berish usuli *</label>
+  <select
+    {...register("delivery", { required: "Yetkazib berish usulini tanlang" })}
+    className={`w-full p-3 mt-2.5 bg-gray-50 border ${errors.delivery ? 'border-red-500' : 'border-gray-200'} rounded-2xl outline-none focus:ring-2 focus:ring-[#00B4D8] appearance-none cursor-pointer`}
+  >
+    <option value="" disabled selected hidden>Tanlang...</option>
+    <option value="btc">BTC (Buyurtma texnik tomonidan olib kelinadi)</option>
+    <option value="yandex_go">Yandex Go / Yetkazib beruvchi xizmati</option>
+  </select>
+  {errors.delivery && (
+    <p className="text-red-500 text-xs mt-1">{errors.delivery.message}</p>
+  )}
+</div>
 
-          </div>
+</div>
 
           {/* Rasm qo'shish */}
           <div className="md:col-span-2 space-y-3">
@@ -196,10 +195,8 @@ function MalumotBerish() {
             )}
 
             <div className="grid grid-cols-2 gap-4">
-              <button type="button" onClick={() => cameraInputRef.current.click()} className="flex items-center justify-center gap-2 p-4 bg-cyan-50 text-cyan-600 rounded-2xl font-bold border">
-                <Camera className="w-5 h-5" /> Kamera
-              </button>
-              <button type="button" onClick={() => galleryInputRef.current.click()} className="flex items-center justify-center gap-2 p-4 bg-cyan-50 text-cyan-600 rounded-2xl font-bold border">
+            
+              <button type="button" onClick={() => galleryInputRef.current.click()} className="flex mt-2.5 items-center justify-center gap-2 p-4 bg-cyan-50 text-cyan-600 rounded-2xl font-bold border">
                 <ImageIcon className="w-5 h-5" /> Galereya
               </button>
             </div>

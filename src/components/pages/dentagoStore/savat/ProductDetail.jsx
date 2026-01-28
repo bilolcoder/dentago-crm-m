@@ -138,13 +138,13 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28 md:pb-12">
+    <div className="min-h-screen   pb-28 md:pb-12">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+        <div className="  mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 -ml-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors"
           >
             <ArrowLeft size={26} className="text-gray-700" />
           </button>
@@ -161,10 +161,10 @@ const ProductDetail = () => {
       </div>
 
       {/* Asosiy kontent */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-24 md:pb-12">
+      <main className="  mx-auto px-4 sm:px-6 pt-6 pb-24 md:pb-12">
         {/* Rasm */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6 md:mb-8">
-          <div className="aspect-[4/3] md:aspect-[5/4] bg-gray-50 flex items-center justify-center p-4 md:p-8">
+        <div className="  rounded-2xl   overflow-hidden mb-6 md:mb-8">
+          <div className="aspect-[4/3] md:aspect-[5/4]   flex items-center justify-center p-4 md:p-8">
             <img
               src={product.img}
               alt={product.name}
