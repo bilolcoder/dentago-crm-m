@@ -15,8 +15,8 @@ function Bemorlarim() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState('');
-  // Mavjud state'lar orasiga qo‘shing
-  const [statusFilter, setStatusFilter] = useState(['all', 'pending', 'confirmed', 'cancelled']); // 'all' | 'pending' | 'confirmed' | 'cancelled'
+  // Mavjud state'lar orasiga qo'shing
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending' | 'confirmed' | 'cancelled'
 
   // Bekor qilish modali uchun state'lar
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);

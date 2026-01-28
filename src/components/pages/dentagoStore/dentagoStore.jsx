@@ -185,7 +185,7 @@ function Boshsaxifa() {
 
         const token = localStorage.getItem('accessToken');
 
-        const response = await axios.get(`${BASE_URL}api/product/app/product/all`, {
+        const response = await axios.get(`${BASE_URL}api/product/app/product/all?limit=500`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json',
@@ -634,7 +634,7 @@ function Boshsaxifa() {
         {/* Products */}
         {!loading && !error && filteredProducts.length > 0 && (
           <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-8 mt-6 pb-10">
-            {filteredProducts.slice(0, 4).map((product) => (
+            {filteredProducts.slice(0, 20).map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
