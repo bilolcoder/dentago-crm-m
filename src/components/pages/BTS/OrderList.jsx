@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MdDeleteOutline, MdCheck } from "react-icons/md";
-import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2 } from 'lucide-react';
+import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2, X, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -17,6 +17,25 @@ function Aperator() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [activeMenu, setActiveMenu] = useState(null); // Qaysi qator menyusi ochiqligini saqlaydi
+  const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
+
+  // Namuna uchun ustaga buyurtmalar ma'lumotlari
+  const masterOrders = [
+    {
+      id: 1,
+      image: "https://via.placeholder.com/50",
+      description: "Tish protezini ta'mirlash kerak, uzoq vaqtdan beri ishlatilmoqda va sinish belgilari bor.",
+      phone1: "+998 90 123 45 67",
+      phone2: "+998 93 765 43 21"
+    },
+    {
+      id: 2,
+      image: "https://via.placeholder.com/50",
+      description: "Yangi uskuna o'rnatish bo'yicha maslahat so'ralmoqda.",
+      phone1: "+998 91 222 33 44",
+      phone2: "+998 94 555 66 77"
+    }
+  ];
 
   const fetchOrders = async () => {
     try {
@@ -142,6 +161,12 @@ function Aperator() {
             <input type="text" placeholder="Qidiruv..." className="pl-12 pr-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 outline-none w-full md:w-80 text-sm font-bold" />
           </div>
           <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
+          <button 
+            onClick={() => setIsMasterModalOpen(true)}
+            className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:text-[#00BCE4] transition-all text-sm font-bold"
+          >
+            Ustaga buyurtma
+          </button>
           <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all"><Download size={16} />Eksport</button>
         </div>
       </div>
@@ -257,6 +282,84 @@ function Aperator() {
           </table>
         </div>
       </div>
+      {/* Ustaga buyurtmalar Modali */}
+      {isMasterModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-white">
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
+                  Ustaga <span style={{ color: PRIMARY_COLOR }}>Buyurtmalar</span>
+                </h2>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Kelib tushgan murojaatlar ro'yxati</p>
+              </div>
+              <button 
+                onClick={() => setIsMasterModalOpen(false)}
+                className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Content - Table */}
+            <div className="p-0 max-h-[60vh] overflow-y-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50 border-b border-gray-50">
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rasmi</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tavsif (Description)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aloqa (Tel)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {masterOrders.map((mOrder) => (
+                    <tr key={mOrder.id} className="hover:bg-gray-50/30 transition-all">
+                      <td className="px-8 py-5">
+                        <div className="w-14 h-14 rounded-2xl border border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-center">
+                          <img 
+                            src={mOrder.image} 
+                            alt="order" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
+                          />
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <p className="text-sm font-bold text-slate-700 max-w-[300px] truncate" title={mOrder.description}>
+                          {mOrder.description}
+                        </p>
+                      </td>
+                      <td className="px-8 py-5">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
+                            <Phone size={12} strokeWidth={3} />
+                            <span>{mOrder.phone1}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                            <Phone size={12} />
+                            <span>{mOrder.phone2}</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-8 py-6 border-t border-gray-50 bg-gray-50/30 flex justify-end">
+              <button 
+                onClick={() => setIsMasterModalOpen(false)}
+                className="px-8 py-3.5 rounded-2xl bg-white border border-gray-200 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95 shadow-sm"
+              >
+                Yopish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

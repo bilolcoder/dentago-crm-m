@@ -22,7 +22,7 @@ function Ustalar() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedImages, setSelectedImages] = useState([]);
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   // Sahifaga o'tish funksiyasi
   const notification = () => {
@@ -70,6 +70,12 @@ function Ustalar() {
     const finalData = { ...data, images: selectedImages.map(img => img.file) };
     console.log("Yuborilayotgan ma'lumotlar:", finalData);
     alert("Murojaatingiz qabul qilindi!");
+    reset({
+      muammo: "",
+      telRaqam: "",
+      telRaqam2: ""
+    });
+    setSelectedImages([]);
   };
 
   const slides = [
