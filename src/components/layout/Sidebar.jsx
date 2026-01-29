@@ -248,7 +248,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 {/* Footer Section */}
                 <div className="px-6 py-1 bg-white border-t border-gray-200">
                     {/* Social Connect */}
-                    <div className="flex justify-start mb-1 gap-4 h-8 items-end">
+                    <div className="flex justify-center mb-1 gap-4 h-8 items-end">
                         <div onClick={() => handleNavigation("https://t.me/Dentago_uz", true)} className="cursor-pointer text-[#00BCE4] hover:scale-110 transition-all">
                             <BsTelegram size={20} />
                         </div>
@@ -260,7 +260,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         </div>
                     </div>
 
-                    <p className="text-start text-[10px] font-medium text-black uppercase tracking-tighter">
+                    <p className="text-center text-[10px] font-medium text-black uppercase tracking-tighter">
                         &copy; 2025 DentaGo Platform
                     </p>
                 </div>

@@ -186,12 +186,25 @@ export const DataProvider = ({ children }) => {
     const [theme, setTheme] = useState(localStorage.getItem('app_theme') || 'light');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [authLoaded, setAuthLoaded] = useState(false);
+    const [user, setUser] = useState(null);
 
     // SAVAT UCHUN
     const [cartItems, setCartItems] = useState([]);     // to'liq savat array
     const [cartCount, setCartCount] = useState(0);      // jami dona (quantity yig'indisi)
 
     const getToken = () => localStorage.getItem('accessToken');
+
+    // Foydalanuvchi ma'lumotlarini yuklash
+    useEffect(() => {
+        const savedUser = localStorage.getItem('userData');
+        if (savedUser) {
+            try {
+                setUser(JSON.parse(savedUser));
+            } catch (e) {
+                console.error("User parsing error:", e);
+            }
+        }
+    }, []);
 
     // Savatni to'liq yuklash va jami sonni hisoblash
     const fetchCart = async () => {
@@ -237,14 +250,34 @@ export const DataProvider = ({ children }) => {
         }
     }, [isAuthenticated]);
 
-    // Auth tekshiruvi (sizning eski kodingiz)
+    // Auth tekshiruvi
     useEffect(() => {
+        const fetchUser = async (token) => {
+            try {
+                const response = await axios.get(`${BASE_URL}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.data?.success && response.data.user) {
+                    const data = response.data;
+                    const userObj = {
+                        name: data.user.username || data.user.name,
+                        role: data.user.role
+                    };
+                    setUser(userObj);
+                    localStorage.setItem('userData', JSON.stringify(userObj));
+                    if (data.user.role) localStorage.setItem('userRole', data.user.role);
+                }
+            } catch (error) {
+                console.error("Fetch user profile error:", error);
+            }
+        };
+
         const accessToken = localStorage.getItem('accessToken');
         const savedPhone = localStorage.getItem('userPhone');
 
         if (accessToken && savedPhone) {
             setIsAuthenticated(true);
-            // fetchUser(accessToken);   // agar user ma'lumotlari kerak bo'lsa
+            fetchUser(accessToken);
         }
         setAuthLoaded(true);
     }, []);
@@ -253,7 +286,8 @@ export const DataProvider = ({ children }) => {
         localStorage.setItem('userPhone', phone);
         setIsAuthenticated(true);
         if (userObj) {
-            // user saqlash logikasi
+            setUser(userObj);
+            localStorage.setItem('userData', JSON.stringify(userObj));
         }
         fetchCart(); // login bo'lganda savatni yangilash
     };
@@ -262,7 +296,9 @@ export const DataProvider = ({ children }) => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userPhone');
+        localStorage.removeItem('userData');
         setIsAuthenticated(false);
+        setUser(null);
         setCartItems([]);
         setCartCount(0);
     };
@@ -294,6 +330,7 @@ export const DataProvider = ({ children }) => {
             switchTheme: setTheme,
             t,
             isAuthenticated,
+            user,
             loginWithPhone,
             logout,
 

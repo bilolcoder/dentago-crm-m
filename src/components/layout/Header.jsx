@@ -57,24 +57,30 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
     const navigate = useNavigate();
 
     const {
-        data = {},
+        user: contextUser,
         locale,
         switchLocale,
         t,
         logout
     } = useData();
 
-    
-
-    // Foydalanuvchi ma'lumotlari olish
     // Foydalanuvchi ma'lumotlari olish
     const getCurrentUser = () => {
-        const getRole = (r) => (r === 'user' ? 'Role Yoq' : (r || 'Role Yoq').toUpperCase());
+        // Contextdan yoki LocalStorage dan ma'lumotlarni qidirish
+        const userData = contextUser || JSON.parse(localStorage.getItem('userData') || 'null');
+        
+        // ProfileContent dagi kabi role ni olish
+        const rawRole = localStorage.getItem('userRole') || (userData && userData.role) || 'user';
 
-        if (data.user) {
+        const getRoleDisplay = (r) => {
+            if (!r || r === 'user') return 'Foydalanuvchi';
+            return r.toUpperCase();
+        };
+
+        if (userData) {
             return {
-                username: data.user.name || data.user.username || 'Foydalanuvchi',
-                role: getRole(data.user.role)
+                username: userData.name || userData.username || 'Foydalanuvchi',
+                role: getRoleDisplay(rawRole)
             };
         }
 
@@ -83,7 +89,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
         return {
             username: formattedPhone,
-            role: 'Role Yoq'
+            role: 'Foydalanuvchi'
         };
     };
 

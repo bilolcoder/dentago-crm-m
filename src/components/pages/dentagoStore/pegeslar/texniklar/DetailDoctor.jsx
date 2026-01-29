@@ -141,6 +141,9 @@ function DetailDoctors() {
 
         {selectedXizmatId && (
           <section className="mt-12">
+            <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 border-l-4 border-cyan-400 rounded-xl pl-4 bg-gray-50 py-3 rounded-r-xl">
+              {xizmatlar.find(item => item.id === selectedXizmatId)?.title}
+            </h3>
             <MalumotBerish isEmbedded={true} />
           </section>
         )}
