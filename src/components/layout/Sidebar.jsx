@@ -255,7 +255,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         <div onClick={() => handleNavigation("https://www.instagram.com/dentago__uz", true)} className="cursor-pointer text-red-700 hover:scale-110 transition-all">
                             <BsInstagram size={20} />
                         </div>
-                        <div onClick={() => handleNavigation("mailto:ddentago@gmail.com", true)} className="cursor-pointer text-red-500 hover:scale-110 transition-all">
+                        <div onClick={() => handleNavigation("https://www.youtube.com/@Dentago_uz", true)} className="cursor-pointer text-red-500 hover:scale-110 transition-all">
                             <FaYoutube size={22} />
                         </div>
                     </div>
