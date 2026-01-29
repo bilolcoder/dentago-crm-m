@@ -4,6 +4,13 @@ import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2, X, P
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// Swiper imports
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 function Aperator() {
   const navigate = useNavigate();
   const PRIMARY_COLOR = "#00BCE4";
@@ -17,23 +24,32 @@ function Aperator() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [activeMenu, setActiveMenu] = useState(null); // Qaysi qator menyusi ochiqligini saqlaydi
-  const [isMasterModalOpen, setIsMasterModalOpen] = useState(false);
+  const [selectedMasterOrder, setSelectedMasterOrder] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Namuna uchun ustaga buyurtmalar ma'lumotlari
   const masterOrders = [
     {
       id: 1,
-      image: "https://via.placeholder.com/50",
+      images: [
+        "https://via.placeholder.com/400x400?text=Rasm+1",
+        "https://via.placeholder.com/400x400?text=Rasm+2",
+        "https://via.placeholder.com/400x400?text=Rasm+3"
+      ],
       description: "Tish protezini ta'mirlash kerak, uzoq vaqtdan beri ishlatilmoqda va sinish belgilari bor.",
-      phone1: "+998 90 123 45 67",
-      phone2: "+998 93 765 43 21"
+      phone1: "+998 77 297 22 22",
+      phone2: "+998 95 219 26 99"
     },
     {
       id: 2,
-      image: "https://via.placeholder.com/50",
+      images: [
+        "https://via.placeholder.com/400x400?text=Mahsulot+1",
+        "https://via.placeholder.com/400x400?text=Mahsulot+2",
+        "https://via.placeholder.com/400x400?text=Mahsulot+3"
+      ],
       description: "Yangi uskuna o'rnatish bo'yicha maslahat so'ralmoqda.",
-      phone1: "+998 91 222 33 44",
-      phone2: "+998 94 555 66 77"
+      phone1: "+998 77 297 22 22",
+      phone2: "+998 95 219 26 99"
     }
   ];
 
@@ -161,18 +177,12 @@ function Aperator() {
             <input type="text" placeholder="Qidiruv..." className="pl-12 pr-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 outline-none w-full md:w-80 text-sm font-bold" />
           </div>
           <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
-          <button 
-            onClick={() => setIsMasterModalOpen(true)}
-            className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:text-[#00BCE4] transition-all text-sm font-bold"
-          >
-            Ustaga buyurtma
-          </button>
           <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all"><Download size={16} />Eksport</button>
         </div>
       </div>
 
       {/* Jadval */}
-      <div className="bg-white rounded-[1rem] shadow-2xl overflow-visible">
+      <div className="bg-white rounded-[1rem] shadow-2xl overflow-visible mb-12">
         <div className="overflow-x-auto overflow-y-visible">
           <table className="w-full min-w-[1100px]   ml-[10px]">
             <thead >
@@ -282,80 +292,179 @@ function Aperator() {
           </table>
         </div>
       </div>
-      {/* Ustaga buyurtmalar Modali */}
-      {isMasterModalOpen && (
+
+      {/* Ustaga buyurtmalar bo'limi */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
+            <Truck size={24} />
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
+            Ustaga <span style={{ color: PRIMARY_COLOR }}>Buyurtmalar</span>
+          </h2>
+        </div>
+
+        <div className="bg-white rounded-[1rem] shadow-2xl overflow-hidden border border-slate-100">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rasmi</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tavsif (Description)</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aloqa (Tel)</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Batafsil</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {masterOrders.map((mOrder) => (
+                  <tr 
+                    key={mOrder.id} 
+                    onClick={() => {
+                      setSelectedMasterOrder(mOrder);
+                      setIsDetailModalOpen(true);
+                    }}
+                    className="hover:bg-[#00BCE4]/[0.02] transition-all cursor-pointer group"
+                  >
+                    <td className="px-8 py-5">
+                      <div className="w-14 h-14 rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center group-hover:border-[#00BCE4]/30 transition-all">
+                        <img 
+                          src={mOrder.images?.[0]} 
+                          alt="order" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
+                        />
+                      </div>
+                    </td>
+                    <td className="px-8 py-5">
+                      <p className="text-sm font-bold text-slate-700 max-w-[400px] truncate">
+                        {mOrder.description}
+                      </p>
+                    </td>
+                    <td className="px-8 py-5">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
+                          <Phone size={12} strokeWidth={3} />
+                          <span>+998 90 123 45 67</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-center">
+                      <button className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
+                        <MoreHorizontal size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {/* Ustaga buyurtma tafsilotlari Modali */}
+      {isDetailModalOpen && selectedMasterOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200">
+          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-white">
+            <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-white">
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
-                  Ustaga <span style={{ color: PRIMARY_COLOR }}>Buyurtmalar</span>
+                <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">
+                  Buyurtma <span style={{ color: PRIMARY_COLOR }}>Tafsilotlari</span>
                 </h2>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Kelib tushgan murojaatlar ro'yxati</p>
+                {/* <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">ID: #{selectedMasterOrder.id}</p> */}
               </div>
               <button 
-                onClick={() => setIsMasterModalOpen(false)}
-                className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+                onClick={() => {
+                  setIsDetailModalOpen(false);
+                  setSelectedMasterOrder(null);
+                }}
+                className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
               >
-                <X size={24} />
+                <X size={28} />
               </button>
             </div>
 
-            {/* Modal Content - Table */}
-            <div className="p-0 max-h-[60vh] overflow-y-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50/50 border-b border-gray-50">
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rasmi</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tavsif (Description)</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aloqa (Tel)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {masterOrders.map((mOrder) => (
-                    <tr key={mOrder.id} className="hover:bg-gray-50/30 transition-all">
-                      <td className="px-8 py-5">
-                        <div className="w-14 h-14 rounded-2xl border border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-center">
+            {/* Modal Content */}
+            <div className="p-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {/* Rasm (Swiper) */}
+                <div className="space-y-4">
+                  <div className="aspect-square rounded-[2rem] border-2 border-slate-100 overflow-hidden bg-slate-50 group relative">
+                    <Swiper
+                      modules={[Navigation, Pagination]}
+                      navigation
+                      pagination={{ clickable: true }}
+                      className="w-full h-full"
+                    >
+                      {selectedMasterOrder.images?.map((img, index) => (
+                        <SwiperSlide key={index}>
                           <img 
-                            src={mOrder.image} 
-                            alt="order" 
+                            src={img} 
+                            alt={`Order detail ${index + 1}`} 
                             className="w-full h-full object-cover"
-                            onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
                           />
-                        </div>
-                      </td>
-                      <td className="px-8 py-5">
-                        <p className="text-sm font-bold text-slate-700 max-w-[300px] truncate" title={mOrder.description}>
-                          {mOrder.description}
-                        </p>
-                      </td>
-                      <td className="px-8 py-5">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
-                            <Phone size={12} strokeWidth={3} />
-                            <span>{mOrder.phone1}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-                            <Phone size={12} />
-                            <span>{mOrder.phone2}</span>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
+                  <div className="flex gap-2">
+                    {/* <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                      <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Faol</span>
+                    </div> */}
+                    <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sana</p>
+                      <span className="text-xs font-black text-slate-700 uppercase tracking-widest">29.01.2026</span>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Modal Footer */}
-            <div className="px-8 py-6 border-t border-gray-50 bg-gray-50/30 flex justify-end">
-              <button 
-                onClick={() => setIsMasterModalOpen(false)}
-                className="px-8 py-3.5 rounded-2xl bg-white border border-gray-200 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95 shadow-sm"
-              >
-                Yopish
-              </button>
+                {/* Malumotlar */}
+                <div className="flex flex-col justify-between">
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Tavsif</h3>
+                      <p className="text-slate-700 font-bold leading-relaxed text-sm bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                        {selectedMasterOrder.description}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Aloqa ma'lumotlari</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#00BCE4]/5 border border-[#00BCE4]/10 group hover:border-[#00BCE4]/30 transition-all">
+                          <div className="w-10 h-10 rounded-xl bg-[#00BCE4] flex items-center justify-center text-white shadow-lg shadow-[#00BCE4]/20">
+                            <Phone size={18} />
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Asosiy raqam</p>
+                            <p className="text-sm font-black text-[#00BCE4]">+998 77 297 22 22</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-slate-300 transition-all">
+                          <div className="w-10 h-10 rounded-xl bg-slate-200 flex items-center justify-center text-slate-500">
+                            <Phone size={18} />
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Qo'shimcha</p>
+                            <p className="text-sm font-bold text-slate-700">+998 95 219 26 99</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button 
+                    className="w-full mt-8 py-5 rounded-3xl bg-[#00BCE4] text-white font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-[#00BCE4]/30 hover:-translate-y-1 transition-all active:scale-95"
+                    onClick={() => {
+                      // API call placeholder
+                      console.log("Bog'lanish uchun so'rov yuborildi ID:", selectedMasterOrder.id);
+                      alert("Mijoz bilan bog'lanish tizimi tayyorlanmoqda...");
+                    }}
+                  >
+                    Mijoz bilan bog'lanish
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

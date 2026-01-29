@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useData } from "../../../context/DataProvider";
 import {
   Search, Users, Megaphone, Bell, ArrowLeft, Heart, ShoppingBag,
-  ChevronDown, X
+  ChevronDown, X, Check
 } from "lucide-react";
 import { RiToothLine } from "react-icons/ri";
 import { MdGridView } from "react-icons/md";
@@ -139,6 +140,7 @@ const productCategories = [
 const BASE_URL = "https://app.dentago.uz/";
 
 function Boshsaxifa() {
+  const { cartItems, fetchCart } = useData();
   const [activeTab, setActiveTab] = useState("barchasi");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
@@ -438,6 +440,8 @@ function Boshsaxifa() {
       });
 
       console.log("Savatga qo'shildi:", response.data);
+      // Savatni yangilash
+      if (fetchCart) fetchCart();
     } catch (error) {
       console.error("Savat xatosi:", error);
       alert("Xato: " + (error.response?.data?.message || "Server bilan muammo"));
@@ -641,6 +645,7 @@ function Boshsaxifa() {
                 navigate={navigate}
                 onAddToCart={handleAddToCartAPI}
                 isLoading={cartLoading[product.id] || false}
+                isInCart={cartItems?.some(item => (item.product_id?._id || item.productSnapshot?._id || item.product_id) === product.id)}
               />
             ))}
           </div>
@@ -757,6 +762,7 @@ function Boshsaxifa() {
                             navigate={navigate}
                             onAddToCart={handleAddToCartAPI}
                             isLoading={cartLoading[product.id] || false}
+                            isInCart={cartItems?.some(item => (item.product_id?._id || item.productSnapshot?._id || item.product_id) === product.id)}
                           />
                         ))}
                       </div>
@@ -892,6 +898,7 @@ function Boshsaxifa() {
                           navigate={navigate}
                           onAddToCart={handleAddToCartAPI}
                           isLoading={cartLoading[product.id] || false}
+                          isInCart={cartItems?.some(item => (item.product_id?._id || item.productSnapshot?._id || item.product_id) === product.id)}
                         />
                       ))}
                     </div>
@@ -924,7 +931,7 @@ function Boshsaxifa() {
   );
 }
 
-function ProductCard({ product, navigate, onAddToCart, isLoading }) {
+function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await onAddToCart(product);
@@ -966,13 +973,19 @@ function ProductCard({ product, navigate, onAddToCart, isLoading }) {
           className={`w-full py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${
             isLoading
               ? 'bg-gray-400'
-              : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
+              : isInCart 
+                ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg'
+                : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
           }`}
         >
           {isLoading ? (
             <>
               <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-2 border-white border-t-transparent"></div>
               Qo'shilmoqda...
+            </>
+          ) : isInCart ? (
+            <>
+              <Check size={16} className="md:size-[18px]" /> Savatda mavjud
             </>
           ) : (
             <>

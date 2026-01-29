@@ -114,9 +114,9 @@ const Savat = () => {
   }, []);
 
   // const navigate = useNavigate();
-    const handleBackMinus = () => {
-      navigate(-1);
-    }
+  const handleBackMinus = () => {
+    navigate(-1);
+  }
 
   const fetchCartFromAPI = async (showLoading = true) => {
     try {
@@ -168,7 +168,7 @@ const Savat = () => {
   };
   const handleUpdateQuantity = async (itemId, change) => {
     if (!checkAuth(navigate)) return;
- 
+
     // 1. Savatdan mahsulotni topamiz
     const item = apiCartItems.find(i => i.id === itemId);
     if (!item) return;
@@ -189,7 +189,7 @@ const Savat = () => {
       );
 
       if (result.success) {
-      
+
         await fetchCartFromAPI(false);
 
         // Agar Context ishlatayotgan bo'lsangiz:
@@ -205,7 +205,7 @@ const Savat = () => {
   };
   const handleRemoveFromCart = async (itemId) => {
     if (!checkAuth(navigate)) return;
-   
+
     try {
       setRemoving(prev => ({ ...prev, [itemId]: true }));
       setApiCartItems(prev => prev.filter(i => i.id !== itemId));
@@ -231,7 +231,7 @@ const Savat = () => {
   const handleClearCart = async () => {
     if (!checkAuth(navigate)) return;
     if (apiCartItems.length === 0) return;
-   
+
     try {
       setClearing(true);
       const oldItems = [...apiCartItems];
@@ -310,7 +310,7 @@ const Savat = () => {
   }
 
   return (
-    <div className="min-h-screen pb-10 p-4">
+    <div className="min-h-screen pb-30 p-4">
       <button onClick={handleBackMinus} className='p-3 text-gray-400 bg-gray-100 cursor-pointer rounded-2xl text-2xl'><IoMdArrowRoundBack /></button>
       <div className="flex items-center justify-between mb-6 sticky top-0 z-10 py-2">
         <h1 className="text-center text-xl font-bold text-gray-800">Korzinka</h1>
@@ -359,7 +359,7 @@ const Savat = () => {
                   {item.category}{item.company && ` • ${item.company}`}
                 </p>
               )}
-             
+
 
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="font-black text-lg text-gray-900">
@@ -391,23 +391,25 @@ const Savat = () => {
 
       <div className="w-full flex justify-center">
 
-      <div className="fixed bottom-0 rounded-lg bg-white py-0 px-5 sm:p-6 z-40 border border-gray-200">
-        <div className="space-y-2 mb-3 text-sm">
-          <div className="flex justify-between items-center     border-gray-300 mt-2">
-            <span className="font-bold text-lg text-black">Jami</span>
-            <span className="font-medium text-2xl text-black">{jamiSumma.toLocaleString()} so'm</span>
+        <div className="fixed bottom-0 right-0 left-70 bg-white p-4 sm:pt-3 sm:pb-4 z-40 border-t border-gray-200">
+          <div className="space-y-2 mb-3 text-sm">
+            <div className="flex justify-center items-center border-gray-300 mt-2">
+              <span className="font-medium text-2xl text-black">JAMI: </span>
+              <span className="font-bold text-2xl text-gray-600"> {jamiSumma.toLocaleString()} so'm</span>
+            </div>
           </div>
+        <div className="flex justify-center items-center">
+
+          <button
+            // onClick={() => navigate('/checkout')}
+            className="py-2 px-16 bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+            disabled={clearing}
+            >
+            {clearing ? 'Kutilmoqda...' : `Sotib olish`}
+          </button>
+            </div>
+
         </div>
-
-        <button
-          // onClick={() => navigate('/checkout')}
-          className="w-full py-3 px-3 bg-gradient-to-r from-[#00C2FF] to-[#0099DD] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
-          disabled={clearing}
-          >
-          {clearing ? 'Kutilmoqda...' : `Sotib olish (${jamiSumma.toLocaleString()} so'm)`}
-        </button>
-
-      </div>
 
       </div>
     </div>
