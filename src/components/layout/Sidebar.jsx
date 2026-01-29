@@ -120,6 +120,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 { label: t('general_settings'), route: "/settings/general" },
             ]
         },
+        { icon: BookOpen, label: t('manual'), route: "/manual", type: "link" },
     ];
 
     const renderNavItem = (item, index) => {
@@ -233,22 +234,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </div>
 
                 {/* Footer Section */}
-                <div className="px-6 py-8 bg-white border-t border-gray-200">
-                    <div
-                        onClick={() => handleNavigation("/manual")}
-                        className={`
-                            cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all
-                            ${location.pathname === '/manual'
-                                ? 'text-[#00BCE4] border-b-2'
-                                : 'text-slate-500 font-bold'}
-                        `}
-                    >
-                        <BookOpen size={15} />
-                        <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
-                    </div>
-
+                <div className="px-6 py-1 bg-white border-t border-gray-200">
                     {/* Social Connect */}
-                    <div className="flex justify-center gap-4 mb-[10px] h-8 items-center">
+                    <div className="flex justify-start mb-1 gap-4 h-8 items-end">
                         <div onClick={() => handleNavigation("https://t.me/Dentago_uz", true)} className="cursor-pointer text-[#00BCE4] hover:scale-110 transition-all">
                             <BsTelegram size={20} />
                         </div>
@@ -260,7 +248,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         </div>
                     </div>
 
-                    <p className="text-center mt-[25px] text-[10px] font-medium text-black uppercase tracking-tighter">
+                    <p className="text-start text-[10px] font-medium text-black uppercase tracking-tighter">
                         &copy; 2025 DentaGo Platform
                     </p>
                 </div>
