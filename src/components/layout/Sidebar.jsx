@@ -120,7 +120,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 { label: t('general_settings'), route: "/settings/general" },
             ]
         },
-        { icon: BookOpen, label: t('manual'), route: "/manual", type: "link" },
     ];
 
     const renderNavItem = (item, index) => {
@@ -230,6 +229,19 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     {/* Navigation */}
                     <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-65px] px-4 space-y-2 custom-scrollbar pb-1">
                         {navItems.map((item, index) => renderNavItem(item, index))}
+
+                        <div
+                            onClick={() => handleNavigation("/manual")}
+                            className={`
+                                cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all mt-4
+                                ${location.pathname === '/manual'
+                                    ? 'text-[#00BCE4] border-b-2'
+                                    : 'text-slate-500 font-bold'}
+                            `}
+                        >
+                            <BookOpen size={15} />
+                            <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
+                        </div>
                     </nav>
                 </div>
 
