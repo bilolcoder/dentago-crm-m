@@ -31,6 +31,7 @@ import OrderList from './components/pages/BTS/OrderList';
 import Yetkazibberish from './components/pages/BTS/yetkazibBeruvchi';
 import Cards from './components/pages/BTS/cards';
 import MahsulotQoshish from './components/pages/BTS/MahsulotQAdd';
+import AdminProduct from './components/pages/BTS/AdminProduct';
 
 // Dentago Store
 import DentagoStore from './components/pages/dentagoStore/dentagoStore';
@@ -80,6 +81,7 @@ const getCurrentPageTitle = (pathname) => {
     '/cards': 'Kartalar',
     '/addproduct': 'Mahsulot qo\'shish',
     '/MahsulotQoshish': 'Mahsulot qo\'shish',
+    '/admin-product': 'Admin Product',
     '/my-information': 'Mening ma\'lumotlarim',
     '/bemorlarim': 'Bemorlarim',
     '/DentagoStore': 'Dentago Store',
@@ -176,6 +178,7 @@ const ProtectedLayout = () => {
               <Route path="/yetkazibberish" element={<Yetkazibberish />} />
               <Route path="/cards" element={<Cards />} />
               <Route path="/MahsulotQoshish" element={<MahsulotQoshish />} />
+              <Route path="/admin-product" element={<AdminProduct />} />
 
               {/* Dentago Store */}
               <Route path="/DentagoStore" element={<DentagoStore />} />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
     Home,Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
-    ChevronDown, ListOrdered, Archive, User, PlusCircle, X
+    ChevronDown, ListOrdered, Archive, User, PlusCircle, X, Package
 } from 'lucide-react';
 import { IoIosStats } from "react-icons/io";
 import { HiOutlineInformationCircle } from "react-icons/hi";
@@ -69,6 +69,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: ListOrdered, label: t('orders_bts'), route: "/orders", type: "link" },
         { icon: User, label: t('my_results'), route: "/result", type: "link" },
         { icon: PlusCircle, label: "Mahsulot qo'shish", route: "/addproduct", type: "link" },
+        { icon: Package, label: "Admin Product", route: "/admin-product", type: "link" },
 
         {
             icon: Archive,
@@ -78,38 +79,38 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             name: "ombor",
             subItems: [
                 { label: t('documents'), route: "/storage/documents" },
-                { label: t('products'), route: "/storage/products" },
-                { label: t('categories'), route: "/storage/categories" },
-                { label: t('brands'), route: "/storage/brands" },
-                { label: t('units'), route: "/storage/units" },
-                { label: t('suppliers'), route: "/storage/suppliers" },
                 { label: t('product_usage'), route: "/storage/usage" },
+                // { label: t('products'), route: "/storage/products" },
+                // { label: t('categories'), route: "/storage/categories" },
+                // { label: t('brands'), route: "/storage/brands" },
+                // { label: t('units'), route: "/storage/units" },
+                // { label: t('suppliers'), route: "/storage/suppliers" },
             ]
         },
-        {
-            icon: FileText,
-            label: t('reports'),
-            route: "/hisobot",
-            type: "group",
-            name: "hisobot",
-            subItems: [
-                { label: t('payments'), route: "/hisobot/to'lovlar" },
-                { label: t('lead_statistics'), route: "/hisobot/lead-statistika" },
-                { label: t('daily_expenses'), route: "/hisobot/kunilik-xarajatlar" },
-                { label: t('daily_expense_categories'), route: "/hisobot/kunilik-xarajatlar-kategoriyalari" },
-            ]
-        },
-        {
-            icon: Send,
-            label: t('sms'),
-            route: "/sms",
-            type: "group",
-            name: "sms",
-            subItems: [
-                { label: t('sms_templates'), route: "/sms/shablonlar" },
-                { label: t('sms_settings'), route: "/sms/sozlamalar" },
-            ]
-        },
+        // {
+        //     icon: FileText,
+        //     label: t('reports'),
+        //     route: "/hisobot",
+        //     type: "group",
+        //     name: "hisobot",
+        //     subItems: [
+        //         { label: t('payments'), route: "/hisobot/to'lovlar" },
+        //         { label: t('lead_statistics'), route: "/hisobot/lead-statistika" },
+        //         { label: t('daily_expenses'), route: "/hisobot/kunilik-xarajatlar" },
+        //         { label: t('daily_expense_categories'), route: "/hisobot/kunilik-xarajatlar-kategoriyalari" },
+        //     ]
+        // },
+        // {
+        //     icon: Send,
+        //     label: t('sms'),
+        //     route: "/sms",
+        //     type: "group",
+        //     name: "sms",
+        //     subItems: [
+        //         { label: t('sms_templates'), route: "/sms/shablonlar" },
+        //         { label: t('sms_settings'), route: "/sms/sozlamalar" },
+        //     ]
+        // },
         {
             icon: Settings,
             label: t('settings'),

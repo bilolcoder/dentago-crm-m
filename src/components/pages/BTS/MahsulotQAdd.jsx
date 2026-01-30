@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 
-function ProductForm({ productToEdit }) {
+function ProductForm({ productToEdit, onClose }) {
+  console.log('ProductForm rendered with:', { productToEdit, onClose });
+  
   const navigate = useNavigate();
 
   // Tokenni localStoragedan olish
@@ -355,7 +357,13 @@ function ProductForm({ productToEdit }) {
           config
         );
         setSuccessMessage('Mahsulot muvaffaqiyatli yangilandi!');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setTimeout(() => {
+          if (onClose) {
+            onClose(); // Modalni yopish
+          } else {
+            navigate('/dashboard'); // Oddiy navigate
+          }
+        }, 2000);
       } else {
         response = await axios.post(
           'https://app.dentago.uz/api/product',
