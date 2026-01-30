@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const ProductUsageContent = () => {
     const { data, updateData, t } = useData();
-    const productUsage = data.productUsage || [];
+    const productUsage = data?.productUsage || [];
     const PRIMARY_COLOR = "#00BCE4";
 
     const [isModalOpen, setIsModalOpen] = useState(false);

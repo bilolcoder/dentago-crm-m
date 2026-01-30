@@ -57,7 +57,7 @@ const VideoCard = ({ title, thumbnailUrl }) => {
 
 const ManualContent = () => {
     const { data, t } = useData();
-    const manualSections = data.manualSections || [];
+    const manualSections = data?.manualSections || [];
 
     return (
         <div className="space-y-12 bg-white">

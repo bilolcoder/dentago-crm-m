@@ -5,7 +5,7 @@ import { useData } from '../context/DataProvider';
 
 const GeneralSettingsContent = () => {
     const { data, updateData, t } = useData();
-    const initialSettings = data.generalSettings || {};
+    const initialSettings = data?.generalSettings || {};
 
     const fileInputRef = useRef(null);
     const [formData, setFormData] = useState(initialSettings);
@@ -15,7 +15,7 @@ const GeneralSettingsContent = () => {
 
     useEffect(() => {
         setFormData(initialSettings);
-    }, [data.generalSettings]);
+    }, [data?.generalSettings]);
 
     const handleLogoClick = () => fileInputRef.current.click();
 

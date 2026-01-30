@@ -6,7 +6,7 @@ import AddDocumentModal from './modals/AddDocumentModal';
 
 const DocumentsContent = () => {
     const { data, t } = useData();
-    const documents = data.storage?.documents || [];
+    const documents = data?.storage?.documents || [];
     const PRIMARY_COLOR = "#00BCE4";
 
     const [isModalOpen, setIsModalOpen] = useState(false);

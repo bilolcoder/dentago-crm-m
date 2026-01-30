@@ -258,7 +258,7 @@ export const DataProvider = ({ children }) => {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.data?.success && response.data.user) {
-                    const data = response.data;
+                    const data = response?.data;
                     const userObj = {
                         name: data.user.username || data.user.name,
                         role: data.user.role
