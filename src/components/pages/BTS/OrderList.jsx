@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { MdDeleteOutline, MdCheck } from "react-icons/md";
-import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2, X, Phone } from 'lucide-react';
+import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2, X, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import Rasm from "../../../assets/dentago.png"
 // Swiper imports
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { FaScrewdriverWrench } from "react-icons/fa6";
 
 function Aperator() {
   const navigate = useNavigate();
@@ -38,7 +39,9 @@ function Aperator() {
       ],
       description: "Tish protezini ta'mirlash kerak, uzoq vaqtdan beri ishlatilmoqda va sinish belgilari bor.",
       phone1: "+998 77 297 22 22",
-      phone2: "+998 95 219 26 99"
+      phone2: "+998 95 219 26 99",
+      status: "kutilmoqda",
+      date: "29.01.2026"
     },
     {
       id: 2,
@@ -49,9 +52,33 @@ function Aperator() {
       ],
       description: "Yangi uskuna o'rnatish bo'yicha maslahat so'ralmoqda.",
       phone1: "+998 77 297 22 22",
-      phone2: "+998 95 219 26 99"
+      phone2: "+998 95 219 26 99",
+      status: "tasdiqlandi",
+      date: "28.01.2026"
+    },
+    {
+      id: 3,
+      images: [
+        "https://via.placeholder.com/400x400?text=Uskuna+1",
+        "https://via.placeholder.com/400x400?text=Uskuna+2",
+        "https://via.placeholder.com/400x400?text=Uskuna+3"
+      ],
+      description: "Eski uskunani yangilash bo'yicha buyurtma rad etildi.",
+      phone1: "+998 77 297 22 22",
+      phone2: "+998 95 219 26 99",
+      status: "bekor qilindi",
+      date: "27.01.2026"
     }
   ];
+
+  const getMasterStatusStyle = (status) => {
+    switch (status) {
+      case 'tasdiqlandi': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'kutilmoqda': return 'bg-amber-50 text-amber-600 border-amber-100';
+      case 'bekor qilindi': return 'bg-rose-50 text-rose-600 border-rose-100';
+      default: return 'bg-slate-50 text-slate-600 border-slate-100';
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -297,7 +324,7 @@ function Aperator() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
-            <Truck size={24} />
+            <FaScrewdriverWrench size={24} />
           </div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
             Ustaga <span style={{ color: PRIMARY_COLOR }}>Buyurtmalar</span>
@@ -312,6 +339,7 @@ function Aperator() {
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rasmi</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tavsif (Description)</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aloqa (Tel)</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Batafsil</th>
                 </tr>
               </thead>
@@ -328,10 +356,10 @@ function Aperator() {
                     <td className="px-8 py-5">
                       <div className="w-14 h-14 rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center group-hover:border-[#00BCE4]/30 transition-all">
                         <img 
-                          src={mOrder.images?.[0]} 
+                          src={Rasm} 
                           alt="order" 
                           className="w-full h-full object-cover"
-                          onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
+                          // onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
                         />
                       </div>
                     </td>
@@ -344,9 +372,15 @@ function Aperator() {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
                           <Phone size={12} strokeWidth={3} />
-                          <span>+998 90 123 45 67</span>
+                          {/* <span>+998 77 297 22 22</span> */}
+                          <span>+998 95 219 26 99</span>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-8 py-5">
+                      <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${getMasterStatusStyle(mOrder.status)}`}>
+                        {mOrder.status}
+                      </span>
                     </td>
                     <td className="px-8 py-5 text-center">
                       <button className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
@@ -391,29 +425,48 @@ function Aperator() {
                   <div className="aspect-square rounded-[2rem] border-2 border-slate-100 overflow-hidden bg-slate-50 group relative">
                     <Swiper
                       modules={[Navigation, Pagination]}
-                      navigation
+                      navigation={{
+                        nextEl: '.swiper-button-next-custom',
+                        prevEl: '.swiper-button-prev-custom',
+                      }}
                       pagination={{ clickable: true }}
+                      slidesPerView={1}
+                      spaceBetween={0}
                       className="w-full h-full"
                     >
                       {selectedMasterOrder.images?.map((img, index) => (
                         <SwiperSlide key={index}>
                           <img 
-                            src={img} 
+                            src={Rasm} 
                             alt={`Order detail ${index + 1}`} 
                             className="w-full h-full object-cover"
                           />
                         </SwiperSlide>
                       ))}
                     </Swiper>
+
+                    {/* Custom Navigation Buttons */}
+                    <button className="swiper-button-prev-custom absolute left-2 top-1/2 -translate-y-1/2 z-20 rounded-2xl border-white flex items-center justify-center text-[#00BCE4] transition-all active:scale-90 disabled:opacity-0 cursor-pointer">
+                      <ChevronLeft size={24} strokeWidth={3} />
+                    </button>
+                    <button className="swiper-button-next-custom absolute right-2 top-1/2 -translate-y-1/2 z-20 rounded-2xl border-white flex items-center justify-center text-[#00BCE4] transition-all active:scale-90 disabled:opacity-0 cursor-pointer">
+                      <ChevronRight size={24} strokeWidth={3} />
+                    </button>
                   </div>
                   <div className="flex gap-2">
-                    {/* <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                      <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Faol</span>
-                    </div> */}
+                      <span className={`text-[9px] font-black uppercase tracking-widest ${
+                        selectedMasterOrder.status === 'tasdiqlandi' ? 'text-emerald-500' :
+                        selectedMasterOrder.status === 'kutilmoqda' ? 'text-amber-500' :
+                        'text-rose-500'
+                      }`}>
+                        {selectedMasterOrder.status}
+                      </span>
+                    </div>
                     <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sana</p>
-                      <span className="text-xs font-black text-slate-700 uppercase tracking-widest">29.01.2026</span>
+                      <span className="text-xs font-black text-slate-700 uppercase tracking-widest">{selectedMasterOrder.date}</span>
                     </div>
                   </div>
                 </div>
