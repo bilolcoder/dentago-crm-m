@@ -209,7 +209,7 @@ function Aperator() {
       </div>
 
       {/* Jadval */}
-      <div className="bg-white rounded-[1rem] shadow-2xl overflow-visible mb-12">
+      <div className="bg-white rounded-[1rem] shadow-sm overflow-visible mb-12">
         <div className="overflow-x-auto overflow-y-visible">
           <table className="w-full min-w-[1100px]   ml-[10px]">
             <thead >
@@ -331,7 +331,7 @@ function Aperator() {
           </h2>
         </div>
 
-        <div className="bg-white rounded-[1rem] shadow-2xl overflow-hidden border border-slate-100">
+        <div className="bg-white rounded-[1rem] shadow-sm overflow-hidden border border-slate-100">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>

@@ -393,7 +393,7 @@ function AdminProduct() {
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto border rounded-lg shadow-sm">
+      <div className="overflow-x-auto rounded-lg shadow-sm">
         <table className="w-full min-w-[1000px]">
           <thead className="bg-slate-50">
             <tr>
@@ -403,7 +403,7 @@ function AdminProduct() {
               <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase">Amallar</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="">
             {filteredProducts.map(product => (
               <tr key={product._id} className="hover:bg-slate-50/70">
                 <td className="px-6 py-4">
