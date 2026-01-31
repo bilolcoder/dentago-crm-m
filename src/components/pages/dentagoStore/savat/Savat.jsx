@@ -4,6 +4,7 @@ import { FaTrash, FaMinus, FaPlus, FaShoppingCart, FaSyncAlt } from 'react-icons
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { IoMdArrowRoundBack } from 'react-icons/io';
+import PurchaseModal from '../../../modals/PurchaseModal';
 
 const BASE_URL = "https://app.dentago.uz";
 
@@ -107,6 +108,7 @@ const Savat = () => {
   const [updating, setUpdating] = useState({});
   const [removing, setRemoving] = useState({});
   const [clearing, setClearing] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -258,6 +260,32 @@ const Savat = () => {
   const jamiSumma = apiCartItems.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
   const jamiTovarlar = apiCartItems.reduce((acc, item) => acc + item.quantity, 0);
 
+  const handlePurchase = async (purchaseData) => {
+    try {
+      // Here you would send the purchase data to your API
+      console.log('Purchase data:', purchaseData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // To'lov usuli nomini o'zbekchaga tarjima qilish
+      const paymentMethodNames = {
+        'humo': 'Humo',
+        'uzcard': 'UzCard',
+        'visa': 'Visa'
+      };
+      
+      alert(`Buyurtma muvaffaqiyatli jo'natildi!\n\nIsm: ${purchaseData.firstName} ${purchaseData.lastName}\nManzil: ${purchaseData.address}\nTo'lov usuli: ${paymentMethodNames[purchaseData.paymentMethod] || purchaseData.paymentMethod}\nJami summa: ${purchaseData.totalAmount.toLocaleString()} so'm`);
+      
+      // Clear cart after successful purchase
+      await handleClearCart();
+      
+    } catch (error) {
+      console.error('Purchase error:', error);
+      alert('Xato yuz berdi. Iltimos, qayta urinib ko\'ring.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
@@ -401,7 +429,7 @@ const Savat = () => {
         <div className="flex justify-center items-center">
 
           <button
-            // onClick={() => navigate('/checkout')}
+            onClick={() => setIsPurchaseModalOpen(true)}
             className="py-2 px-16 bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
             disabled={clearing}
             >
@@ -412,6 +440,15 @@ const Savat = () => {
         </div>
 
       </div>
+      
+      {/* Purchase Modal */}
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        totalAmount={jamiSumma}
+        items={apiCartItems}
+        onConfirm={handlePurchase}
+      />
     </div>
   );
 };
