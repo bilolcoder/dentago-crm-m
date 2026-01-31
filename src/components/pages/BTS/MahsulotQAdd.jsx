@@ -141,7 +141,7 @@ function ProductForm({ productToEdit, onClose }) {
     if (productToEdit) {
       const editData = {
         ...productToEdit,
-        imageUrl: Array.isArray(productToEdit.imageUrl) ? productToEdit.imageUrl : (productToEdit.imageUrl ? [productToEdit.imageUrl] : [])
+        imageUrl: productToEdit.imageUrl || []
       };
 
       // Raqamli maydonlarni stringga o'tkazish
@@ -153,15 +153,10 @@ function ProductForm({ productToEdit, onClose }) {
 
       setFormData(editData);
 
-      if (editData.imageUrl && editData.imageUrl.length > 0) {
-        setPreviewImages(editData.imageUrl.map(img => {
-          // Check if the image URL is already complete (starts with http) or needs to be prefixed
-          if (img.startsWith('http')) {
-            return img;
-          } else {
-            return `https://app.dentago.uz/images/${img}`;
-          }
-        }));
+      if (productToEdit.imageUrl && productToEdit.imageUrl.length > 0) {
+        setPreviewImages(productToEdit.imageUrl.map(img =>
+          `https://app.dentago.uz/images/${img}`
+        ));
       }
     }
   }, [productToEdit, token]);
@@ -202,28 +197,20 @@ function ProductForm({ productToEdit, onClose }) {
   };
 
   const removeImage = (index) => {
-    // Calculate how many old/existing images we have
-    const oldImageCount = productToEdit ? (Array.isArray(productToEdit.imageUrl) ? productToEdit.imageUrl.length : (productToEdit.imageUrl ? 1 : 0)) : 0;
-    
-    const isOldImage = index < oldImageCount;
+    const isOldImage = productToEdit && index < (productToEdit.imageUrl?.length || 0);
 
     if (isOldImage) {
-      // Removing an existing image - update formData to exclude this image
       const newImageUrls = [...formData.imageUrl];
       newImageUrls.splice(index, 1);
       setFormData(prev => ({ ...prev, imageUrl: newImageUrls }));
     } else {
-      // Removing a newly selected file - update selectedFiles
-      const fileIndex = index - oldImageCount;
+      const fileIndex = index - (productToEdit?.imageUrl?.length || 0);
       setSelectedFiles(prev => prev.filter((_, i) => i !== fileIndex));
     }
 
     setPreviewImages(prev => {
       const newPreviews = [...prev];
-      // Revoke object URL to free up memory
-      if (newPreviews[index]) {
-        URL.revokeObjectURL(newPreviews[index]);
-      }
+      URL.revokeObjectURL(newPreviews[index]);
       return newPreviews.filter((_, i) => i !== index);
     });
   };
@@ -332,9 +319,8 @@ function ProductForm({ productToEdit, onClose }) {
           setLoading(false);
           return;
         }
-      } else if (productToEdit) {
-        // Preserve existing images when no new images are uploaded
-        uploadedImageUrls = formData.imageUrl || [];
+      } else if (productToEdit && formData.imageUrl.length > 0) {
+        uploadedImageUrls = formData.imageUrl;
       }
 
       const dataToSend = {

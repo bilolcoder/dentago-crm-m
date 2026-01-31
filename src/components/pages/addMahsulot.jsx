@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function AddMahsulot() {
@@ -13,22 +13,118 @@ function AddMahsulot() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  
   const [editForm, setEditForm] = useState({
     name: '',
+    sku: '',
     price: '',
     category: '',
-    discount: '0',
-    description: ''
+    company: '',
+    description: '',
+    deliveryDays: '',
+    salePercentage: '',
+    quantity: '',
+    code: '',
+    vat_percent: 0,
+    package_code: '',
+    imageUrl: []
   });
-  const [savingEdit, setSavingEdit] = useState(false);
-  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
 
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [codeOptions, setCodeOptions] = useState([
+    // Birinchi va oldingi rasmlardan olingan dorilar va materiallar
+    { code: '03004002004003000', name: 'Гексетидин - A01AB12 СТОМАТИДИН ® (Bosnalijek)' },
+    { code: '03004002004003001', name: 'Гексетидин - A01AB12 СТОМАТИДИН ® (Bosnalijek) Раствор для местного применения 0,1% 200мл флаконы' },
+    { code: '03004010003004001', name: 'Фамотидин - A02BA03 ГАСТРОСИДИН-DF (Dentafill Plyus) Таблетки покрытые оболочкой 20 мг упаковки контурные ячейковые №10(1x10)' },
+    { code: '03004010003004002', name: 'Фамотидин - A02BA03 ГАСТРОСИДИН-DF (Dentafill Plyus) Таблетки покрытые оболочкой 20 мг упаковки контурные ячейковые №20(2x10)' },
+    { code: '03004010003004003', name: 'Фамотидин - A02BA03 ГАСТРОСИДИН-DF (Dentafill Plyus) Таблетки покрытые оболочкой 40 мг упаковки контурные ячейковые №10(1x10)' },
+    { code: '03004010003004004', name: 'Фамотидин - A02BA03 ГАСТРОСИДИН-DF (Dentafill Plyus) Таблетки покрытые оболочкой 40 мг упаковки контурные ячейковые №20(2x10)' },
+    { code: '03004034005019001', name: 'Лактулоза - A06AD11 ДЕФИЛАК (Dentafill Plyus) Сироп для приема внутрь 1000миллилитр флаконы' },
+    { code: '03004034005019002', name: 'Лактулоза - A06AD11 ДЕФИЛАК (Dentafill Plyus) Сироп для приема внутрь 100миллилитр флаконы' },
+    { code: '03004034005019003', name: 'Лактулоза - A06AD11 ДЕФИЛАК (Dentafill Plyus) Сироп для приема внутрь 200миллилитр флаконы' },
+    { code: '03004034005019004', name: 'Лактулоза - A06AD11 ДЕФИЛАК (Dentafill Plyus) Сироп для приема внутрь 500миллилитр флаконы' },
+    { code: '03004034005019005', name: 'Лактулоза - A06AD11 ДЕФИЛАК (Dentafill Plyus) Сироп для приема внутрь 50миллилитр флаконы' },
+    { code: '03004097001006001', name: 'Гепарин - B01AB01 ГЕПАРИН-MF (Mediofarm) Раствор для инъекций 5000 ме/мл 1мл ампулы №10(10x1)' },
+    { code: '03004097001006002', name: 'Гепарин - B01AB01 ГЕПАРИН-MF (Mediofarm) Раствор для инъекций 5000 ме/мл 1мл ампулы №10(1x10)' },
+    { code: '03004097001006003', name: 'Гепарин - B01AB01 ГЕПАРИН-MF (Mediofarm) Раствор для инъекций 5000 ме/мл 1мл ампулы №10(2x5)' },
+    { code: '03004097001006004', name: 'Гепарин - B01AB01 ГЕПАРИН-MF (Mediofarm) Раствор для инъекций 5000 ме/мл 1мл ампулы №5(1x5)' },
+    { code: '03004097001006005', name: 'Гепарин - B01AB01 ГЕПАРИН-MF (Mediofarm) Раствор для инъекций 5000 ме/мл 1мл ампулы №5(5x1)' },
+    { code: '03004199001013001', name: 'Клотримазол - D01AC01 КЛОТРИМАЗОЛ (Dentafill Plyus) Мазь 1% 20г тубы' },
+    { code: '03004199001013002', name: 'Клотримазол - D01AC01 КЛОТРИМАЗОЛ (Dentafill Plyus) Мазь 1% 25г тубы' },
+    { code: '03004199001013003', name: 'Клотримазол - D01AC01 КЛОТРИМАЗОЛ (Dentafill Plyus) Мазь 1% 30г тубы' },
+
+    // Ikkinchi rasm – stomatologik materiallar va dorilar
+    { code: '02520001004000000', name: 'Стоматологик гипс' },
+    { code: '02520002002000000', name: 'Стоматологик тиббиёт гипси' },
+    { code: '02916001007000000', name: 'Фармацевтик субстанция диклофенак натрий' },
+    { code: '03003002001000000', name: 'Кальций хлорид эритмаси' },
+    { code: '03004002001001000', name: 'Хлоргексидин - A01AB03 Гексикон® (Nizhegorodskii himiko-farm zavod)' },
+    { code: '03004002001001001', name: 'Хлоргексидин - A01AB03 Гексикон® (Nizhegorodskii himiko-farm zavod) Суппозитории вагинальные 16 мг упаковки контурные ячейковые №10(2x5)' },
+    { code: '03004002002000000', name: 'Миконазол - A01AB09' },
+    { code: '03004002003000000', name: 'Метронидазол - A01AB17 АНАСЕП® ГЕЛЬ (Marion Biotech) Гель для десен 20г тубы' },
+    { code: '03004002005010001', name: 'Метронидазол - A01AB17 АНАСЕП® ГЕЛЬ (Marion Biotech) Гель для десен 5г саше №50(1x50)' },
+    { code: '0300400202201001', name: 'Метронидазол, хлоргексидин - A01AB ДЖИМЕТРИЛ® (Agio Pharmaceuticals) Гель стоматологический 20г тубы' },
+    { code: '03006002002001001', name: 'Тиш цементлари ва тиш пломбалаш материаллари' },
+
+    // Uchinchi rasm – stomatologik asbob-uskunalar
+    { code: '02207002015000000', name: 'Gutta-percha points' },
+    { code: '02207002016000000', name: 'Paper points' },
+    { code: '02207002017000000', name: 'Rubber dam sheet' },
+    { code: '02520002018000000', name: 'Rubber dam clamp' },
+    { code: '02520002019000000', name: 'Rubber dam punch' },
+    { code: '02520002020000000', name: 'Matrix band' },
+    { code: '02520002021000000', name: 'Matrix retainer (Tofflemire)' },
+    { code: '02207002018000000', name: 'Wedges (wooden/plastic)' },
+    { code: '02207002019000000', name: 'Dental cotton rolls' },
+    { code: '02207002020000000', name: 'Dental bibs (patient napkins)' },
+    { code: '02520002022000000', name: 'Saliva ejector' },
+    { code: '02520002023000000', name: 'High vacuum suction tip' },
+    { code: '02520002024000000', name: 'Dental curing light shield' },
+    { code: '02520002025000000', name: 'Composite finishing kit (discs, strips)' },
+    { code: '02207002021000000', name: 'Polishing paste' },
+    { code: '02520002026000000', name: 'Prophy cups & brushes' },
+    { code: '02520002027000000', name: 'Ultrasonic scaler tips' },
+    { code: '02520002028000000', name: 'Endo motor files (rotary NiTi)' },
+    { code: '02520002029000000', name: 'Endo irrigation needles' },
+    { code: '02207002022000000', name: 'Irrigation solution (NaOCl, CHX)' },
+
+    // Yangi rasm – stomatologik xizmatlar va qurilmalar (oxirgi qo'shilgan)
+    { code: '09018013001001001', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
+    { code: '09018013001001002', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
+    { code: '09018013001001003', name: 'Стоматологический картридж-ротор APPLEDENTAL наконечник BLUE-CA' },
+    { code: '09018013001001004', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
+    { code: '09018013003000000', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
+    { code: '09018013004000000', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
+    { code: '09018013014000000', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
+    { code: '09021001011000000', name: 'Стоматологик имплантатлар учун абатментлар' },
+    { code: '09021001027000000', name: 'Имплантатлар' },
+    { code: '10901003001000000', name: 'Стоматология соҳасидаги хизматлар' },
+    { code: '10901003003000000', name: 'Ортопед стоматология хизмати' },
+    { code: '10901003004000000', name: 'Стоматологик маслахат ва касалликларнинг олдини олиш хизматлари' },
+    { code: '10901003005000000', name: 'Тиш даволаш учун стоматологик хизматлар' },
+    { code: '10901003006000000', name: 'Оғиз бўшлиғи касалликларини даволаш учун стоматологик хизматлар' },
+    { code: '10901003007000000', name: 'Тиш протезлаш хизмати' },
+    { code: '10901003008000000', name: 'Терапевтика стоматология хизмати' },
+    { code: '10901003009000000', name: 'Жарроҳлик стоматология хизматлари' },
+    { code: '10902001046000000', name: 'Консультация стоматолога' },
+    { code: '10902002002000002', name: 'Лучевая диагностика, Рентгенодиагностика' },
+    { code: '10902003047000000', name: 'Даволаш ва муолажалар бўйича стоматолог хизматлари' }
+  ]);
+
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   const BASE_URL = "https://app.dentago.uz";
   const TOKEN = localStorage.getItem('accessToken');
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   // Qidiruv maydoni o'zgarganda
@@ -39,6 +135,20 @@ function AddMahsulot() {
       handleSearch();
     }
   }, [searchTerm, products]);
+
+  // Kategoriyalarni yuklash
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/api/category`, {
+        headers: { Authorization: `Bearer ${TOKEN}` }
+      });
+      if (response.data && Array.isArray(response.data)) {
+        setCategories(response.data);
+      }
+    } catch (err) {
+      console.error("Kategoriyalar yuklanmadi:", err);
+    }
+  };
 
   // Bildirishnoma ko'rsatish
   const showNotification = (message, type = 'success') => {
@@ -112,20 +222,189 @@ function AddMahsulot() {
   // Tahrirlashni boshlash
   const handleEditClick = (product) => {
     setEditingProduct(product);
-    setEditForm({
+    
+    // Form ma'lumotlarini to'ldirish
+    const editData = {
       name: product.name || '',
-      price: product.price || '',
+      sku: product.sku || '',
+      price: product.price?.toString() || '',
       category: product.category || '',
-      discount: product.discount || '0',
-      description: product.description || ''
-    });
+      company: product.company || '',
+      description: product.description || '',
+      deliveryDays: product.deliveryDays?.toString() || '',
+      salePercentage: product.salePercentage?.toString() || '',
+      quantity: product.quantity?.toString() || '1',
+      code: product.code || '',
+      vat_percent: product.vat_percent?.toString() || '0',
+      package_code: product.package_code || '',
+      imageUrl: Array.isArray(product.imageUrl) ? product.imageUrl : (product.imageUrl ? [product.imageUrl] : [])
+    };
+
+    setEditForm(editData);
+    
+    // Preview rasmlarni o'rnatish
+    if (editData.imageUrl && editData.imageUrl.length > 0) {
+      const previews = editData.imageUrl.map(img => {
+        if (img.startsWith('http')) {
+          return img;
+        } else {
+          return `${BASE_URL}/images/${img}`;
+        }
+      });
+      setPreviewImages(previews);
+    } else {
+      setPreviewImages([]);
+    }
+    
+    setSelectedFiles([]);
     setEditModalOpen(true);
   };
 
-  // Tahrirlash formasi o'zgarishi
+  // Form o'zgarishi
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditForm(prev => ({ ...prev, [name]: value }));
+    const numericFields = ['price', 'salePercentage', 'vat_percent', 'quantity', 'deliveryDays'];
+
+    setEditForm((prevData) => ({
+      ...prevData,
+      [name]: numericFields.includes(name) ?
+        (value === '' ? '' : parseFloat(value) || 0) :
+        value,
+    }));
+  };
+
+  // Fayl tanlash
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) return;
+
+    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    if (validFiles.length !== files.length) {
+      showNotification('Faqat rasm fayllar yuklanishi mumkin!', 'error');
+      return;
+    }
+
+    if (validFiles.length > 10) {
+      showNotification('Maksimal 10 ta rasm yuklashingiz mumkin!', 'error');
+      return;
+    }
+
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+
+    const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+    setPreviewImages(prev => [...prev, ...newPreviews]);
+  };
+
+  // Rasmni o'chirish
+  const removeImage = (index) => {
+    // Mavjud rasmlar sonini hisoblash
+    const existingImageCount = editForm.imageUrl ? editForm.imageUrl.length : 0;
+    const isExistingImage = index < existingImageCount;
+
+    if (isExistingImage) {
+      // Mavjud rasmni o'chirish
+      const newImageUrls = [...editForm.imageUrl];
+      newImageUrls.splice(index, 1);
+      setEditForm(prev => ({ ...prev, imageUrl: newImageUrls }));
+    } else {
+      // Yangi faylni o'chirish
+      const fileIndex = index - existingImageCount;
+      setSelectedFiles(prev => prev.filter((_, i) => i !== fileIndex));
+    }
+
+    // Preview ro'yxatini yangilash
+    setPreviewImages(prev => {
+      const newPreviews = [...prev];
+      // O'chirilgan fayl uchun object URL'ni tozalash
+      if (newPreviews[index] && !newPreviews[index].startsWith(BASE_URL)) {
+        URL.revokeObjectURL(newPreviews[index]);
+      }
+      return newPreviews.filter((_, i) => i !== index);
+    });
+  };
+
+  // Rasmlarni serverga yuklash
+  const uploadImagesToServer = async () => {
+    if (selectedFiles.length === 0) {
+      return editForm.imageUrl || [];
+    }
+
+    setUploadingImages(true);
+    const uploadedFilenames = [];
+
+    try {
+      for (const file of selectedFiles) {
+        const formDataImage = new FormData();
+        formDataImage.append('image', file);
+
+        const response = await axios.post(
+          `${BASE_URL}/api/upload/image`,
+          formDataImage,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${TOKEN}`
+            },
+          }
+        );
+
+        if (response.data && response.data.file && response.data.file.savedName) {
+          uploadedFilenames.push(response.data.file.savedName);
+        } else if (response.data && response.data.filename) {
+          uploadedFilenames.push(response.data.filename);
+        } else if (response.data && response.data.url) {
+          uploadedFilenames.push(response.data.url.split('/').pop());
+        } else {
+          uploadedFilenames.push(`image_${Date.now()}.jpg`);
+        }
+      }
+      return [...(editForm.imageUrl || []), ...uploadedFilenames];
+
+    } catch (error) {
+      console.error("Rasm yuklanmadi:", error);
+      showNotification('Rasm yuklanmadi. Qayta urinib ko\'ring.', 'error');
+      return null;
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  // Formani tekshirish
+  const validateForm = () => {
+    const requiredFields = ['name', 'price', 'category', 'code', 'sku', 'package_code'];
+    const missingFields = requiredFields.filter(field => {
+      const value = editForm[field];
+      return value === undefined || value === null || value.toString().trim() === '';
+    });
+
+    if (missingFields.length > 0) {
+      showNotification(`Quyidagi maydonlarni to'ldiring: ${missingFields.join(', ')}`, 'error');
+      return false;
+    }
+
+    if (!editForm.price || Number(editForm.price) <= 0) {
+      showNotification("Narx 0 dan katta bo'lishi kerak", 'error');
+      return false;
+    }
+
+    if (editForm.quantity && Number(editForm.quantity) < 0) {
+      showNotification("Miqdor 0 dan kichik bo'lishi mumkin emas", 'error');
+      return false;
+    }
+
+    if (editForm.salePercentage &&
+      (Number(editForm.salePercentage) < 0 || Number(editForm.salePercentage) > 100)) {
+      showNotification("Chegirma foizi 0 dan 100 gacha bo'lishi kerak", 'error');
+      return false;
+    }
+
+    if (editForm.vat_percent && Number(editForm.vat_percent) < 0) {
+      showNotification("QQS foizi 0 dan kichik bo'lishi mumkin emas", 'error');
+      return false;
+    }
+
+    return true;
   };
 
   // Tahrirlashni saqlash
@@ -135,89 +414,92 @@ function AddMahsulot() {
       return;
     }
 
-    if (!editForm.name.trim() || !editForm.price) {
-      showNotification("Nomi va narxi maydonlari to'ldirilishi shart!", 'error');
+    if (!validateForm()) {
       return;
     }
 
     setSavingEdit(true);
 
-    const payload = {
-      name: editForm.name.trim(),
-      price: Number(editForm.price),
-      category: editForm.category,
-      discount: Number(editForm.discount || 0),
-      description: editForm.description.trim()
-    };
-
     try {
-      // Avval PUT metodini sinab ko'ramiz
-      let response;
-      let methodUsed = 'PUT';
-
-      try {
-        response = await axios.put(
-          `${BASE_URL}/api/product/${editingProduct._id}`,
-          payload,
-          {
-            headers: {
-              'Authorization': `Bearer ${TOKEN}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-      } catch (putErr) {
-        // PUT ishlamasa, PATCH sinab ko'ramiz
-        methodUsed = 'PATCH';
-        try {
-          response = await axios.patch(
-            `${BASE_URL}/api/product/${editingProduct._id}`,
-            payload,
-            {
-              headers: {
-                'Authorization': `Bearer ${TOKEN}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-        } catch (patchErr) {
-          // PATCH ham ishlamasa, POST sinab ko'ramiz
-          methodUsed = 'POST';
-          response = await axios.post(
-            `${BASE_URL}/api/product/${editingProduct._id}`,
-            payload,
-            {
-              headers: {
-                'Authorization': `Bearer ${TOKEN}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
+      // Rasmlarni yuklash
+      let uploadedImageUrls = [];
+      if (selectedFiles.length > 0) {
+        uploadedImageUrls = await uploadImagesToServer();
+        if (uploadedImageUrls === null) {
+          setSavingEdit(false);
+          return;
         }
+      } else {
+        // Yangi rasm yuklanmagan, mavjud rasmlarni saqlash
+        uploadedImageUrls = editForm.imageUrl || [];
       }
 
-      console.log(`${methodUsed} metodidan javob:`, response.data);
+      const dataToSend = {
+        name: editForm.name.trim(),
+        sku: editForm.sku.trim(),
+        category: editForm.category.trim(),
+        company: editForm.company.trim() || "",
+        description: editForm.description.trim() || "",
+        code: editForm.code.trim(),
+        package_code: editForm.package_code.trim(),
+        imageUrl: uploadedImageUrls,
+        price: parseFloat(editForm.price) || 0,
+        deliveryDays: parseInt(editForm.deliveryDays, 10) || 0,
+        salePercentage: parseInt(editForm.salePercentage, 10) || 0,
+        quantity: parseInt(editForm.quantity, 10) || 1,
+        vat_percent: parseFloat(editForm.vat_percent) || 0,
+      };
+
+      console.log("Yuborilayotgan ma'lumot:", dataToSend);
+
+      // API ga yuborish
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const productId = editingProduct._id;
+      const response = await axios.put(
+        `${BASE_URL}/api/product/${productId}`,
+        dataToSend,
+        config
+      );
+
+      console.log("Server javobi:", response.data);
 
       // Mahsulotlar ro'yxatini yangilash
       const updatedProducts = products.map(p =>
-        p._id === editingProduct._id ? { ...p, ...payload } : p
+        p._id === editingProduct._id ? { 
+          ...p, 
+          ...dataToSend,
+          imageUrl: uploadedImageUrls 
+        } : p
       );
 
       setProducts(updatedProducts);
       setSearchResults(updatedProducts);
 
       showNotification("Mahsulot muvaffaqiyatli yangilandi!");
+      
+      // Modalni yopish va ma'lumotlarni tozalash
       setEditModalOpen(false);
       setEditingProduct(null);
+      setSelectedFiles([]);
+      setPreviewImages([]);
 
     } catch (err) {
       console.error("Tahrirlashda xatolik:", err);
+      
       let errorMsg = "Tahrirlashda xatolik yuz berdi";
 
       if (err.response?.status === 401) {
         errorMsg = "Token noto'g'ri yoki muddati tugagan";
       } else if (err.response?.status === 404) {
         errorMsg = "API endpoint topilmadi";
+      } else if (err.response?.status === 409) {
+        errorMsg = "Bu kod yoki SKU bilan mahsulot allaqachon mavjud";
       } else if (err.response?.data?.message) {
         errorMsg = err.response.data.message;
       }
@@ -274,6 +556,20 @@ function AddMahsulot() {
     navigate("/MahsulotQoshish");
   };
 
+  // Modalni yopish
+  const closeEditModal = () => {
+    // Preview rasmlar uchun object URL'larni tozalash
+    previewImages.forEach(img => {
+      if (!img.startsWith(BASE_URL)) {
+        URL.revokeObjectURL(img);
+      }
+    });
+    
+    setEditModalOpen(false);
+    setEditingProduct(null);
+    setSelectedFiles([]);
+    setPreviewImages([]);
+  };
 
   if (loading) {
     return (
@@ -377,6 +673,7 @@ function AddMahsulot() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Mahsulot</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Kategoriya</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Narxi</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">SKU</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Amallar</th>
                   </tr>
                 </thead>
@@ -392,6 +689,10 @@ function AddMahsulot() {
                                   src={`${BASE_URL}/images/${product.imageUrl[0]}`}
                                   alt={product.name}
                                   className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = `https://via.placeholder.com/150?text=${encodeURIComponent(product.name.substring(0, 10))}`;
+                                  }}
                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -421,18 +722,22 @@ function AddMahsulot() {
                           <div className="font-bold text-gray-800 text-lg">
                             {product.price?.toLocaleString()} UZS
                           </div>
-                          {product.discount > 0 && (
+                          {product.salePercentage > 0 && (
                             <div className="text-sm text-red-500 line-through mt-1">
-                              {Math.round((product.price * 100) / (100 - product.discount)).toLocaleString()} UZS
+                              {Math.round((product.price * 100) / (100 - product.salePercentage)).toLocaleString()} UZS
                               <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-                                -{product.discount}%
+                                -{product.salePercentage}%
                               </span>
                             </div>
                           )}
                         </td>
                         <td className="px-6 py-4">
+                          <div className="font-medium text-gray-700">
+                            {product.sku || "—"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
-
                             <button
                               onClick={() => handleEditClick(product)}
                               className="p-2 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
@@ -453,7 +758,7 @@ function AddMahsulot() {
                     ))
                   ) : !searchTerm && !loading ? (
                     <tr>
-                      <td colSpan="4" className="px-6 py-12 text-center">
+                      <td colSpan="5" className="px-6 py-12 text-center">
                         <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-600 mb-2">Mahsulotlar topilmadi</h3>
                         <p className="text-gray-500 mb-4">Hozircha mahsulotlar mavjud emas</p>
@@ -476,123 +781,321 @@ function AddMahsulot() {
       {/* Tahrirlash Modali */}
       {editModalOpen && editingProduct && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg">
-            <div className="p-6 border-b">
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b sticky top-0 bg-white z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-gray-800">Mahsulotni tahrirlash</h3>
                   <p className="text-gray-500 text-sm mt-1">{editingProduct.name}</p>
                 </div>
                 <button
-                  onClick={() => setEditModalOpen(false)}
+                  onClick={closeEditModal}
                   className="text-gray-400 hover:text-gray-600"
+                  disabled={savingEdit || uploadingImages}
                 >
                   <X size={24} />
                 </button>
               </div>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="p-6 space-y-6">
+              {/* Yuklash holati */}
+              {(savingEdit || uploadingImages) && (
+                <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <p>
+                    {uploadingImages
+                      ? `Rasmlar yuklanmoqda... (${selectedFiles.length} ta)`
+                      : "Saqlanmoqda..."}
+                  </p>
+                </div>
+              )}
+
+              {/* Rasmlar qismi */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mahsulot nomi <span className="text-red-500">*</span>
+                <label htmlFor="imageFile" className="block text-sm font-medium text-gray-700 mb-1">
+                  Расмлар
                 </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={editForm.name}
-                  onChange={handleEditChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent"
-                  required
-                  placeholder="Mahsulot nomini kiriting"
-                />
+                <div className="flex items-center gap-4 mb-4">
+                  <label className="bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-700 transition">
+                    Fayl tanlash
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                    />
+                  </label>
+                  <span className="text-gray-500 text-sm">
+                    {selectedFiles.length > 0 ? `${selectedFiles.length} ta fayl tanlandi` : 'Fayl tanlanmadi'}
+                  </span>
+                </div>
+
+                {previewImages.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Олдиндан кўриш:</p>
+                    <div className="flex flex-wrap gap-4">
+                      {previewImages.map((imgUrl, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={imgUrl}
+                            alt={`Tanlangan rasm ${index + 1}`}
+                            className="w-32 h-32 object-cover rounded-md shadow-md"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            disabled={savingEdit || uploadingImages}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 disabled:opacity-50"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Form maydonlari */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Narxi (UZS) <span className="text-red-500">*</span>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Товар номи
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    value={editForm.name}
+                    onChange={handleEditChange}
+                    required
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="Mahsulot nomini kiriting"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="sku" className="block text-sm font-medium text-gray-700 mb-1">
+                    Артикул
+                  </label>
+                  <input
+                    type="text"
+                    name="sku"
+                    id="sku"
+                    value={editForm.sku}
+                    onChange={handleEditChange}
+                    required
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="Mahsulot artikuli"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                    Нарх
                   </label>
                   <input
                     type="number"
                     name="price"
+                    id="price"
                     value={editForm.price}
                     onChange={handleEditChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent"
                     required
                     min="0"
+                    step="0.01"
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
+                    Количество
+                  </label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    id="quantity"
+                    value={editForm.quantity}
+                    onChange={handleEditChange}
+                    min="0"
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="1"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="deliveryDays" className="block text-sm font-medium text-gray-700 mb-1">
+                    Етказиб бериш кунлари
+                  </label>
+                  <input
+                    type="number"
+                    name="deliveryDays"
+                    id="deliveryDays"
+                    value={editForm.deliveryDays}
+                    onChange={handleEditChange}
+                    min="0"
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Chegirma (%)
+                  <label htmlFor="salePercentage" className="block text-sm font-medium text-gray-700 mb-1">
+                    Чегирма фоизи (%)
                   </label>
                   <input
                     type="number"
-                    name="discount"
-                    value={editForm.discount}
+                    name="salePercentage"
+                    id="salePercentage"
+                    value={editForm.salePercentage}
                     onChange={handleEditChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent"
                     min="0"
                     max="100"
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="0"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Kategoriya
-                </label>
-                <select
-                  name="category"
-                  value={editForm.category}
-                  onChange={handleEditChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent"
-                >
-                  <option value="">Kategoriyani tanlang</option>
-                  <option value="Terapiya">Terapiya</option>
-                  <option value="Jarrohlik">Jarrohlik</option>
-                  <option value="Burlar">Burlar</option>
-                  <option value="Sarf materiallari">Sarf materiallari</option>
-                  <option value="Fayllar">Fayllar</option>
-                </select>
-              </div>
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                    Категория
+                  </label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={editForm.category}
+                    onChange={handleEditChange}
+                    required
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                  >
+                    <option value="">Категорияни танланг</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tavsif
-                </label>
-                <textarea
-                  name="description"
-                  value={editForm.description}
-                  onChange={handleEditChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent"
-                  rows="4"
-                  placeholder="Mahsulot haqida qo'shimcha ma'lumot..."
-                />
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
+                    Компания/Бренд
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={editForm.company}
+                    onChange={handleEditChange}
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="Kompaniya nomi"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-1">
+                    Код
+                  </label>
+                  <select
+                    id="code"
+                    name="code"
+                    value={editForm.code}
+                    onChange={handleEditChange}
+                    required
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                  >
+                    <option value="">Кодни танланг</option>
+                    {codeOptions.map((item, index) => (
+                      <option key={index} value={item.code}>
+                        {item.code} - {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="vat_percent" className="block text-sm font-medium text-gray-700 mb-1">
+                    НДС (%)
+                  </label>
+                  <input
+                    type="number"
+                    id="vat_percent"
+                    name="vat_percent"
+                    value={editForm.vat_percent}
+                    onChange={handleEditChange}
+                    min="0"
+                    step="0.01"
+                    placeholder="0"
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="package_code" className="block text-sm font-medium text-gray-700 mb-1">
+                    Код упаковки
+                  </label>
+                  <input
+                    type="text"
+                    id="package_code"
+                    name="package_code"
+                    value={editForm.package_code}
+                    onChange={handleEditChange}
+                    required
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="Qadoqlash kodi"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                    Тавсиф
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    value={editForm.description}
+                    onChange={handleEditChange}
+                    disabled={savingEdit || uploadingImages}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    placeholder="Mahsulot tavsifi..."
+                  ></textarea>
+                </div>
               </div>
             </div>
 
             <div className="p-6 border-t flex justify-end gap-3">
               <button
-                onClick={() => setEditModalOpen(false)}
-                disabled={savingEdit}
+                onClick={closeEditModal}
+                disabled={savingEdit || uploadingImages}
                 className="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
               >
                 Bekor qilish
               </button>
               <button
                 onClick={handleSaveEdit}
-                disabled={savingEdit}
+                disabled={savingEdit || uploadingImages}
                 className="px-6 py-3 bg-[#00BCE4] text-white font-semibold rounded-lg hover:bg-[#00a6c9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {savingEdit ? (
+                {(savingEdit || uploadingImages) ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Saqlanmoqda...
+                    {uploadingImages ? "Rasmlar yuklanmoqda..." : "Saqlanmoqda..."}
                   </>
                 ) : (
                   'Saqlash'
