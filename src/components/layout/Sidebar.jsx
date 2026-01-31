@@ -71,22 +71,22 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: PlusCircle, label: "Mahsulot qo'shish", route: "/addproduct", type: "link" },
         { icon: Package, label: "Admin Product", route: "/admin-product", type: "link" },
 
-        {
-            icon: Archive,
-            label: t('warehouse'),
-            route: "/storage",
-            type: "group",
-            name: "ombor",
-            subItems: [
-                { label: t('documents'), route: "/storage/documents" },
-                { label: t('product_usage'), route: "/storage/usage" },
-                // { label: t('products'), route: "/storage/products" },
-                // { label: t('categories'), route: "/storage/categories" },
-                // { label: t('brands'), route: "/storage/brands" },
-                // { label: t('units'), route: "/storage/units" },
-                // { label: t('suppliers'), route: "/storage/suppliers" },
-            ]
-        },
+        // {
+        //     icon: Archive,
+        //     label: t('warehouse'),
+        //     route: "/storage",
+        //     type: "group",
+        //     name: "ombor",
+        //     subItems: [
+        //         { label: t('documents'), route: "/storage/documents" },
+        //         { label: t('product_usage'), route: "/storage/usage" },
+        //         { label: t('products'), route: "/storage/products" },
+        //         { label: t('categories'), route: "/storage/categories" },
+        //         { label: t('brands'), route: "/storage/brands" },
+        //         { label: t('units'), route: "/storage/units" },
+        //         { label: t('suppliers'), route: "/storage/suppliers" },
+        //     ]
+        // },
         // {
         //     icon: FileText,
         //     label: t('reports'),
