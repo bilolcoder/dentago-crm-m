@@ -391,7 +391,7 @@ const Savat = () => {
 
       <div className="w-full flex justify-center">
 
-        <div className="fixed bottom-0 right-0 left-70 bg-white p-4 sm:pt-3 sm:pb-4 z-40 border-t border-gray-200">
+        <div className="fixed bottom-0 right-0 max-sm:left-0 sm:left-0 md:left-70 lg:left-70 bg-white p-4 sm:pt-3 sm:pb-4 z-40 border-t border-gray-200">
           <div className="space-y-2 mb-3 text-sm">
             <div className="flex justify-center items-center border-gray-300 mt-2">
               <span className="font-medium text-2xl text-black">JAMI: </span>
