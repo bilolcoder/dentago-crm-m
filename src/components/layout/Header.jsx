@@ -10,6 +10,7 @@ import {
     User,
     CreditCard,
     FileText,
+    BookOpen,
 } from 'lucide-react';
 import { UZ, US, RU } from 'country-flag-icons/react/3x2';
 import { useNavigate } from 'react-router-dom';
@@ -146,6 +147,18 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
         }
     };
 
+    const handleNavigation = (route, isExternal = false) => {
+        if (isExternal) {
+            window.open(route, '_blank', 'noopener,noreferrer');
+        } else {
+            navigate(route);
+            // Mobil versiyada sidebarni yopish
+            if (window.innerWidth < 768) {
+                setIsSidebarOpen(false);
+            }
+        }
+    };
+
     // MOBIL SIDEBAR OCHISH/YOPISH FUNKSIYASI
     const handleMobileMenuToggle = () => {
         console.log('Menu tugmasi bosildi, hozirgi holat:', isSidebarOpen);
@@ -187,6 +200,20 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                 >
                     <Calendar className="w-5 h-5 hover:text-[#00BCE4]" />
                 </button>
+
+                {/* Qo'llanma */}
+                <div
+                                            onClick={() => handleNavigation("/manual")}
+                                            className={`
+                                                cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all mt-4
+                                                ${location.pathname === '/manual'
+                                                    ? 'text-[#00BCE4] border-b-2'
+                                                    : 'text-slate-500 font-bold'}
+                                            `}
+                                        >
+                                            <BookOpen size={15} />
+                                            <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
+                                        </div>
 
                 {/* Fullscreen */}
                 {/* <button

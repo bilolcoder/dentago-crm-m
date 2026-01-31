@@ -53,9 +53,19 @@ const ProfileContent = () => {
           const firstName = nameParts[0];
           const lastName = nameParts.slice(1).join(' ');
 
-          const formattedBirthDate = data.user.birthdate
-            ? new Date(data.user.birthdate).toISOString().split('T')[0]
-            : '';
+          // Safely format birthdate to avoid invalid date errors
+          let formattedBirthDate = '';
+          if (data.user.birthdate) {
+            try {
+              const birthDate = new Date(data.user.birthdate);
+              if (!isNaN(birthDate.getTime())) {  // Check if date is valid
+                formattedBirthDate = birthDate.toISOString().split('T')[0];
+              }
+            } catch (dateError) {
+              console.warn('Invalid birthdate format:', data.user.birthdate);
+              formattedBirthDate = '';
+            }
+          }
 
           setUser({
             firstName,

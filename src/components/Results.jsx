@@ -152,93 +152,127 @@ function Results() {
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='min-h-screenpy-8'>
+      <div className="">
+        <nav className="flex items-center gap-3 text-sm font-medium text-slate-500 mb-8">
+          <Link to="/" className="hover:text-[#00BCE4] transition-colors duration-200">{t('dashboard') || 'Dashboard'}</Link>
+          <span className="text-slate-300">/</span>
+          <span className="text-slate-700 font-semibold">{t('my_results') || 'Natijalarim'}</span>
+        </nav>
 
-      <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-        <Link to="/" className="hover:text-[#00BCE4] transition-colors">{t('dashboard') || 'Dashboard'}</Link>
-        <span className="text-slate-300">/</span>
-        <span className="text-slate-900">{t('my_results') || 'Natijalarim'}</span>
-      </nav>
-
-      <header className="space-y-1">
-        <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-          Natijalar <span className="text-[#00BCE4]">Gallereyasi</span>
-        </h2>
-        <p className="text-sm text-slate-500 font-medium italic">
-          Tanlangan rasmlar barcha doktorlar gallereyasiga qo'shiladi.
-        </p>
-      </header>
-
-      <section className="space-y-6 bg-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-50 rounded-xl">
-              <ImageIcon className="w-5 h-5 text-emerald-500" />
-            </div>
-            <h3 className='text-sm font-black text-slate-700 uppercase tracking-wider'>Rasmlar</h3>
-          </div>
-          <span className={`text-xs font-black px-3 py-1 rounded-lg ${selectedImages.length === MAX_IMAGES ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'}`}>
-            {selectedImages.length} / {MAX_IMAGES}
-          </span>
-        </div>
-
-        <div className='flex flex-wrap gap-5'>
-          {selectedImages.length < MAX_IMAGES && (
-            <button
-              className='w-40 h-40 border-2 border-dashed border-slate-200 text-slate-400 rounded-[2rem] flex flex-col items-center justify-center cursor-pointer hover:border-[#00BCE4] hover:text-[#00BCE4] hover:bg-[#00BCE4]/5 transition-all duration-300 group'
-              onClick={() => document.getElementById('imageInput')?.click()}
-            >
-              <div className="p-3 bg-slate-50 rounded-2xl group-hover:bg-white transition-colors">
-                <Plus className="w-6 h-6" />
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden mb-8">
+          <div className="p-6 md:p-8 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-slate-100">
+            <div className="flex items-center gap-4 mb-2">
+              <div className="p-3 bg-[#00BCE4] rounded-xl shadow-md">
+                <ImageIcon className="w-6 h-6 text-white" />
               </div>
-              <span className='mt-3 text-[10px] font-black uppercase tracking-tighter'>Rasm tanlash</span>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id='imageInput'
-                multiple
-                onChange={handleImageChange}
-              />
-            </button>
-          )}
+              <div>
+                <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+                  Natijalar <span className="text-[#00BCE4]">Gallereyasi</span>
+                </h1>
+                <p className="text-slate-600 mt-1">
+                  Tanlangan rasmlar barcha doktorlar gallereyasiga qo'shiladi.
+                </p>
+              </div>
+            </div>
+          </div>
 
-          {selectedImages.map((image, index) => (
-            <div key={index} className='relative w-40 h-40 rounded-[2rem] overflow-hidden shadow-md group border border-slate-100'>
-              <img
-                src={image.preview}
-                alt={`Rasm ${index + 1}`}
-                className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
-              />
-              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="p-6 md:p-8">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+              <h2 className='text-lg font-bold text-slate-700 flex items-center gap-2'>
+                <ImageIcon className="w-5 h-5 text-[#00BCE4]" />
+                Rasm Galereyasi
+              </h2>
+              <span className={`text-sm font-semibold px-4 py-2 rounded-full ${selectedImages.length === MAX_IMAGES ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md' : 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-md'}`}>
+                {selectedImages.length} / {MAX_IMAGES} rasm
+              </span>
+            </div>
+
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6'>
+              {selectedImages.length < MAX_IMAGES && (
+                <div className="group">
+                  <button
+                    className='w-full aspect-square border-2 border-dashed border-slate-300 text-slate-500 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-[#00BCE4] hover:text-[#00BCE4] hover:bg-[#00BCE4]/5 transition-all duration-300 group'
+                    onClick={() => document.getElementById('imageInput')?.click()}
+                  >
+                    <div className="p-4 bg-slate-100 rounded-full group-hover:bg-white group-hover:scale-110 transition-transform duration-300">
+                      <Plus className="w-6 h-6" />
+                    </div>
+                    <span className='mt-3 text-xs font-semibold uppercase tracking-wide text-slate-500 group-hover:text-[#00BCE4]'>
+                      Rasm tanlash
+                    </span>
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    id='imageInput'
+                    multiple
+                    onChange={handleImageChange}
+                  />
+                </div>
+              )}
+
+              {selectedImages.map((image, index) => (
+                <div key={index} className='relative aspect-square rounded-2xl overflow-hidden shadow-lg group border border-slate-200 transition-transform duration-300 hover:shadow-xl'>
+                  <img
+                    src={image.preview}
+                    alt={`Rasm ${index + 1}`}
+                    className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <button
+                    onClick={() => handleRemoveImage(index)}
+                    className='absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-red-500 rounded-full p-2 hover:bg-red-500 hover:text-white transition-all shadow-lg z-10'
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-3 left-3 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Rasm #{index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-slate-100">
+              <div className="text-sm text-slate-600">
+                <p><strong>{selectedImages.length}</strong> ta rasm tanlandi</p>
+              </div>
               <button
-                onClick={() => handleRemoveImage(index)}
-                className='absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-red-500 rounded-xl p-2 hover:bg-red-500 hover:text-white transition-all shadow-sm'
+                onClick={handleSave}
+                disabled={loading || selectedImages.length === 0}
+                className={`px-8 py-3.5 rounded-xl font-bold text-white flex items-center gap-3 transition-all duration-300 shadow-lg ${
+                  loading || selectedImages.length === 0
+                    ? 'bg-gradient-to-r from-gray-400 to-gray-500 cursor-not-allowed opacity-70'
+                    : 'bg-gradient-to-r from-[#00BCE4] to-[#0099d4] hover:from-[#0099d4] hover:to-[#007bb0] active:scale-95'
+                }`}
               >
-                <X className="w-4 h-4" />
+                {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+                {loading ? 'Saqlanmoqda...' : 'Barcha doktorlarga saqlash'}
               </button>
             </div>
-          ))}
-        </div>
 
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={handleSave}
-            disabled={loading || selectedImages.length === 0}
-            className={`px-8 py-3 rounded-full font-bold text-white flex items-center gap-2 transition-all ${
-              loading || selectedImages.length === 0
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-[#00BCE4] hover:bg-[#0099d4] active:scale-95'
-            }`}
-          >
-            {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-            {loading ? 'Barchaga saqlanmoqda...' : 'Barcha doktorlarga saqlash'}
-          </button>
+            {error && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                <div className="text-red-500 font-bold text-lg">⚠️</div>
+                <div>
+                  <h3 className="font-bold text-red-800 mb-1">Xatolik yuz berdi</h3>
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              </div>
+            )}
+            {success && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
+                <div className="text-green-500 font-bold text-lg">✓</div>
+                <div>
+                  <h3 className="font-bold text-green-800 mb-1">Muvaffaqiyatli bajarildi!</h3>
+                  <p className="text-green-600 text-sm">Rasmlar barcha doktorlar gallereyasiga muvaffaqiyatli qo'shildi!</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-
-        {error && <p className="text-red-600 bg-red-50 p-4 rounded-xl mt-4">{error}</p>}
-        {success && <p className="text-green-600 bg-green-50 p-4 rounded-xl mt-4">Rasmlar barcha doktorlar gallereyasiga muvaffaqiyatli qo'shildi!</p>}
-      </section>
+      </div>
     </div>
   );
 }

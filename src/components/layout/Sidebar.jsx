@@ -111,16 +111,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         //         { label: t('sms_settings'), route: "/sms/sozlamalar" },
         //     ]
         // },
-        {
-            icon: Settings,
-            label: t('settings'),
-            route: "/settings",
-            type: "group",
-            name: "settings",
-            subItems: [
-                { label: t('general_settings'), route: "/settings/general" },
-            ]
-        },
+        // {
+        //     icon: Settings,
+        //     label: t('settings'),
+        //     route: "/settings",
+        //     type: "group",
+        //     name: "settings",
+        //     subItems: [
+        //         { label: t('general_settings'), route: "/settings/general" },
+        //     ]
+        // },
     ];
 
     const renderNavItem = (item, index) => {
@@ -231,7 +231,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-65px] px-4 space-y-2 custom-scrollbar pb-1">
                         {navItems.map((item, index) => renderNavItem(item, index))}
 
-                        <div
+                        {/* <div
                             onClick={() => handleNavigation("/manual")}
                             className={`
                                 cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all mt-4
@@ -242,7 +242,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         >
                             <BookOpen size={15} />
                             <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
-                        </div>
+                        </div> */}
                     </nav>
                 </div>
 

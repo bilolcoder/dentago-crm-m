@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, Truck, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Truck, ShoppingBag, Check } from "lucide-react";
 import axios from "axios";
 
 const BASE_URL = "https://app.dentago.uz";
@@ -11,6 +11,9 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [isInCart, setIsInCart] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -65,6 +68,9 @@ const ProductDetail = () => {
         };
 
         setProduct(formatted);
+        
+        // Fetch cart items after product is loaded
+        await fetchCartItems(token);
       } catch (err) {
         console.error("Mahsulot yuklash xatosi:", err);
         setError(err.message || "Mahsulot yuklanmadi. Internet yoki server bilan muammo bo'lishi mumkin.");
@@ -72,8 +78,41 @@ const ProductDetail = () => {
         setLoading(false);
       }
     };
+    
+    const fetchCartItems = async (token) => {
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await axios.get(`${BASE_URL}/api/cart`, {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 10000
+        });
+        
+        if (response.data.success && response.data.data) {
+          const items = response.data.data.items || [];
+          setCartItems(items);
+          
+          // Check if current product is in cart
+          const isInCurrentCart = items.some(item => 
+            item.product_id?._id === id || 
+            item.product_id === id || 
+            item.productSnapshot?._id === id
+          );
+          setIsInCart(isInCurrentCart);
+        }
+      } catch (err) {
+        console.error("Savat yuklash xatosi:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    if (id) fetchProduct();
+    if (id) {
+      fetchProduct();
+    }
   }, [id]);
 
   const handleAddToCart = async () => {
@@ -86,12 +125,14 @@ const ProductDetail = () => {
       return;
     }
   
+    setIsLoading(true);
+    
     const priceNumber = product.price
       ? parseInt(product.price.replace(/\s|so'm/g, ""), 10)
       : 0;
   
     try {
-      await axios.post(
+      const response = await axios.post(
         `${BASE_URL}/api/cart/add`,
         {
           product_id: product.id,
@@ -103,11 +144,18 @@ const ProductDetail = () => {
           timeout: 8000,
         }
       );
-  
-   
+      
+      if (response.data.success) {
+        // Update the cart state to reflect that the product is now in the cart
+        setIsInCart(true);
+        // Optionally update cart items
+        setCartItems(prev => [...prev, { product_id: product.id, quantity: 1, price: priceNumber }]);
+      }
   
     } catch (err) {
       alert("Savatga qo'shishda xato: " + (err.response?.data?.message || "Server bilan muammo"));
+    } finally {
+      setIsLoading(false);
     }
   };
   if (loading) {
@@ -223,14 +271,31 @@ const ProductDetail = () => {
       <div className="fixed bottom-0 left-70 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
           <button
-            onClick={handleAddToCart}
-            className="w-full bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800 
-                     text-white py-4 rounded-xl font-semibold text-lg 
-                     flex items-center justify-center gap-3 transition-colors shadow-md"
-          >
-            <ShoppingBag size={22} />
-            Savatga qo'shish
-          </button>
+          onClick={handleAddToCart}
+          disabled={isLoading}
+          className={`w-full py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${
+            isLoading
+              ? 'bg-gray-400'
+              : isInCart 
+                ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg'
+                : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
+          }`}
+        >
+          {isLoading ? (
+            <>
+              <div className="animate-spin rounded-full h-3 w-3 md:h-4 md:w-4 border-2 border-white border-t-transparent"></div>
+              Qo'shilmoqda...
+            </>
+          ) : isInCart ? (
+            <>
+              <Check size={16} className="md:size-[18px]" /> Savatda mavjud
+            </>
+          ) : (
+            <>
+              <ShoppingBag size={16} className="md:size-[18px]" /> Savatga
+            </>
+          )}
+        </button>
         </div>
       </div>
     </div>
