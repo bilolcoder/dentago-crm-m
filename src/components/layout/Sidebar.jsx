@@ -215,7 +215,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     {/* Brand Identity */}
                     <div className="p-8 pb-6 flex bg-white items-center justify-between relative">
                         <div onClick={() => handleNavigation("/DentagoStore")} className="cursor-pointer flex items-center justify-center gap-3 group">
-                            <img className='h-37.5 -mt-18.25 mx-auto ml-[32px]' src={Logo} alt="Logo" />
+                            <img className='h-37.5 -mt-16.5 ml-[32px]' src={Logo} alt="Logo" />
                         </div>
                         {/* Yopish tugmasi - faqat mobilda */}
                         <button
@@ -228,7 +228,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-65px] px-4 space-y-2 custom-scrollbar pb-1">
+                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-50px] px-4 space-y-2 custom-scrollbar pb-1">
                         {navItems.map((item, index) => renderNavItem(item, index))}
 
                         {/* <div
@@ -262,7 +262,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
 
                     <p className="text-center text-[10px] font-medium text-black uppercase tracking-tighter">
-                        &copy; 2025 DentaGo Platform
+                        &copy; 2026 DentaGo Platform
                     </p>
                 </div>
             </aside>

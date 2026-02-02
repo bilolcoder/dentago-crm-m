@@ -436,13 +436,12 @@ function ProductForm({ productToEdit, onClose }) {
     <div className="bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10">
-          <Link
-            to="/dashboard"
-            className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center gap-2"
+          <div
+            onClick={() => navigate(-1)}
+            className="text-gray-500 font-semibold hover:text-gray-900"
           >
             <ArrowLeftIcon className="h-5 w-5" />
-            Дашбоард
-          </Link>
+          </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
             {productToEdit ? 'Товарни таҳрирлаш' : 'Янги товар қўшиш'}
           </h1>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { TiTick } from "react-icons/ti";
+import { CiViewTable } from "react-icons/ci";
 
 function Bemorlarim() {
   const [appointments, setAppointments] = useState([]);
@@ -417,9 +418,7 @@ function Bemorlarim() {
                     : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+                <CiViewTable />
                 <span className="hidden xs:block">Jadval</span>
               </button>
             </div>
@@ -483,7 +482,7 @@ function Bemorlarim() {
       </div>
 
       {appointments.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
           <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#00BCE4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
