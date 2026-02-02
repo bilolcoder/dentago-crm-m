@@ -607,7 +607,7 @@ function AddMahsulot() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="pl-10 pr-10 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent w-full md:w-96 transition-all"
+                  className="pl-10 pr-10 py-3 bg-white border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent w-full md:w-96 transition-all"
                 />
                 {searchTerm && (
                   <button
@@ -873,7 +873,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     required
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="Mahsulot nomini kiriting"
                   />
                 </div>
@@ -890,7 +890,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     required
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="Mahsulot artikuli"
                   />
                 </div>
@@ -909,7 +909,7 @@ function AddMahsulot() {
                     min="0"
                     step="0.01"
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="0.00"
                   />
                 </div>
@@ -926,7 +926,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     min="0"
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="1"
                   />
                 </div>
@@ -943,7 +943,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     min="0"
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="0"
                   />
                 </div>
@@ -961,7 +961,7 @@ function AddMahsulot() {
                     min="0"
                     max="100"
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="0"
                   />
                 </div>
@@ -977,7 +977,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     required
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                   >
                     <option value="">Категорияни танланг</option>
                     {categories.map((cat) => (
@@ -999,7 +999,7 @@ function AddMahsulot() {
                     value={editForm.company}
                     onChange={handleEditChange}
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="Kompaniya nomi"
                   />
                 </div>
@@ -1015,7 +1015,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     required
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                   >
                     <option value="">Кодни танланг</option>
                     {codeOptions.map((item, index) => (
@@ -1040,7 +1040,7 @@ function AddMahsulot() {
                     step="0.01"
                     placeholder="0"
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                   />
                 </div>
 
@@ -1056,7 +1056,7 @@ function AddMahsulot() {
                     onChange={handleEditChange}
                     required
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="Qadoqlash kodi"
                   />
                 </div>
@@ -1072,7 +1072,7 @@ function AddMahsulot() {
                     value={editForm.description}
                     onChange={handleEditChange}
                     disabled={savingEdit || uploadingImages}
-                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent disabled:opacity-50"
                     placeholder="Mahsulot tavsifi..."
                   ></textarea>
                 </div>

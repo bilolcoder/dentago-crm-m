@@ -234,6 +234,82 @@ const uzbekistanCities = [
   },
 
   // =========================
+  // JIZZAX
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30e0",
+    label: "Jizzax",
+    value: "jizzax",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e1",
+    label: "Zomin",
+    value: "zomin",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e2",
+    label: "Zarbdor",
+    value: "zarbdor",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e3",
+    label: "Do'stlik",
+    value: "dostlik",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e4",
+    label: "Forish",
+    value: "forish",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e5",
+    label: "G'allaorol",
+    value: "gallaorol",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e6",
+    label: "Mirzacho'l",
+    value: "mirzachol",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e7",
+    label: "Paxtakor",
+    value: "paxtakor",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e8",
+    label: "Yangiobod",
+    value: "yangiobod",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e9",
+    label: "Arnasoy",
+    value: "arnasoy",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30ea",
+    label: "Baxmal",
+    value: "baxmal",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30eb",
+    label: "Sharof Rashidov",
+    value: "sharof_rashidov",
+    region: "Jizzax viloyati"
+  },
+
+  // =========================
   // XORAZM
   // =========================
   {
