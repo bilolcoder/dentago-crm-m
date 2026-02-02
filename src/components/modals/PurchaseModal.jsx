@@ -146,7 +146,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
         }))
       });
       
-      // Formani tozalash
+      // Formani tozalash va yopish
       setFormData({
         firstName: '',
         lastName: '',
