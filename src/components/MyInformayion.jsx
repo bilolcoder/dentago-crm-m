@@ -1274,7 +1274,8 @@ function MyInformation() {
             {!isFormCollapsed && (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Rasm yuklash */}
-                <div className="flex flex-col items-center mb-8">
+                <div className="flex flex-col items-start
+                 mb-8">
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     className="w-32 h-32 rounded-[10px] overflow-hidden bg-white cursor-pointer hover:opacity-90 transition border-2 border-[#00BCE4] relative"

@@ -292,14 +292,14 @@ function Aperator() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input type="text" placeholder="Qidiruv..." className="pl-12 pr-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 outline-none w-full md:w-80 text-sm font-bold" />
           </div>
-          <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
-          <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all cursor-pointer"><Download size={16} />Eksport</button>
+          {/* <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
+          <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all cursor-pointer"><Download size={16} />Eksport</button> */}
         </div>
       </div>
 
       {/* Jadval */}
       <div className="bg-white rounded-[1rem] shadow-sm border border-slate-100 mb-12 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="">
           <table className="w-full min-w-[1200px]">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
