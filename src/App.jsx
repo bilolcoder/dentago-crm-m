@@ -107,7 +107,7 @@ const FloatingButton = () => {
     <div className="fixed bottom-6 right-6 z-[9999]">
       <button
         onClick={() => window.location.href = '/savat'}
-        className="relative w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
+        className=" cursor-pointer relative w-14 h-14 flex items-center justify-center bg-[#00C2FF] rounded-full shadow-2xl hover:scale-110 transition-all text-white"
         title="Savatga o'tish"
       >
         <ShoppingCart size={26} />
