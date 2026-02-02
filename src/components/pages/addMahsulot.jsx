@@ -622,7 +622,7 @@ function AddMahsulot() {
 
               <button
                 onClick={handleAddProduct}
-                className="flex items-center gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+                className="flex items-center cursor-pointer gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"
               >
                 <Plus size={20} /> Yangi qo'shish
               </button>
