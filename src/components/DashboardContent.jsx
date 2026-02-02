@@ -253,7 +253,7 @@ const DashboardContent = () => {
                             </div>
                             <button 
                                 onClick={() => dateInputRef.current?.showPicker()} 
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl text-xs font-bold text-[#00BCE4]"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl text-xs font-bold text-[#00BCE4] cursor-pointer"
                             >
                                 <Calendar className="w-4 h-4" />
                                 <span>{selectedDate}</span>
