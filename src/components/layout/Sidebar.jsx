@@ -228,7 +228,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-50px] px-4 space-y-2 custom-scrollbar pb-1">
+                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white shadow-sm mt-[-50px] px-4 space-y-2 custom-scrollbar pb-1">
                         {navItems.map((item, index) => renderNavItem(item, index))}
 
                         {/* <div
