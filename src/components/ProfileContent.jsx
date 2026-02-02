@@ -224,14 +224,14 @@ const ProfileContent = () => {
 
   return (
     <div className="bg-white">
-      <div className="max-w-4xl mx-auto">
+      <div className="  mx-auto">
         {/* Sarlavha */}
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 text-gray-600 hover:text-[#00BCE4] transition-colors"
+            className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-[#00BCE4] transition-colors"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-6 h-6 " />
             <span className="text-lg font-semibold">Orqaga</span>
           </button>
         </div>
@@ -257,9 +257,9 @@ const ProfileContent = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 p-3 bg-[#00BCE4] text-white rounded-full shadow-lg hover:scale-110 transition"
+                  className=" cursor-pointer absolute bottom-0 right-0 p-3 bg-[#00BCE4] text-white rounded-full shadow-lg hover:scale-110 transition"
                 >
-                  <Upload className="w-5 h-5" />
+                  <Upload className="w-5 h-5 " />
                 </button>
               )}
             </div>
@@ -348,7 +348,7 @@ const ProfileContent = () => {
                 value={isEditing ? formData.birthdate : (formData.birthdate ? new Date(formData.birthdate).toLocaleDateString('uz-UZ') : '')}
                 onChange={(e) => setFormData(prev => ({ ...prev, birthdate: e.target.value }))}
                 placeholder="mm/dd/yyyy"
-                className={`w-full px-5 py-4 rounded-2xl italic transition-all
+                className={`w-full px-5 py-4 rounded-2xl italic transition-all 
                   ${isEditing
                     ? 'bg-white border-2 border-[#00BCE4] focus:ring-4 focus:ring-[#00BCE4]/20 text-gray-900'
                     : 'bg-white border border-gray-100 text-gray-700'
@@ -363,7 +363,7 @@ const ProfileContent = () => {
                 <select
                   value={formData.gender}
                   onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
-                  className="w-full px-5 py-4 bg-white border-2 border-[#00BCE4] rounded-2xl focus:ring-4 focus:ring-[#00BCE4]/20 font-medium"
+                  className="w-full cursor-pointer px-5 py-4 bg-white border-2 border-[#00BCE4] rounded-2xl focus:ring-4 focus:ring-[#00BCE4]/20 font-medium"
                 >
                   <option value="male">Erkak</option>
                   <option value="female">Ayol</option>
@@ -398,16 +398,16 @@ const ProfileContent = () => {
             <button
               onClick={toggleEdit}
               disabled={saving}
-              className="px-12 py-5 bg-[#00BCE4] hover:bg-[#00a8cc] text-white font-bold text-xl rounded-2xl shadow-lg transition-all flex items-center gap-3 disabled:opacity-70"
+              className="px-12 py-5 cursor-pointer bg-[#00BCE4] hover:bg-[#00a8cc] text-white font-bold text-xl rounded-2xl shadow-lg transition-all flex items-center gap-3 disabled:opacity-70"
             >
               {saving ? (
                 <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <Loader2 className="w-6 h-6 animate-spin " />
                   Saqlanmoqda...
                 </>
               ) : (
                 <>
-                  <Edit2 className="w-6 h-6" />
+                  <Edit2 className="w-6 h-6 " />
                   {isEditing ? 'Saqlash' : 'Tahrirlash'}
                 </>
               )}

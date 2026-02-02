@@ -22,7 +22,7 @@ const SearchModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 sm:pt-20 bg-slate-900/40 backdrop-blur-sm transition-all duration-300">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 sm:pt-20 bg-slate-900/40 backdrop-blur-sm transition-all duration-300 ">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-blue-100 animate-in fade-in zoom-in duration-200">
                 <div className="p-4 border-b border-blue-50 flex items-center gap-3">
                     <Search className="w-5 h-5 text-[#00BCE4]" />
@@ -208,7 +208,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                                                 cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all mt-4
                                                 ${location.pathname === '/manual'
                                                     ? 'text-[#00BCE4] border-b-2'
-                                                    : 'text-slate-500 font-bold'}
+                                                    : 'text-slate-500  '}
                                             `}
                                         >
                                             <BookOpen size={15} />
@@ -258,7 +258,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                 <div className="relative flex items-center border-l border-slate-100 ml-1 pl-2 sm:pl-4">
                     <button
                         onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                        className="flex items-center gap-2 group outline-none"
+                        className="flex items-center gap-2 group outline-none cursor-pointer "
                     >
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00BCE4] text-white flex items-center justify-center rounded-full text-sm font-black shadow-lg shadow-blue-200 group-hover:scale-105 transition-transform">
                             {getInitial()}
@@ -276,22 +276,22 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
                     {isProfileMenuOpen && (
                         <>
-                            <div className="fixed inset-0 z-10" onClick={() => setIsProfileMenuOpen(false)}></div>
+                            <div className="fixed inset-0 z-10 cursor-pointer" onClick={() => setIsProfileMenuOpen(false)}></div>
                             <div className="absolute right-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-2xl z-20 border border-blue-50 py-3">
                                 <div className="px-4 py-2 mb-2 border-b border-blue-50 lg:hidden">
                                     <p className="text-sm font-bold text-slate-900">{user.username}</p>
                                     <p className="text-xs text-[#00BCE4] font-medium">{user.role}</p>
                                 </div>
 
-                                <button onClick={() => { navigate('/profile'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group">
+                                <button onClick={() => { navigate('/profile'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group cursor-pointer ">
                                     <User className="w-4 h-4 mr-3 text-slate-400 group-hover:text-[#00BCE4]" />
                                     <span className="font-medium">{t('my_profile') || "Mening profilim"}</span>
                                 </button>
-                                <button onClick={() => { navigate('/payments/app'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group">
+                                <button onClick={() => { navigate('/payments/app'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group cursor-pointer">
                                     <CreditCard className="w-4 h-4 mr-3 text-slate-400 group-hover:text-[#00BCE4]" />
                                     <span className="font-medium">{t('app_payments') || "To'lovlar"}</span>
                                 </button>
-                                <button onClick={() => { navigate('/payments/tariffs'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group">
+                                <button onClick={() => { navigate('/payments/tariffs'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group cursor-pointer">
                                     <FileText className="w-4 h-4 mr-3 text-slate-400 group-hover:text-[#00BCE4]" />
                                     <span className="font-medium">{t('tariffs') || "Tariflar"}</span>
                                 </button>
@@ -300,7 +300,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
                                 <button
                                     onClick={handleLogoutClick}
-                                    className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 font-bold"
+                                    className="flex items-center cursor-pointer w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 font-bold"
                                 >
                                     <LogOut className="w-4 h-4 mr-3" />
                                     {t('logout') || "Chiqish"}
