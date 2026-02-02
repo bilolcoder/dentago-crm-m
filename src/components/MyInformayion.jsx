@@ -267,6 +267,7 @@ function MyInformation() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [debugInfo, setDebugInfo] = useState('');
   const [isFormCollapsed, setIsFormCollapsed] = useState(false);
+  const [selectedSpecialties, setSelectedSpecialties] = useState([]);
 
   // Yangi state'lar - viloyat va tuman uchun
   const [selectedRegion, setSelectedRegion] = useState('');
@@ -423,7 +424,6 @@ function MyInformation() {
     const formValues = {
       fullName: doctor.fullName || doctor.name || '',
       gender: doctor.gender || 'male',
-      specialty: doctor.specialty || doctor.specialization || 'Terapevt',
       experienceYears: doctor.experienceYears || doctor.experience || 5,
       clinicName: doctor.clinic?.name || doctor.hospitalName || '',
       clinicAddress: doctor.clinic?.address || doctor.address || '',
@@ -437,6 +437,16 @@ function MyInformation() {
       region: doctor.region || '',
       city: doctor.city || ''
     };
+
+    // Handle specialty field - could be string or array
+    const doctorSpecialty = doctor.specialty || doctor.specialization || 'Terapevt';
+    if (Array.isArray(doctorSpecialty)) {
+      setSelectedSpecialties(doctorSpecialty);
+    } else {
+      // Split the string by comma if it contains multiple specialties
+      const specialtyArray = String(doctorSpecialty).split(', ').filter(item => item.trim() !== '');
+      setSelectedSpecialties(specialtyArray.length > 0 ? specialtyArray : ['Terapevt']);
+    }
 
     console.log('Form values to reset:', formValues);
     reset(formValues);
@@ -592,7 +602,7 @@ function MyInformation() {
       const doctorData = {
         fullName: data.fullName?.trim() || 'Noma\'lum Shifokor',
         gender: data.gender || 'male',
-        specialty: data.specialty || 'Terapevt',
+        specialty: selectedSpecialties.length > 0 ? selectedSpecialties.join(', ') : '',
         experienceYears: Number(data.experienceYears) || 0,
         price: Number(data.price) || 0,
         phone: Number(data.phone) || 0,
@@ -739,6 +749,7 @@ function MyInformation() {
     setSubmitMessage({ type: '', text: '' });
     setSelectedRegion('');
     setSelectedCity('');
+    setSelectedSpecialties([]);
   };
 
   // Yangi shifokor qo'shish tugmasi
@@ -752,7 +763,6 @@ function MyInformation() {
     reset({
       fullName: '',
       gender: 'male',
-      specialty: 'Terapevt',
       experienceYears: 5,
       clinicName: '',
       clinicAddress: '',
@@ -766,6 +776,7 @@ function MyInformation() {
       region: '',
       city: ''
     });
+    setSelectedSpecialties([]);
     setPreviewUrl(null);
     setSelectedFile(null);
     setSelectedRegion('');
@@ -780,7 +791,8 @@ function MyInformation() {
   // Filtrlangan shifokorlar
   const filteredDoctors = doctors.filter(doctor => {
     const doctorName = (doctor.fullName || doctor.name || '').toLowerCase();
-    const doctorSpecialty = (doctor.specialty || doctor.specialization || '').toLowerCase();
+    const doctorSpecialty = doctor.specialty || doctor.specialization || '';
+    const specialtiesArray = Array.isArray(doctorSpecialty) ? doctorSpecialty.map(s => s.toLowerCase()) : String(doctorSpecialty).toLowerCase().split(', ');
     const clinicName = (doctor.clinic?.name || doctor.hospitalName || '').toLowerCase();
     const doctorRegion = (doctor.region || '').toLowerCase();
     const doctorCity = (doctor.city || '').toLowerCase();
@@ -788,7 +800,7 @@ function MyInformation() {
 
     return (
       doctorName.includes(search) ||
-      doctorSpecialty.includes(search) ||
+      specialtiesArray.some(spec => spec.includes(search)) ||
       clinicName.includes(search) ||
       doctorRegion.includes(search) ||
       doctorCity.includes(search)
@@ -808,6 +820,9 @@ function MyInformation() {
     const doctorSpecialty = doctor.specialty || doctor.specialization || 'Mutaxassislik kiritilmagan';
     const experienceYears = doctor.experienceYears || doctor.experience || 0;
     const price = doctor.price || doctor.consultationPrice || 0;
+
+    // Handle multiple specialties
+    const specialtiesArray = Array.isArray(doctorSpecialty) ? doctorSpecialty : String(doctorSpecialty).split(', ');
 
     const avatar = doctor.avatar || doctor.profileImage || doctor.image || null;
     const region = doctor.region || '';
@@ -851,9 +866,13 @@ function MyInformation() {
         <div className="p-5">
           <div className="mb-4">
             <h3 className="text-xl font-bold text-gray-800 mb-1">{doctorName}</h3>
-            <div className="flex items-center gap-2 text-[#00BCE4] font-medium">
-              <BriefcaseMedical className="w-4 h-4" />
-              {doctorSpecialty}
+            <div className="flex flex-wrap gap-2">
+              {specialtiesArray.map((spec, index) => (
+                <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-medium">
+                  <BriefcaseMedical className="w-4 h-4" />
+                  {spec}
+                </div>
+              ))}
             </div>
 
             {/* Viloyat va tuman ko'rsatish */}
@@ -1302,19 +1321,46 @@ function MyInformation() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Mutaxassislik *
                     </label>
-                    <select
-                      {...register('specialty', { required: 'Mutaxassislikni tanlang' })}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
-                    >
-                      <option value="">Tanlang...</option>
-                      {specialties.map((spec) => (
-                        <option key={spec} value={spec}>
-                          {spec}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.specialty && (
-                      <p className="mt-1 text-sm text-red-600">{errors.specialty.message}</p>
+                    <div className="border border-gray-300 rounded-xl p-2 min-h-[46px] bg-white focus-within:ring-2 focus-within:ring-[#00BCE4]">
+                      <div className="flex flex-wrap gap-2 p-1">
+                        {selectedSpecialties.map((specialty, index) => (
+                          <div key={index} className="bg-[#00BCE4] text-white px-3 py-1 rounded-lg flex items-center gap-1">
+                            <span>{specialty}</span>
+                            <button 
+                              type="button" 
+                              onClick={() => {
+                                const updatedSpecialties = selectedSpecialties.filter((_, i) => i !== index);
+                                setSelectedSpecialties(updatedSpecialties);
+                              }}
+                              className="text-white hover:text-gray-200 focus:outline-none"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value && !selectedSpecialties.includes(e.target.value)) {
+                              setSelectedSpecialties([...selectedSpecialties, e.target.value]);
+                            }
+                            e.target.value = ""; // Reset selection
+                          }}
+                          className="flex-1 min-w-[100px] border-none outline-none bg-transparent"
+                        >
+                          <option value="">Qo'shish...</option>
+                          {specialties.map((spec) => (
+                            !selectedSpecialties.includes(spec) && (
+                              <option key={spec} value={spec}>
+                                {spec}
+                              </option>
+                            )
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    {selectedSpecialties.length === 0 && (
+                      <p className="mt-1 text-sm text-red-600">Mutaxassislikni tanlang *</p>
                     )}
                   </div>
 
@@ -1553,9 +1599,13 @@ function MyInformation() {
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">
                       {viewDoctor.fullName || viewDoctor.name || 'Noma\'lum Shifokor'}
                     </h3>
-                    <div className="flex items-center gap-3 text-[#00BCE4] font-semibold mb-4">
-                      <BriefcaseMedical className="w-5 h-5" />
-                      {viewDoctor.specialty || viewDoctor.specialization || 'Mutaxassislik kiritilmagan'}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {(Array.isArray(viewDoctor.specialty) ? viewDoctor.specialty : (Array.isArray(viewDoctor.specialization) ? viewDoctor.specialization : String(viewDoctor.specialty || viewDoctor.specialization || 'Mutaxassislik kiritilmagan').split(', '))).map((spec, index) => (
+                        <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-semibold">
+                          <BriefcaseMedical className="w-5 h-5" />
+                          {spec}
+                        </div>
+                      ))}
                     </div>
 
                     <div className="flex flex-wrap gap-3">
