@@ -438,14 +438,14 @@ function AdminProduct() {
                   <div className="flex justify-center gap-2">
                     <button
                       onClick={() => openEditModal(product)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => deleteProduct(product._id)}
                       disabled={deletingId === product._id}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                      className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg disabled:opacity-50"
                     >
                       {deletingId === product._id ? (
                         <Loader2 size={18} className="animate-spin" />
@@ -471,7 +471,7 @@ function AdminProduct() {
               </h2>
               <button
                 onClick={() => setShowFormModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-full"
+                className="p-2 cursor-pointer hover:bg-slate-100 rounded-full"
               >
                 <X size={24} />
               </button>
@@ -589,7 +589,7 @@ function AdminProduct() {
                     accept="image/*"
                     multiple
                     onChange={handleFileChange}
-                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#00BCE4]/10 file:text-[#00BCE4] hover:file:bg-[#00BCE4]/20"
+                    className="block cursor-pointer w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#00BCE4]/10 file:text-[#00BCE4] hover:file:bg-[#00BCE4]/20"
                   />
 
                   {previewImages.length > 0 && (
@@ -599,12 +599,12 @@ function AdminProduct() {
                           <img
                             src={src}
                             alt="preview"
-                            className="w-24 h-24 object-cover rounded-lg border"
+                            className="w-24  h-24 object-cover rounded-lg border"
                           />
                           <button
                             type="button"
                             onClick={() => removeImage(idx)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                            className="absolute cursor-pointer -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                           >
                             ×
                           </button>
@@ -630,14 +630,15 @@ function AdminProduct() {
                   <button
                     type="button"
                     onClick={() => setShowFormModal(false)}
-                    className="px-6 py-2 border rounded-lg hover:bg-slate-50"
+                    className="px-6 cursor-pointer py-2 border rounded-lg hover:bg-slate-50"
                   >
                     Bekor qilish
                   </button>
                   <button
                     type="submit"
                     disabled={formLoading || uploading}
-                    className="px-6 py-2 bg-[#00BCE4] text-white rounded-lg hover:bg-[#0099c2] disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-2 cursor-pointer
+                     bg-[#00BCE4] text-white rounded-lg hover:bg-[#0099c2] disabled:opacity-50 flex items-center gap-2"
                   >
                     {formLoading || uploading ? (
                       <>

@@ -370,7 +370,7 @@ function Bemorlarim() {
           <p className="text-red-600 mb-6 font-medium">{error}</p>
           <button
             onClick={fetchAppointments}
-            className="bg-[#00BCE4] hover:bg-[#00a8cc] text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+            className="bg-[#00BCE4] cursor-pointer hover:bg-[#00a8cc] text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
           >
             Qayta urinish
           </button>

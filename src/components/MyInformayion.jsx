@@ -959,7 +959,7 @@ function MyInformation() {
 
             <button
               onClick={handleAddNewDoctor}
-              className="bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/10 transition-all"
+              className="bg-[#00BCE4] cursor-pointer hover:bg-[#0096b8] text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/10 transition-all"
             >
               <Plus className="w-5 h-5" />
               Yangi Shifokor Qo'shish
@@ -1039,7 +1039,7 @@ function MyInformation() {
               </p>
               <button
                 onClick={fetchDoctors}
-                className="bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2 px-6 rounded-xl transition-colors"
+                className="bg-[#00BCE4] cursor-pointer hover:bg-[#0096b8] text-white font-semibold py-2 px-6 rounded-xl transition-colors"
               >
                 Qayta Yuklash
               </button>

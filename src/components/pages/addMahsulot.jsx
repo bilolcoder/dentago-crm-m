@@ -612,7 +612,7 @@ function AddMahsulot() {
                 {searchTerm && (
                   <button
                     onClick={clearSearch}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                     title="Tozalash"
                   >
                     <X size={18} />
@@ -657,7 +657,7 @@ function AddMahsulot() {
               </p>
               <button
                 onClick={clearSearch}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
               >
                 Barcha mahsulotlarni ko'rish
               </button>
@@ -669,7 +669,7 @@ function AddMahsulot() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 border-b">
+                  <tr className="bg-gray-50 ">
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Mahsulot</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Kategoriya</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Narxi</th>
@@ -740,14 +740,14 @@ function AddMahsulot() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleEditClick(product)}
-                              className="p-2 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              className="p-2 cursor-pointer text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                               title="Tahrirlash"
                             >
                               <Edit3 size={20} />
                             </button>
                             <button
                               onClick={() => handleDeleteClick(product)}
-                              className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-2 text-gray-500 cursor-pointer hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               title="O'chirish"
                             >
                               <Trash2 size={20} />
@@ -764,7 +764,7 @@ function AddMahsulot() {
                         <p className="text-gray-500 mb-4">Hozircha mahsulotlar mavjud emas</p>
                         <button
                           onClick={handleAddProduct}
-                          className="px-6 py-2 bg-[#00BCE4] text-white rounded-lg hover:bg-[#00a6c9] transition-colors"
+                          className="px-6 py-2 cursor-pointer bg-[#00BCE4] text-white rounded-lg hover:bg-[#00a6c9] transition-colors"
                         >
                           Birinchi mahsulotni qo'shing
                         </button>
@@ -782,7 +782,7 @@ function AddMahsulot() {
       {editModalOpen && editingProduct && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b sticky top-0 bg-white z-10">
+            <div className="p-6   sticky top-0 bg-white z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-gray-800">Mahsulotni tahrirlash</h3>
@@ -790,7 +790,7 @@ function AddMahsulot() {
                 </div>
                 <button
                   onClick={closeEditModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 cursor-pointer hover:text-gray-600"
                   disabled={savingEdit || uploadingImages}
                 >
                   <X size={24} />
@@ -848,7 +848,7 @@ function AddMahsulot() {
                             type="button"
                             onClick={() => removeImage(index)}
                             disabled={savingEdit || uploadingImages}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 disabled:opacity-50"
+                            className="absolute cursor-pointer -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 disabled:opacity-50"
                           >
                             <X size={16} />
                           </button>
@@ -1079,18 +1079,18 @@ function AddMahsulot() {
               </div>
             </div>
 
-            <div className="p-6 border-t flex justify-end gap-3">
+            <div className="p-6 flex justify-end gap-3">
               <button
                 onClick={closeEditModal}
                 disabled={savingEdit || uploadingImages}
-                className="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                className="px-6 py-3 cursor-pointer text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
               >
                 Bekor qilish
               </button>
               <button
                 onClick={handleSaveEdit}
                 disabled={savingEdit || uploadingImages}
-                className="px-6 py-3 bg-[#00BCE4] text-white font-semibold rounded-lg hover:bg-[#00a6c9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-3 bg-[#00BCE4] cursor-pointer text-white font-semibold rounded-lg hover:bg-[#00a6c9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {(savingEdit || uploadingImages) ? (
                   <>
@@ -1115,7 +1115,7 @@ function AddMahsulot() {
                 <h3 className="text-xl font-bold text-gray-800">Mahsulotni o'chirish</h3>
                 <button
                   onClick={() => setDeleteConfirmOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 cursor-pointer hover:text-gray-600"
                 >
                   <X size={24} />
                 </button>
@@ -1144,13 +1144,13 @@ function AddMahsulot() {
             <div className="p-6 border-t flex justify-end gap-3">
               <button
                 onClick={() => setDeleteConfirmOpen(false)}
-                className="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-6 py-3 cursor-pointer text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Bekor qilish
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
+                className="px-6 py-3 cursor-pointer bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
               >
                 <Trash2 size={20} />
                 O'chirish

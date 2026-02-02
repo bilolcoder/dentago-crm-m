@@ -438,11 +438,11 @@ function ProductForm({ productToEdit, onClose }) {
         <div className="flex justify-between items-center mb-10">
           <div
             onClick={() => navigate(-1)}
-            className="text-gray-500 font-semibold hover:text-gray-900"
+            className="text-gray-500 cursor-pointer font-semibold hover:text-gray-900"
           >
             <ArrowLeftIcon className="h-5 w-5" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
+          <h1 className="text-3xl sm:text-4xl  text-gray-900">
             {productToEdit ? 'Товарни таҳрирлаш' : 'Янги товар қўшиш'}
           </h1>
         </div>
@@ -569,7 +569,7 @@ function ProductForm({ productToEdit, onClose }) {
                         <img
                           src={imgUrl}
                           alt={`Tanlangan rasm ${index + 1}`}
-                          className="w-32 h-32 object-cover rounded-md shadow-md"
+                          className="w-32 h-32 object-cover rounded-md  "
                         />
                         <button
                           type="button"
@@ -729,7 +729,7 @@ function ProductForm({ productToEdit, onClose }) {
               <button
                 type="submit"
                 disabled={loading || uploadingImages}
-                className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-6 py-3 cursor-pointer   text-sm font-medium rounded-md   text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading
                   ? 'Юкланмоқда...'
