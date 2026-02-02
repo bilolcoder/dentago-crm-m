@@ -292,8 +292,8 @@ function Aperator() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input type="text" placeholder="Qidiruv..." className="pl-12 pr-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 outline-none w-full md:w-80 text-sm font-bold" />
           </div>
-          <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
-          <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all"><Download size={16} />Eksport</button>
+          <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
+          <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all cursor-pointer"><Download size={16} />Eksport</button>
         </div>
       </div>
 
@@ -423,8 +423,8 @@ function Aperator() {
                         {mOrder.status}
                       </span>
                     </td>
-                    <td className="px-8 py-5 text-center">
-                      <button className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
+                    <td className="px-8  py-5 text-center">
+                      <button className="p-2 rounded-xl cursor-pointer bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
                         <MoreHorizontal size={18} />
                       </button>
                     </td>
@@ -452,7 +452,7 @@ function Aperator() {
                   setIsDetailModalOpen(false);
                   setSelectedMasterOrder(null);
                 }}
-                className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+                className="w-14 cursor-pointer h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
               >
                 <X size={28} />
               </button>
@@ -526,7 +526,7 @@ function Aperator() {
                       <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Aloqa ma'lumotlari</h3>
                       <div className="space-y-3">
                         <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#00BCE4]/5 border border-[#00BCE4]/10 group hover:border-[#00BCE4]/30 transition-all">
-                          <div className="w-10 h-10 rounded-xl bg-[#00BCE4] flex items-center justify-center text-white shadow-lg shadow-[#00BCE4]/20">
+                          <div className="w-10 cursor-pointer h-10 rounded-xl bg-[#00BCE4] flex items-center justify-center text-white shadow-lg shadow-[#00BCE4]/20">
                             <Phone size={18} />
                           </div>
                           <div>
@@ -548,7 +548,7 @@ function Aperator() {
                   </div>
 
                   <button 
-                    className="w-full mt-8 py-5 rounded-3xl bg-[#00BCE4] text-white font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-[#00BCE4]/30 hover:-translate-y-1 transition-all active:scale-95"
+                    className="w-full cursor-pointer mt-8 py-5 rounded-3xl bg-[#00BCE4] text-white font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-[#00BCE4]/30 hover:-translate-y-1 transition-all active:scale-95"
                     onClick={() => {
                       // API call placeholder
                       console.log("Bog'lanish uchun so'rov yuborildi ID:", selectedMasterOrder.id);

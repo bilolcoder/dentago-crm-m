@@ -136,8 +136,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         className={`
                             flex items-center gap-4 px-5 py-3 rounded-[7px] cursor-pointer transition-all duration-300
                             ${isActive
-                                ? 'bg-[#00BCE4] text-white'
-                                : 'text-slate-400   hover:bg-[#00BCE4] hover:text-slate-50'}
+                                ? 'bg-[#00BCE4] text-white font-bold'
+                                : 'text-slate-400  font-bold  hover:bg-[#00BCE4] hover:text-slate-50'}
                         `}
                     >
                         <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
