@@ -268,6 +268,8 @@ function MyInformation() {
   const [debugInfo, setDebugInfo] = useState('');
   const [isFormCollapsed, setIsFormCollapsed] = useState(false);
   const [selectedSpecialties, setSelectedSpecialties] = useState([]);
+  const [location, setLocation] = useState({ lat: '', lng: '' });
+  const [showMapModal, setShowMapModal] = useState(false);
 
   // Yangi state'lar - viloyat va tuman uchun
   const [selectedRegion, setSelectedRegion] = useState('');
@@ -462,6 +464,16 @@ function MyInformation() {
       );
       setSelectedCity(cityData ? cityData.value : formValues.city);
     }
+    
+    // Joylashuv ma'lumotlarini o'rnatish (agar mavjud bo'lsa)
+    if (doctor.clinic?.location) {
+      setLocation({
+        lat: doctor.clinic.location.lat?.toString() || '',
+        lng: doctor.clinic.location.lng?.toString() || ''
+      });
+    } else {
+      setLocation({ lat: '', lng: '' });
+    }
 
     if (doctor.avatar || doctor.profileImage || doctor.image) {
       setPreviewUrl(doctor.avatar || doctor.profileImage || doctor.image);
@@ -514,6 +526,51 @@ function MyInformation() {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     mode: 'onChange'
   });
+
+  const openMapSelector = () => {
+    // Foydalanuvchi joriy joylashuvini aniqlash
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ lat: latitude.toString(), lng: longitude.toString() });
+          alert(`Joriy joylashuvingiz aniqlandi: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+        },
+        (error) => {
+          console.error('Geolokatsiya xatosi:', error);
+          // Agar foydalanuvchi ruxsat bermasa yoki aniqlash imkonsiz bo'lsa, standart joylashuvni qo'shamiz
+          alert('Joylashuvni aniqlashda xatolik yuz berdi. Iltimos, koordinatalarni qo\'lda kiriting.');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    } else {
+      alert('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi. Iltimos, koordinatalarni qo\'lda kiriting.');
+    }
+  };
+
+
+
+
+  // Formani yopish
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setIsEditing(false);
+    setSelectedDoctor(null);
+    reset();
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setIsFormCollapsed(true);
+    setSubmitMessage({ type: '', text: '' });
+    setSelectedRegion('');
+    setSelectedCity('');
+    setSelectedSpecialties([]);
+    setLocation({ lat: '', lng: '' });
+    setShowMapModal(false);
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -612,7 +669,10 @@ function MyInformation() {
         clinic: {
           name: data.clinicName?.trim() || 'Noma\'lum Klinika',
           address: data.clinicAddress?.trim() || 'Manzil kiritilmagan',
-          location: { lat: 41.3111, lng: 69.2797 },
+          location: { 
+            lat: location.lat ? parseFloat(location.lat) : 41.3111, 
+            lng: location.lng ? parseFloat(location.lng) : 69.2797 
+          },
           distanceKm: 2.5
         },
         workTime: {
@@ -737,20 +797,7 @@ function MyInformation() {
     'Челюстно-лицевой хирург'
   ];
 
-  // Formani yopish
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setIsEditing(false);
-    setSelectedDoctor(null);
-    reset();
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    setIsFormCollapsed(true);
-    setSubmitMessage({ type: '', text: '' });
-    setSelectedRegion('');
-    setSelectedCity('');
-    setSelectedSpecialties([]);
-  };
+
 
   // Yangi shifokor qo'shish tugmasi
   const handleAddNewDoctor = () => {
@@ -1374,6 +1421,57 @@ function MyInformation() {
                       placeholder="Shifokor haqida qisqacha ma'lumot..."
                     />
                   </div>
+                </div>
+
+                {/* Joylashuvni belgilash */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Joylashuvni belgilash
+                  </label>
+                  
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Kenglik (Latitude)
+                      </label>
+                      <input
+                        type="text"
+                        value={location.lat || ''}
+                        onChange={(e) => setLocation({...location, lat: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
+                        placeholder="41.3111"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Uzunlik (Longitude)
+                      </label>
+                      <input
+                        type="text"
+                        value={location.lng || ''}
+                        onChange={(e) => setLocation({...location, lng: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
+                        placeholder="69.2797"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={openMapSelector}
+                        className="h-12 px-4 bg-blue-100 hover:bg-blue-200 rounded-xl border border-blue-300 text-blue-700 font-medium transition-colors ml-2"
+                      >
+                        <MapPin className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {location.lat && location.lng && (
+                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <span className="font-medium">Tanlangan joy:</span> {location.lat}, {location.lng}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Tajriba */}
