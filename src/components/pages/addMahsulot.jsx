@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload } from 'lucide-react';
+import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function AddMahsulot() {
@@ -16,6 +16,10 @@ function AddMahsulot() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   
   const [editForm, setEditForm] = useState({
     name: '',
@@ -131,6 +135,7 @@ function AddMahsulot() {
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setSearchResults(products);
+      setCurrentPage(1); // Qidiruv tozalanganda 1-sahifaga qaytish
     } else {
       handleSearch();
     }
@@ -150,7 +155,30 @@ function AddMahsulot() {
     }
   };
 
-  // Bildirishnoma ko'rsatish
+  // Pagination funksiyalari
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  
+  const nextPage = () => {
+    if (currentPage < Math.ceil(searchResults.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  // Joriy sahifadagi mahsulotlarni olish
+  const getCurrentProducts = () => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return searchResults.slice(indexOfFirstItem, indexOfLastItem);
+  };
+  
+  // Sahifalash ma'lumotlari
+  const totalPages = Math.ceil(searchResults.length / itemsPerPage);
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
     setTimeout(() => {
@@ -162,7 +190,7 @@ function AddMahsulot() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${BASE_URL}/api/product`, {
+      const response = await axios.get(`${BASE_URL}/api/product?limit=100000`, {
         headers: { Authorization: `Bearer ${TOKEN}` }
       });
 
@@ -678,8 +706,8 @@ function AddMahsulot() {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchResults.length > 0 ? (
-                    searchResults.map((product) => (
+                  {getCurrentProducts().length > 0 ? (
+                    getCurrentProducts().map((product) => (
                       <tr key={product._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
@@ -775,6 +803,63 @@ function AddMahsulot() {
               </table>
             </div>
           </div>
+          
+          {/* Pagination */}
+          {searchResults.length > itemsPerPage && (
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-200">
+              <div className="text-sm text-gray-600">
+                Jami: <span className="font-semibold">{searchResults.length}</span> ta mahsulot, 
+                Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={prevPage}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => paginate(pageNum)}
+                        className={`w-10 h-10 rounded-lg ${
+                          currentPage === pageNum
+                            ? 'bg-[#00BCE4] text-white'
+                            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                        } transition-colors`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <button
+                  onClick={nextPage}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

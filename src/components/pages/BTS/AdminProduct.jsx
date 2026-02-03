@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Package, Edit2, Trash2, Loader2, Plus, X } from 'lucide-react';
+import { Search, Package, Edit2, Trash2, Loader2, Plus, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
 function AdminProduct() {
@@ -12,6 +12,10 @@ function AdminProduct() {
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   // States - form (add / edit)
   const [showFormModal, setShowFormModal] = useState(false);
@@ -134,7 +138,7 @@ function AdminProduct() {
 
     try {
       setLoading(true);
-      const res = await axios.get(`${BASE_URL}/api/product/app/product/all?limit=100000`, {
+      const res = await axios.get(`${BASE_URL}/api/product/app/product/all?limit=100000000`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(Array.isArray(res.data) ? res.data : res.data?.data || []);
@@ -163,14 +167,42 @@ function AdminProduct() {
     fetchCategories();
   }, []);
 
+  // Pagination functions
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  
+  const nextPage = () => {
+    if (currentPage < Math.ceil(filteredProducts.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
   // Qidiruv filtri
   const filteredProducts = products.filter(p =>
     (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.sku || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.category || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Modalni ochish — yangi qo'shish
+  
+  // Get current page products
+  const getCurrentProducts = () => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  };
+  
+  // Pagination info
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  
+  // Effect for search - reset to first page
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
   const openAddModal = () => {
     setIsEditing(false);
     setCurrentProduct(null);
@@ -404,7 +436,7 @@ function AdminProduct() {
             </tr>
           </thead>
           <tbody className="">
-            {filteredProducts.map(product => (
+            {getCurrentProducts().map(product => (
               <tr key={product._id} className="hover:bg-slate-50/70">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-4">
@@ -460,6 +492,63 @@ function AdminProduct() {
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {filteredProducts.length > itemsPerPage && (
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl">
+          <div className="text-sm text-slate-600">
+            Jami: <span className="font-semibold">{filteredProducts.length}</span> ta mahsulot, 
+            Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => paginate(pageNum)}
+                    className={`w-10 h-10 rounded-lg ${
+                      currentPage === pageNum
+                        ? 'bg-[#00BCE4] text-white'
+                        : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                    } transition-colors`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ---------------------- FORM MODAL ---------------------- */}
       {showFormModal && (
