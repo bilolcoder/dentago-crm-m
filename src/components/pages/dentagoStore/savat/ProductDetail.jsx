@@ -212,7 +212,7 @@ const ProductDetail = () => {
       <main className="  mx-auto px-4 sm:px-6 pt-6 pb-24 md:pb-12">
         {/* Rasm */}
         <div className="  rounded-2xl   overflow-hidden mb-6 md:mb-8">
-          <div className="aspect-[4/3] md:aspect-[5/4]   flex items-center justify-center p-4 md:p-8">
+          <div className="flex items-center justify-center">
             <img
               src={product.img}
               alt={product.name}
@@ -268,7 +268,8 @@ const ProductDetail = () => {
       </main>
 
       {/* Pastki tugma */}
-      <div className="fixed bottom-0 left-70 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-10">
+      <div className="fixed bottom-0 lg:left-70 sm:left-0 max-sm:left-0 md:left-70 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-10
+">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
           <button
           onClick={handleAddToCart}
