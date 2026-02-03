@@ -239,7 +239,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
               <p className="text-sm text-gray-500">{items.length} ta mahsulot</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition">
+          <button onClick={onClose} className="text-gray-400 cursor-pointer hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -289,7 +289,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     locationStatus === 'granted' ? 'bg-green-100' : 'bg-gray-200'
                   }`}>
-                    <MapPin className={`w-4 h-4 ${locationStatus === 'granted' ? 'text-green-600' : 'text-gray-500'}`} />
+                    <MapPin className={`w-4 cursor-pointer h-4 ${locationStatus === 'granted' ? 'text-green-600' : 'text-gray-500'}`} />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
@@ -390,7 +390,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'payme' }))}
-                className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
+                className={`p-4 rounded-2xl cursor-pointer border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
                   formData.paymentMethod === 'payme'
                     ? 'border-[#05CBCA] bg-green-50/70 scale-[1.03]'
                     : 'border-gray-200 hover:border-gray-300'
@@ -399,7 +399,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
                 <img 
                   src={PaymeSvg} 
                   alt="Payme" 
-                  className="w-14 h-10 object-contain rounded-md drop-shadow-sm" 
+                  className="w-14 cursor-pointer h-10 object-contain rounded-md drop-shadow-sm" 
                 />
                 <span className="text-sm font-medium text-gray-800">Payme</span>
               </button>
@@ -407,7 +407,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'click' }))}
-                className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
+                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
                   formData.paymentMethod === 'click'
                     ? 'border-[#0868FC] bg-blue-50/70 scale-[1.03]'
                     : 'border-gray-200 hover:border-gray-300'
@@ -416,7 +416,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
                 <img 
                   src={ClickSvg} 
                   alt="Click" 
-                  className="w-14 h-10 object-contain rounded-md drop-shadow-sm" 
+                  className="w-14  h-10 object-contain rounded-md drop-shadow-sm" 
                 />
                 <span className="text-sm font-medium text-gray-800">Click</span>
               </button>
@@ -424,7 +424,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'rahmat' }))}
-                className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
+                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
                   formData.paymentMethod === 'rahmat'
                     ? 'border-[#FF4B34] bg-red-50/70 scale-[1.03]'
                     : 'border-gray-200 hover:border-gray-300'
@@ -456,7 +456,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3.5 px-6 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex-1 py-3.5 cursor-pointer px-6 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50"
               disabled={isSubmitting}
             >
               Bekor qilish
@@ -464,7 +464,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-3.5 px-6 bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] transition disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
+              className="flex-1 cursor-pointer py-3.5 px-6 bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] transition disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
             >
               {isSubmitting ? (
                 <>
