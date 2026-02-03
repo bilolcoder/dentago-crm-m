@@ -28,12 +28,12 @@ const AppPaymentsContent = () => {
                             placeholder={t('search')}
                             className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 transition-colors text-gray-700"
                         />
-                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                        <Search className=" absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
                     </div>
-                    <button className="p-2 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors text-gray-600">
+                    <button className="p-2 border cursor-pointer border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors text-gray-600">
                         <ChevronDown className="w-5 h-5" />
                     </button>
-                    <button className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                    <button className="p-2 bg-blue-600 cursor-pointer hover:bg-blue-700 text-white rounded-lg transition-colors">
                         <ChevronUp className="w-5 h-5" />
                     </button>
                 </div>

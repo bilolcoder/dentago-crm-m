@@ -273,7 +273,7 @@ const ProductDetail = () => {
           <button
           onClick={handleAddToCart}
           disabled={isLoading}
-          className={`w-full py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${
+          className={`w-full py-2.5 md:py-3 cursor-pointer rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${
             isLoading
               ? 'bg-gray-400'
               : isInCart 

@@ -491,14 +491,14 @@ function Boshsaxifa() {
                 {searchQuery && (
                   <button
                     onClick={clearCategory}
-                    className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                    className="p-1 X hover:bg-gray-200 rounded-full transition-colors"
                   >
                     <X size={18} className="text-gray-500" />
                   </button>
                 )}
                 <ChevronDown
                   size={20}
-                  className={`text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`text-gray-400 cursor-pointer transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                 />
               </div>
 
@@ -546,7 +546,7 @@ function Boshsaxifa() {
                               </div>
 
                               {/* O'ng tarafdagi icon */}
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity">
                                 <ChevronDown className="text-cyan-500 rotate-270 transform rotate-90" size={20} />
                               </div>
                             </div>
@@ -668,7 +668,7 @@ function Boshsaxifa() {
                         setIsSubcategoryModalOpen(false);
                       }
                     }}
-                    className="p-2 hover:bg-gray-100 rounded-xl"
+                    className="p-2 cursor-pointer hover:bg-gray-100 rounded-xl"
                   >
                     <ArrowLeft size={28} />
                   </button>
@@ -690,7 +690,7 @@ function Boshsaxifa() {
                     setIsSubcategoryModalOpen(false);
                     setCurrentView('subcategories');
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-xl"
+                  className="p-2 cursor-pointer hover:bg-gray-100 rounded-xl"
                 >
                   <X size={24} />
                 </button>
@@ -835,7 +835,7 @@ function Boshsaxifa() {
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Qidirish</label>
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Search className="absolute  left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input
                           type="text"
                           placeholder="Mahsulot nomi bo'yicha qidirish..."
@@ -846,7 +846,7 @@ function Boshsaxifa() {
                         {searchFilter && (
                           <button
                             onClick={() => setSearchFilter("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                           >
                             <X size={18} />
                           </button>
@@ -925,7 +925,7 @@ function Boshsaxifa() {
                           {searchFilter && (
                             <button
                               onClick={() => setSearchFilter("")}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                              className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
                               <X size={16} />
                             </button>

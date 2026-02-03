@@ -124,13 +124,13 @@ function Elonlar() {
     {/* Oldinga / Orqaga tugmalar – bosh sahifadagi kabi */}
     <button
       onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-      className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+      className="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
     >
       <ArrowLeft className="text-white" size={24} />
     </button>
     <button
       onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-      className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
+      className="absolute  cursor-pointer right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
     >
       <ArrowLeft className="text-white" size={24} />
     </button>
@@ -193,7 +193,7 @@ function Elonlar() {
               {/* Sevimlilar tugmasi */}
               <button
                 onClick={(e) => e.stopPropagation()}
-                className="absolute right-5 top-5 text-gray-300 hover:text-red-500 transition-colors"
+                className="absolute cursor-pointer right-5 top-5 text-gray-300 hover:text-red-500 transition-colors"
               >
                 <Heart size={24} />
               </button>

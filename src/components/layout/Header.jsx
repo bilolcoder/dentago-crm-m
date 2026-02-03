@@ -260,11 +260,11 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                         onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                         className="flex items-center gap-2 group outline-none cursor-pointer "
                     >
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00BCE4] text-white flex items-center justify-center rounded-full text-sm font-black shadow-lg shadow-blue-200 group-hover:scale-105 transition-transform">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#00BCE4] text-white flex items-center justify-center rounded-full text-sm font-black shadow-lg shadow-blue-200  transition-transform">
                             {getInitial()}
                         </div>
                         <div className="hidden lg:flex flex-col items-start text-left">
-                            <span className="text-sm font-bold text-slate-900 leading-tight group-hover:text-[#00BCE4]">
+                            <span className="text-sm font-bold text-slate-900 leading-tight  ">
                                 {user.username}
                             </span>
                             <span className="text-[10px] font-bold text-[#00BCE4] uppercase tracking-wider">

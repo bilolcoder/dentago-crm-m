@@ -38,66 +38,7 @@ const doctors = [
     exp: 6,
     service: false,
   },
-  {
-    id: 3,
-    img: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5",
-    name: "Dr. Usmonov",
-    job: "Tish-texnik",
-    rating: 4.7,
-    distance: "0.8 km",
-    price: "140 000",
-    patients: 1500,
-    exp: 10,
-    service: true,
-  },
-  {
-    id: 4,
-    img: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d",
-    name: "Dr. Saidova",
-    job: "Tish-texnik",
-    rating: 4.9,
-    distance: "3.1 km",
-    price: "160 000",
-    patients: 2000,
-    exp: 9,
-    service: true,
-  },
-  {
-    id: 5,
-    img: "https://images.unsplash.com/photo-1550831107-1553da8c8464",
-    name: "Dr. Rasulov",
-    job: "Tish-texnik",
-    rating: 4.5,
-    distance: "4.0 km",
-    price: "300 000",
-    patients: 700,
-    exp: 7,
-    service: false,
-  },
-  {
-    id: 6,
-    img: "https://images.unsplash.com/photo-1594824476967-48c8b964273f",
-    name: "Dr. Nasirova",
-    job: "Tish-texnik",
-    rating: 4.6,
-    distance: "2.0 km",
-    price: "170 000",
-    patients: 1100,
-    exp: 5,
-    service: false,
-  },
-  {
-    id: 7,
-    img: "https://images.unsplash.com/photo-1607746882042-944635dfe10e",
-    name: "Dr. Xolmatov",
-    job: "Tish-texnik",
-    rating: 4.9,
-    distance: "1.5 km",
-    price: "250 000",
-    patients: 1600,
-    exp: 11,
-    service: true,
-  },
+  
 ];
 const categories = [
   { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/DentagoStore' },
@@ -200,13 +141,13 @@ function DentoGoApp() {
     {/* Oldinga / Orqaga tugmalar */}
     <button
       onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-      className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+      className="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
     >
       <ArrowLeft className="text-white" size={24} />
     </button>
     <button
       onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-      className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
+      className="absolute cursor-pointer right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
     >
       <ArrowLeft className="text-white" size={24} />
     </button>
