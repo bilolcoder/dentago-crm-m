@@ -505,7 +505,7 @@ function AdminProduct() {
             <button
               onClick={prevPage}
               disabled={currentPage === 1}
-              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <ChevronLeft size={20} />
             </button>
@@ -527,7 +527,7 @@ function AdminProduct() {
                   <button
                     key={pageNum}
                     onClick={() => paginate(pageNum)}
-                    className={`w-10 h-10 rounded-lg ${
+                    className={`w-10 h-10 rounded-lg cursor-pointer ${
                       currentPage === pageNum
                         ? 'bg-[#00BCE4] text-white'
                         : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
@@ -542,7 +542,7 @@ function AdminProduct() {
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages}
-              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               <ChevronRight size={20} />
             </button>

@@ -698,11 +698,11 @@ function AddMahsulot() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50 ">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Mahsulot</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Kategoriya</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Narxi</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">SKU</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Amallar</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[200px]">Mahsulot</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Kategoriya</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Narxi</th>
+                    {/* <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">SKU</th> */}
+                    <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Amallar</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -711,7 +711,7 @@ function AddMahsulot() {
                       <tr key={product._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden border">
+                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden border flex-shrink-0">
                               {product.imageUrl?.[0] ? (
                                 <img
                                   src={`${BASE_URL}/images/${product.imageUrl[0]}`}
@@ -728,8 +728,8 @@ function AddMahsulot() {
                                 </div>
                               )}
                             </div>
-                            <div>
-                              <div className="font-bold text-gray-800">
+                            <div className="min-w-0">
+                              <div className="font-bold text-gray-800 truncate max-w-xs">
                                 {product.name}
                               </div>
                               <div className="text-xs text-gray-400 mt-1">ID: {product._id?.slice(-6)}</div>
@@ -742,28 +742,28 @@ function AddMahsulot() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 truncate max-w-xs">
                             {product.category || "—"}
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-gray-800 text-lg">
+                          <div className="font-bold text-gray-800 text-base">
                             {product.price?.toLocaleString()} UZS
                           </div>
                           {product.salePercentage > 0 && (
-                            <div className="text-sm text-red-500 line-through mt-1">
+                            <div className="text-xs text-red-500 line-through mt-1">
                               {Math.round((product.price * 100) / (100 - product.salePercentage)).toLocaleString()} UZS
-                              <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                              <span className="ml-1 text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
                                 -{product.salePercentage}%
                               </span>
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4">
+                        {/* <td className="px-6 py-4">
                           <div className="font-medium text-gray-700">
                             {product.sku || "—"}
                           </div>
-                        </td>
+                        </td> */}
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
                             <button
@@ -816,7 +816,7 @@ function AddMahsulot() {
                 <button
                   onClick={prevPage}
                   disabled={currentPage === 1}
-                  className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -838,7 +838,7 @@ function AddMahsulot() {
                       <button
                         key={pageNum}
                         onClick={() => paginate(pageNum)}
-                        className={`w-10 h-10 rounded-lg ${
+                        className={`w-10 h-10 rounded-lg cursor-pointer ${
                           currentPage === pageNum
                             ? 'bg-[#00BCE4] text-white'
                             : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
@@ -853,7 +853,7 @@ function AddMahsulot() {
                 <button
                   onClick={nextPage}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 >
                   <ChevronRight size={20} />
                 </button>
