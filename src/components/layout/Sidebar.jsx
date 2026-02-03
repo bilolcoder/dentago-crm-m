@@ -70,6 +70,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: User, label: t('my_results'), route: "/result", type: "link" },
         { icon: PlusCircle, label: "Mahsulot qo'shish", route: "/addproduct", type: "link" },
         { icon: Package, label: "Admin Product", route: "/admin-product", type: "link" },
+        { icon: Package, label: "All Doctors Edit", route: "/AllDoctorsEdit", type: "link" },
 
         // {
         //     icon: Archive,

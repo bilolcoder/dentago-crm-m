@@ -54,6 +54,7 @@ import MyInformation from './components/MyInformayion';
 import Bemorlarim from './components/Bemorlarim';
 import Login from './components/Login';
 import Registration from './components/registration';
+import AllDoctorsEdit from './components/AllDoctorsedit';
 
 // Icons
 import { ShoppingCart } from 'lucide-react';
@@ -201,6 +202,7 @@ const ProtectedLayout = () => {
               <Route path="/texniklar" element={<Texniklar />} />
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
+              <Route path="/AllDoctorsEdit" element={<AllDoctorsEdit />} />
 
               {/* settings general */}
               {/* <Route path="/settings/general" element={<GeneralSettingsContent />} /> */}
