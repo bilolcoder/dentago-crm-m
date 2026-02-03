@@ -275,7 +275,7 @@ const Savat = () => {
         'visa': 'Visa'
       };
       
-      alert(`Buyurtma muvaffaqiyatli jo'natildi!\n\nIsm: ${purchaseData.firstName} ${purchaseData.lastName}\nManzil: ${purchaseData.address}\nTo'lov usuli: ${paymentMethodNames[purchaseData.paymentMethod] || purchaseData.paymentMethod}\nJami summa: ${purchaseData.totalAmount.toLocaleString()} so'm`);
+      // alert(`Buyurtma muvaffaqiyatli jo'natildi!\n\nIsm: ${purchaseData.firstName} ${purchaseData.lastName}\nManzil: ${purchaseData.address}\nTo'lov usuli: ${paymentMethodNames[purchaseData.paymentMethod] || purchaseData.paymentMethod}\nJami summa: ${purchaseData.totalAmount.toLocaleString()} so'm`);
       
       // Clear cart after successful purchase
       await handleClearCart();
@@ -303,13 +303,13 @@ const Savat = () => {
         <h2 className="text-xl font-bold mb-2 text-gray-800">Xato yuz berdi</h2>
         <p className="text-gray-600 mb-6 max-w-md">{error}</p>
         <div className="flex gap-4 flex-wrap justify-center">
-          <button onClick={() => fetchCartFromAPI()} className="bg-cyan-500 text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-cyan-600">
+          <button onClick={() => fetchCartFromAPI()} className="bg-cyan-500 cursor-pointer text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-cyan-600">
             <FaSyncAlt /> Qayta yuklash
           </button>
-          <button onClick={() => navigate('/login')} className="bg-gray-200 text-gray-800 px-6 py-3 rounded-full font-bold hover:bg-gray-300">
+          <button onClick={() => navigate('/login')} className="bg-gray-200 cursor-pointer text-gray-800 px-6 py-3 rounded-full font-bold hover:bg-gray-300">
             Kirish
           </button>
-          <button onClick={() => navigate('/')} className="bg-green-500 text-white px-6 py-3 rounded-full font-bold hover:bg-green-600">
+          <button onClick={() => navigate('/')} className="bg-green-500 cursor-pointer text-white px-6 py-3 rounded-full font-bold hover:bg-green-600">
             Asosiy sahifaga
           </button>
         </div>
@@ -347,11 +347,11 @@ const Savat = () => {
           <button
             onClick={handleClearCart}
             disabled={clearing}
-            className="text-red-500 text-sm hover:text-red-700 px-3 py-1 border border-red-200 rounded-full hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
+            className="text-red-500 text-sm cursor-pointer hover:text-red-700 px-3 py-1 border  border-red-200 rounded-full hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
           >
             {clearing ? <>Tozalanmoqda...</> : <><FaTrash size={12} /> Tozalash</>}
           </button>
-          <button onClick={() => fetchCartFromAPI(true)} className="text-gray-500 hover:text-cyan-600 p-2 hover:bg-gray-100 rounded-full">
+          <button onClick={() => fetchCartFromAPI(true)} className="text-gray-500 cursor-pointer hover:text-cyan-600 p-2 hover:bg-gray-100 rounded-full">
             <FaSyncAlt />
           </button>
         </div>
@@ -363,9 +363,9 @@ const Savat = () => {
             <button
               onClick={() => handleRemoveFromCart(item.id)}
               disabled={removing[item.id]}
-              className="absolute top-4 right-4 text-gray-300 hover:text-red-500 p-2 disabled:opacity-50"
+              className="absolute top-4 right-4 cursor-pointer text-gray-300 hover:text-red-500 p-2 disabled:opacity-50"
             >
-              {removing[item.id] ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-500 border-t-transparent"></div> : <FaTrash size={14} />}
+              {removing[item.id] ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-500 border-t-transparent  "></div> : <FaTrash size={14} />}
             </button>
 
             <div
@@ -398,7 +398,7 @@ const Savat = () => {
                   <button
                     onClick={() => handleUpdateQuantity(item.id, -1)}
                     disabled={updating[item.id] || item.quantity <= 1}
-                    className="text-blue-500 hover:bg-blue-50 rounded-full p-1 disabled:opacity-50"
+                    className="text-blue-500 cursor-pointer hover:bg-blue-50 rounded-full p-1 disabled:opacity-50"
                   >
                     {updating[item.id] ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-blue-500 border-t-transparent"></div> : <FaMinus size={10} />}
                   </button>
@@ -406,7 +406,7 @@ const Savat = () => {
                   <button
                     onClick={() => handleUpdateQuantity(item.id, 1)}
                     disabled={updating[item.id]}
-                    className="text-blue-500 hover:bg-blue-50 rounded-full p-1 disabled:opacity-50"
+                    className="text-blue-500 cursor-pointer hover:bg-blue-50 rounded-full p-1 disabled:opacity-50"
                   >
                     {updating[item.id] ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-blue-500 border-t-transparent"></div> : <FaPlus size={10} />}
                   </button>
@@ -430,7 +430,7 @@ const Savat = () => {
 
           <button
             onClick={() => setIsPurchaseModalOpen(true)}
-            className="py-2 px-16 bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+            className="py-2 px-16 cursor-pointer bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
             disabled={clearing}
             >
             {clearing ? 'Kutilmoqda...' : `Sotib olish`}
