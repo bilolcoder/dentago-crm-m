@@ -556,7 +556,7 @@ function AllDoctorsEdit() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-cyan-100">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-max">
               <thead className="bg-cyan-500" style={{ backgroundColor: '#00BCE4' }}>
