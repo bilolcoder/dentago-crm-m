@@ -414,7 +414,7 @@ function Aperator() {
                         <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
                           <Phone size={12} strokeWidth={3} />
                           {/* <span>+998 77 297 22 22</span> */}
-                          <span>+998 95 219 26 99</span>
+                          <span>+99870 038 66 66</span>
                         </div>
                       </div>
                     </td>
