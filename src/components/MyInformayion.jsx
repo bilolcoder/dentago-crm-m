@@ -354,7 +354,7 @@ function MyInformation() {
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
-  const ITEMS_PER_PAGE = 6;
+  const ITEMS_PER_PAGE = 10;
 
   // Barcha unikallik viloyatlarni olish
   const regions = [...new Set(uzbekistanCities.map(city => city.region))].sort();
@@ -391,7 +391,7 @@ function MyInformation() {
       setDebugInfo('Shifokorlarni yuklash boshlandi...');
 
       const response = await axios.get(
-        'https://app.dentago.uz/api/admin/doctors',
+        'https://app.dentago.uz/api/admin/doctors?limit=100000',
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -1193,43 +1193,60 @@ function MyInformation() {
 
               {/* Sahifalash */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-8">
+                <div className="flex items-center justify-between mt-8">
+                  <div className="text-sm text-gray-600">
+                    Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition"
+                    className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft size={20} />
                   </button>
 
-                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                    const pageNum = i + 1;
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
                     return (
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-10 h-10 rounded-lg font-medium transition ${currentPage === pageNum
-                          ? 'bg-[#00BCE4] text-white'
-                          : 'border border-gray-300 hover:bg-gray-50'
-                          }`}
+                        className={`w-10 h-10 rounded-lg cursor-pointer ${
+                          currentPage === pageNum
+                            ? 'bg-[#00BCE4] text-white'
+                            : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                        } transition-colors`}
                       >
                         {pageNum}
                       </button>
                     );
                   })}
 
-                  {totalPages > 5 && (
+                  {/* {totalPages > 5 && (
                     <span className="px-2 text-gray-500">...</span>
-                  )}
+                  )} */}
 
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition"
+                    className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight size={20} />
                   </button>
                 </div>
+              </div>
               )}
             </>
           )}
