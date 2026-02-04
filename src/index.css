@@ -19,3 +19,18 @@
     --color-primary: #2563eb;
     /* text-blue-600 */
 }
+
+/* Global Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #00BCE4;
+    border-radius: 10px;
+}

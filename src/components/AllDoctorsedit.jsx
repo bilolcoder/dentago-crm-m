@@ -586,7 +586,7 @@ function AllDoctorsEdit() {
                           <img
                             src={doctor.avatar}
                             alt={doctor.fullName}
-                            className="w-12 h-12 rounded-xl object-cover border"
+                            className="w-12 h-12 rounded-lg object-cover"
                             onError={e => e.target.src = `https://ui-avatars.com/api/?name=${doctor.fullName}&background=667eea&color=fff`}
                           />
                         ) : (
@@ -651,7 +651,7 @@ function AllDoctorsEdit() {
               <div>
                 <label className="block text-sm font-medium mb-2">Shifokor rasmi</label>
                 <div 
-                  className="w-32 h-32 rounded-xl border-2 border-dashed border-cyan-300 flex items-center justify-center cursor-pointer hover:border-cyan-500 transition"
+                  className="w-32 h-32 rounded-xl flex items-center justify-center cursor-pointer hover:border-cyan-500 transition"
                   onClick={() => fileInputRef.current.click()}
                 >
                   {previewUrl ? (
