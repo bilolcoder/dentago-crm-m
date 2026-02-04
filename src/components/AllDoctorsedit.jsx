@@ -525,14 +525,14 @@ function AllDoctorsEdit() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen">
+      <div className="">
         {/* Header */}
         <div className="mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-gray-800" style={{ color: '#00BCE4' }}>
                   Barcha Shifokorlar
                 </h1>
                 <p className="text-gray-600 mt-2 flex items-center gap-2">
@@ -547,7 +547,7 @@ function AllDoctorsEdit() {
                   placeholder="Shifokor qidirish..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full pl-12 pr-4 py-3 bg-white border border-cyan-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 transition outline-none"
                 />
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               </div>
@@ -556,10 +556,10 @@ function AllDoctorsEdit() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-cyan-100">
           <div className="overflow-x-auto">
             <table className="w-full min-w-max">
-              <thead className="bg-gradient-to-r from-blue-600 to-purple-600">
+              <thead className="bg-cyan-500" style={{ backgroundColor: '#00BCE4' }}>
                 <tr>
                   <th className="py-4 px-6 text-left text-white font-semibold">#</th>
                   <th className="py-4 px-6 text-left text-white font-semibold">Rasm</th>
@@ -579,7 +579,7 @@ function AllDoctorsEdit() {
                   </tr>
                 ) : (
                   filteredDoctors.map((doctor, index) => (
-                    <tr key={doctor._id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={doctor._id} className="hover:bg-cyan-50 transition-colors">
                       <td className="py-4 px-6 text-gray-700 font-medium">{index + 1}</td>
                       <td className="py-4 px-6">
                         {doctor.avatar ? (
@@ -602,12 +602,12 @@ function AllDoctorsEdit() {
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        <span className="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm">
                           {doctor.specialty || '-'}
                         </span>
                       </td>
                       <td className="py-4 px-6">
-                        <a href={`tel:${doctor.phone}`} className="text-blue-600 hover:underline">
+                        <a href={`tel:${doctor.phone}`} className="text-cyan-600 hover:underline" style={{ color: '#00BCE4' }}>
                           {doctor.phone || '-'}
                         </a>
                       </td>
@@ -620,7 +620,8 @@ function AllDoctorsEdit() {
                       <td className="py-4 px-6">
                         <button
                           onClick={() => handleEdit(doctor)}
-                          className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                          className="cursor-pointer text-white px-4 py-2 rounded-lg hover:opacity-90 flex items-center gap-2"
+                          style={{ backgroundColor: '#00BCE4' }}
                         >
                           <Edit size={16} /> Tahrirlash
                         </button>
@@ -637,20 +638,20 @@ function AllDoctorsEdit() {
       {/* Tahrirlash Modal */}
       {showModal && selectedDoctor && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white p-6 border-b flex justify-between items-center z-10">
-              <h2 className="text-2xl font-bold">Shifokorni Tahrirlash</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded cursor-pointer">
-                <X size={24} />
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl border border-cyan-200">
+            <div className="sticky top-0 bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 border-b border-cyan-300 flex justify-between items-center z-10">
+              <h2 className="text-2xl font-bold text-white">Shifokorni Tahrirlash</h2>
+              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/20 rounded cursor-pointer transition">
+                <X size={24} className="text-white" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6 bg-gray-50">
               {/* Rasm yuklash */}
               <div>
                 <label className="block text-sm font-medium mb-2">Shifokor rasmi</label>
                 <div 
-                  className="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-blue-500"
+                  className="w-32 h-32 rounded-xl border-2 border-dashed border-cyan-300 flex items-center justify-center cursor-pointer hover:border-cyan-500 transition"
                   onClick={() => fileInputRef.current.click()}
                 >
                   {previewUrl ? (
@@ -666,13 +667,13 @@ function AllDoctorsEdit() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">To'liq ism *</label>
-                  <input {...register('fullName', { required: 'Ism majburiy' })} className="w-full p-3 border rounded-lg" />
+                  <input {...register('fullName', { required: 'Ism majburiy' })} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                   {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Jins</label>
-                  <select {...register('gender')} className="w-full p-3 border rounded-lg">
+                  <select {...register('gender')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none">
                     <option value="male">Erkak</option>
                     <option value="female">Ayol</option>
                   </select>
@@ -680,17 +681,17 @@ function AllDoctorsEdit() {
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Telefon</label>
-                  <input {...register('phone')} className="w-full p-3 border rounded-lg" />
+                  <input {...register('phone')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Narx (so'm)</label>
-                  <input type="number" {...register('price')} className="w-full p-3 border rounded-lg" />
+                  <input type="number" {...register('price')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">Tajriba (yil)</label>
-                  <input type="number" {...register('experienceYears')} className="w-full p-3 border rounded-lg" />
+                  <input type="number" {...register('experienceYears')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
               </div>
 
@@ -701,7 +702,7 @@ function AllDoctorsEdit() {
                   <select 
                     value={selectedRegion} 
                     onChange={e => { setSelectedRegion(e.target.value); setSelectedCity(''); }} 
-                    className="w-full p-3 border rounded-lg"
+                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none"
                   >
                     <option value="">Tanlang</option>
                     {regions.map(r => <option key={r} value={r}>{r}</option>)}
@@ -713,7 +714,7 @@ function AllDoctorsEdit() {
                     value={selectedCity} 
                     onChange={e => setSelectedCity(e.target.value)} 
                     disabled={!selectedRegion}
-                    className="w-full p-3 border rounded-lg disabled:opacity-50"
+                    className="w-full p-3 border border-cyan-200 rounded-lg disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none"
                   >
                     <option value="">Tanlang</option>
                     {filteredCities.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -724,11 +725,11 @@ function AllDoctorsEdit() {
               {/* Mutaxassisliklar */}
               <div>
                 <label className="block text-sm font-medium mb-2">Mutaxassisliklar</label>
-                <div className="border p-3 rounded-lg flex flex-wrap gap-2 min-h-[50px]">
+                <div className="border border-cyan-200 p-3 rounded-lg flex flex-wrap gap-2 min-h-[50px] bg-white">
                   {selectedSpecialties.map((spec, i) => (
-                    <div key={i} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-1">
+                    <div key={i} className="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full flex items-center gap-1">
                       {spec}
-                      <button type="button" onClick={() => setSelectedSpecialties(prev => prev.filter((_, idx) => idx !== i))} className="text-red-600">×</button>
+                      <button type="button" onClick={() => setSelectedSpecialties(prev => prev.filter((_, idx) => idx !== i))} className="text-red-600 hover:text-red-800 cursor-pointer">×</button>
                     </div>
                   ))}
                   <select 
@@ -738,7 +739,7 @@ function AllDoctorsEdit() {
                         setSelectedSpecialties([...selectedSpecialties, e.target.value]);
                       }
                     }} 
-                    className="flex-1 min-w-[150px] border-none bg-transparent"
+                    className="flex-1 min-w-[150px] border-none bg-transparent focus:outline-none"
                   >
                     <option value="">Qo'shish...</option>
                     {specialties.map(s => !selectedSpecialties.includes(s) && <option key={s} value={s}>{s}</option>)}
@@ -750,11 +751,11 @@ function AllDoctorsEdit() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">Klinika nomi</label>
-                  <input {...register('clinicName')} className="w-full p-3 border rounded-lg" />
+                  <input {...register('clinicName')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Manzil</label>
-                  <input {...register('clinicAddress')} className="w-full p-3 border rounded-lg" />
+                  <input {...register('clinicAddress')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
               </div>
 
@@ -766,7 +767,7 @@ function AllDoctorsEdit() {
                     type="text" 
                     value={location.lat} 
                     onChange={e => setLocation({ ...location, lat: e.target.value })} 
-                    className="w-full p-3 border rounded-lg" 
+                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" 
                     placeholder="41.3111" 
                   />
                 </div>
@@ -776,7 +777,7 @@ function AllDoctorsEdit() {
                     type="text" 
                     value={location.lng} 
                     onChange={e => setLocation({ ...location, lng: e.target.value })} 
-                    className="w-full p-3 border rounded-lg" 
+                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" 
                     placeholder="69.2797" 
                   />
                 </div>
@@ -786,41 +787,47 @@ function AllDoctorsEdit() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">Ish boshlanishi</label>
-                  <input type="time" {...register('workTimeStart')} className="w-full p-3 border rounded-lg" />
+                  <input type="time" {...register('workTimeStart')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Ish tugashi</label>
-                  <input type="time" {...register('workTimeEnd')} className="w-full p-3 border rounded-lg" />
+                  <input type="time" {...register('workTimeEnd')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
                 </div>
               </div>
 
               {/* Tavsif */}
               <div>
                 <label className="block text-sm font-medium mb-1">Tavsif</label>
-                <textarea {...register('description')} rows={4} className="w-full p-3 border rounded-lg" />
+                <textarea {...register('description')} rows={4} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
               </div>
 
               {/* Checkboxlar */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <label className="flex items-center gap-3">
-                  <input type="checkbox" {...register('isActive')} className="w-5 h-5" />
-                  <span>Faol</span>
+                <label className="border border-cyan-200 py-5 rounded-lg px-6 cursor-pointer hover:bg-cyan-50 transition" style={{ backgroundColor: selectedDoctor?.isActive ? '#e6f7ff' : 'white' }}>
+                  <div className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" {...register('isActive')} className="w-5 h-5 cursor-pointer focus:ring-cyan-500 focus:outline-none" />
+                  <span className="text-gray-700">Faol</span>
+                </div>
                 </label>
-                <label className="flex items-center gap-3">
-                  <input type="checkbox" {...register('isAvailable24x7')} className="w-5 h-5" />
-                  <span>24/7 mavjud</span>
+
+                <label className="border border-cyan-200 py-5 rounded-lg px-6 cursor-pointer hover:bg-cyan-50 transition" style={{ backgroundColor: selectedDoctor?.isActive ? '#e6f7ff' : 'white' }}>
+                  <div className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" {...register('isAvailable24x7')} className="w-5 h-5 cursor-pointer focus:ring-cyan-500 focus:outline-none" />
+                  <span className="text-gray-700">24/7 mavjud</span>
+                </div>
                 </label>
               </div>
 
               {/* Submit */}
-              <div className="flex justify-end gap-4 pt-6 border-t">
-                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 cursor-pointer border rounded-lg hover:bg-gray-100">
+              <div className="flex justify-end gap-4 pt-6 border-t border-cyan-200">
+                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 cursor-pointer border border-cyan-300 rounded-lg hover:bg-cyan-50 text-cyan-700 transition">
                   Bekor qilish
                 </button>
                 <button 
                   type="submit" 
                   disabled={saving} 
-                  className="px-6 py-3 bg-blue-600 cursor-pointer text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+                  className="px-6 py-3 cursor-pointer text-white rounded-lg hover:opacity-90 flex items-center gap-2 disabled:opacity-50 transition"
+                  style={{ backgroundColor: '#00BCE4' }}
                 >
                   {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                   {saving ? 'Saqlanmoqda...' : 'Saqlash'}
