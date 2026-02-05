@@ -8,289 +8,289 @@ import {
 } from 'lucide-react';
 
 const uzbekistanCities = [
-    // =========================
-    // QORAQALPOG'ISTON
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30c1",
-      label: "Nukus",
-      value: "nukus",
-      region: "Qoraqalpog'iston Respublikasi"
-    },
-    {
-      _id: "6964cadeb2a92667023e30c2",
-      label: "Xo'jayli",
-      value: "xojayli",
-      region: "Qoraqalpog'iston Respublikasi"
-    },
-    {
-      _id: "6964cadeb2a92667023e30c3",
-      label: "To'rtko'l",
-      value: "tortkol",
-      region: "Qoraqalpog'iston Respublikasi"
-    },
-    {
-      _id: "6964cadeb2a92667023e30c4",
-      label: "Beruniy",
-      value: "beruniy",
-      region: "Qoraqalpog'iston Respublikasi"
-    },
-    {
-      _id: "6964cadeb2a92667023e30c5",
-      label: "Qo'ng'irot",
-      value: "qongirot",
-      region: "Qoraqalpog'iston Respublikasi"
-    },
-    // =========================
-    // TOSHKENT SHAHAR
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30c6",
-      label: "Toshkent",
-      value: "toshkent",
-      region: "Toshkent shahri"
-    },
-    // =========================
-    // TOSHKENT VILOYATI
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30c7",
-      label: "Chirchiq",
-      value: "chirchiq",
-      region: "Toshkent viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30c8",
-      label: "Angren",
-      value: "angren",
-      region: "Toshkent viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30c9",
-      label: "Olmaliq",
-      value: "olmaliq",
-      region: "Toshkent viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30ca",
-      label: "Bekobod",
-      value: "bekobod",
-      region: "Toshkent viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30cb",
-      label: "Yangiyo'l",
-      value: "yangiyol",
-      region: "Toshkent viloyati"
-    },
-    // =========================
-    // SAMARQAND
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30cc",
-      label: "Samarqand",
-      value: "samarqand",
-      region: "Samarqand viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30cd",
-      label: "Kattaqo'rg'on",
-      value: "kattaqorgon",
-      region: "Samarqand viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30ce",
-      label: "Urgut",
-      value: "urgut",
-      region: "Samarqand viloyati"
-    },
-    // =========================
-    // BUXORO
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30cf",
-      label: "Buxoro",
-      value: "buxoro",
-      region: "Buxoro viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30d0",
-      label: "G'ijduvon",
-      value: "gijduvon",
-      region: "Buxoro viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30d1",
-      label: "Kogon",
-      value: "kogon",
-      region: "Buxoro viloyati"
-    },
-    // =========================
-    // FARG'ONA
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30d2",
-      label: "Farg'ona",
-      value: "fargona",
-      region: "Farg'ona viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30d3",
-      label: "Marg'ilon",
-      value: "margilon",
-      region: "Farg'ona viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30d4",
-      label: "Qo'qon",
-      value: "qoqon",
-      region: "Farg'ona viloyati"
-    },
-    // =========================
-    // ANDIJON
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30d5",
-      label: "Andijon",
-      value: "andijon",
-      region: "Andijon viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30d6",
-      label: "Asaka",
-      value: "asaka",
-      region: "Andijon viloyati"
-    },
-    // =========================
-    // NAMANGAN
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30d7",
-      label: "Namangan",
-      value: "namangan",
-      region: "Namangan viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30d8",
-      label: "Chust",
-      value: "chust",
-      region: "Namangan viloyati"
-    },
-    // =========================
-    // QASHQADARYO
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30d9",
-      label: "Qarshi",
-      value: "qarshi",
-      region: "Qashqadaryo viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30da",
-      label: "Shahrisabz",
-      value: "shahrisabz",
-      region: "Qashqadaryo viloyati"
-    },
-    // =========================
-    // SURXONDARYO
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30db",
-      label: "Termiz",
-      value: "termiz",
-      region: "Surxondaryo viloyati"
-    },
-    // =========================
-    // JIZZAX
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30e0",
-      label: "Jizzax",
-      value: "jizzax",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e1",
-      label: "Zomin",
-      value: "zomin",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e2",
-      label: "Zarbdor",
-      value: "zarbdor",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e3",
-      label: "Do'stlik",
-      value: "dostlik",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e4",
-      label: "Forish",
-      value: "forish",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e5",
-      label: "G'allaorol",
-      value: "gallaorol",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e6",
-      label: "Mirzacho'l",
-      value: "mirzachol",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e7",
-      label: "Paxtakor",
-      value: "paxtakor",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e8",
-      label: "Yangiobod",
-      value: "yangiobod",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30e9",
-      label: "Arnasoy",
-      value: "arnasoy",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30ea",
-      label: "Baxmal",
-      value: "baxmal",
-      region: "Jizzax viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30eb",
-      label: "Sharof Rashidov",
-      value: "sharof_rashidov",
-      region: "Jizzax viloyati"
-    },
-    // =========================
-    // XORAZM
-    // =========================
-    {
-      _id: "6964cadeb2a92667023e30dc",
-      label: "Urganch",
-      value: "urganch",
-      region: "Xorazm viloyati"
-    },
-    {
-      _id: "6964cadeb2a92667023e30dd",
-      label: "Xiva",
-      value: "xiva",
-      region: "Xorazm viloyati"
-    }
-  ];
+  // =========================
+  // QORAQALPOG'ISTON
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30c1",
+    label: "Nukus",
+    value: "nukus",
+    region: "Qoraqalpog'iston Respublikasi"
+  },
+  {
+    _id: "6964cadeb2a92667023e30c2",
+    label: "Xo'jayli",
+    value: "xojayli",
+    region: "Qoraqalpog'iston Respublikasi"
+  },
+  {
+    _id: "6964cadeb2a92667023e30c3",
+    label: "To'rtko'l",
+    value: "tortkol",
+    region: "Qoraqalpog'iston Respublikasi"
+  },
+  {
+    _id: "6964cadeb2a92667023e30c4",
+    label: "Beruniy",
+    value: "beruniy",
+    region: "Qoraqalpog'iston Respublikasi"
+  },
+  {
+    _id: "6964cadeb2a92667023e30c5",
+    label: "Qo'ng'irot",
+    value: "qongirot",
+    region: "Qoraqalpog'iston Respublikasi"
+  },
+  // =========================
+  // TOSHKENT SHAHAR
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30c6",
+    label: "Toshkent",
+    value: "toshkent",
+    region: "Toshkent shahri"
+  },
+  // =========================
+  // TOSHKENT VILOYATI
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30c7",
+    label: "Chirchiq",
+    value: "chirchiq",
+    region: "Toshkent viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30c8",
+    label: "Angren",
+    value: "angren",
+    region: "Toshkent viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30c9",
+    label: "Olmaliq",
+    value: "olmaliq",
+    region: "Toshkent viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30ca",
+    label: "Bekobod",
+    value: "bekobod",
+    region: "Toshkent viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30cb",
+    label: "Yangiyo'l",
+    value: "yangiyol",
+    region: "Toshkent viloyati"
+  },
+  // =========================
+  // SAMARQAND
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30cc",
+    label: "Samarqand",
+    value: "samarqand",
+    region: "Samarqand viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30cd",
+    label: "Kattaqo'rg'on",
+    value: "kattaqorgon",
+    region: "Samarqand viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30ce",
+    label: "Urgut",
+    value: "urgut",
+    region: "Samarqand viloyati"
+  },
+  // =========================
+  // BUXORO
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30cf",
+    label: "Buxoro",
+    value: "buxoro",
+    region: "Buxoro viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30d0",
+    label: "G'ijduvon",
+    value: "gijduvon",
+    region: "Buxoro viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30d1",
+    label: "Kogon",
+    value: "kogon",
+    region: "Buxoro viloyati"
+  },
+  // =========================
+  // FARG'ONA
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30d2",
+    label: "Farg'ona",
+    value: "fargona",
+    region: "Farg'ona viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30d3",
+    label: "Marg'ilon",
+    value: "margilon",
+    region: "Farg'ona viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30d4",
+    label: "Qo'qon",
+    value: "qoqon",
+    region: "Farg'ona viloyati"
+  },
+  // =========================
+  // ANDIJON
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30d5",
+    label: "Andijon",
+    value: "andijon",
+    region: "Andijon viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30d6",
+    label: "Asaka",
+    value: "asaka",
+    region: "Andijon viloyati"
+  },
+  // =========================
+  // NAMANGAN
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30d7",
+    label: "Namangan",
+    value: "namangan",
+    region: "Namangan viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30d8",
+    label: "Chust",
+    value: "chust",
+    region: "Namangan viloyati"
+  },
+  // =========================
+  // QASHQADARYO
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30d9",
+    label: "Qarshi",
+    value: "qarshi",
+    region: "Qashqadaryo viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30da",
+    label: "Shahrisabz",
+    value: "shahrisabz",
+    region: "Qashqadaryo viloyati"
+  },
+  // =========================
+  // SURXONDARYO
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30db",
+    label: "Termiz",
+    value: "termiz",
+    region: "Surxondaryo viloyati"
+  },
+  // =========================
+  // JIZZAX
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30e0",
+    label: "Jizzax",
+    value: "jizzax",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e1",
+    label: "Zomin",
+    value: "zomin",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e2",
+    label: "Zarbdor",
+    value: "zarbdor",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e3",
+    label: "Do'stlik",
+    value: "dostlik",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e4",
+    label: "Forish",
+    value: "forish",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e5",
+    label: "G'allaorol",
+    value: "gallaorol",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e6",
+    label: "Mirzacho'l",
+    value: "mirzachol",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e7",
+    label: "Paxtakor",
+    value: "paxtakor",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e8",
+    label: "Yangiobod",
+    value: "yangiobod",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30e9",
+    label: "Arnasoy",
+    value: "arnasoy",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30ea",
+    label: "Baxmal",
+    value: "baxmal",
+    region: "Jizzax viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30eb",
+    label: "Sharof Rashidov",
+    value: "sharof_rashidov",
+    region: "Jizzax viloyati"
+  },
+  // =========================
+  // XORAZM
+  // =========================
+  {
+    _id: "6964cadeb2a92667023e30dc",
+    label: "Urganch",
+    value: "urganch",
+    region: "Xorazm viloyati"
+  },
+  {
+    _id: "6964cadeb2a92667023e30dd",
+    label: "Xiva",
+    value: "xiva",
+    region: "Xorazm viloyati"
+  }
+];
 
 const specialties = [
   'Terapevt', 'Ortoped', 'Ayol shifokor', 'Bolalar stomatologi', 'Хирург',
@@ -360,8 +360,8 @@ function AllDoctorsEdit() {
     const initialSpecialties = Array.isArray(doctor.specialty)
       ? doctor.specialty
       : typeof doctor.specialty === 'string'
-      ? doctor.specialty.split(', ').filter(item => item.trim() !== '')
-      : [];
+        ? doctor.specialty.split(', ').filter(item => item.trim() !== '')
+        : [];
 
     setSelectedSpecialties(initialSpecialties);
     setSelectedRegion(doctor.region || '');
@@ -513,7 +513,7 @@ function AllDoctorsEdit() {
           <AlertCircle className="h-16 w-16 text-red-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Xato yuz berdi</h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition"
           >
@@ -540,7 +540,7 @@ function AllDoctorsEdit() {
                   <span>Jami: {doctors.length} ta shifokor</span>
                 </p>
               </div>
-              
+
               <div className="relative w-full md:w-auto md:min-w-[400px]">
                 <input
                   type="text"
@@ -603,7 +603,9 @@ function AllDoctorsEdit() {
                       </td>
                       <td className="py-4 px-6">
                         <span className="bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm">
-                          {doctor.specialty || '-'}
+                          {(doctor.specialty || '-').length > 20
+                            ? (doctor.specialty || '-').slice(0, 20) + '...'
+                            : (doctor.specialty || '-')}
                         </span>
                       </td>
                       <td className="py-4 px-6">
@@ -611,7 +613,7 @@ function AllDoctorsEdit() {
                           {doctor.phone || '-'}
                         </a>
                       </td>
-                    
+
                       <td className="py-4 px-6">
                         <span className={`px-3 py-1 rounded-full text-sm ${doctor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                           {doctor.isActive ? 'Faol' : 'Faol emas'}
@@ -650,7 +652,7 @@ function AllDoctorsEdit() {
               {/* Rasm yuklash */}
               <div>
                 <label className="block text-sm font-medium mb-2">Shifokor rasmi</label>
-                <div 
+                <div
                   className="w-32 h-32 rounded-xl flex items-center justify-center cursor-pointer hover:border-cyan-500 transition"
                   onClick={() => fileInputRef.current.click()}
                 >
@@ -699,9 +701,9 @@ function AllDoctorsEdit() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">Viloyat *</label>
-                  <select 
-                    value={selectedRegion} 
-                    onChange={e => { setSelectedRegion(e.target.value); setSelectedCity(''); }} 
+                  <select
+                    value={selectedRegion}
+                    onChange={e => { setSelectedRegion(e.target.value); setSelectedCity(''); }}
                     className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none"
                   >
                     <option value="">Tanlang</option>
@@ -710,9 +712,9 @@ function AllDoctorsEdit() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Tuman/Shahar *</label>
-                  <select 
-                    value={selectedCity} 
-                    onChange={e => setSelectedCity(e.target.value)} 
+                  <select
+                    value={selectedCity}
+                    onChange={e => setSelectedCity(e.target.value)}
                     disabled={!selectedRegion}
                     className="w-full p-3 border border-cyan-200 rounded-lg disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none"
                   >
@@ -732,13 +734,13 @@ function AllDoctorsEdit() {
                       <button type="button" onClick={() => setSelectedSpecialties(prev => prev.filter((_, idx) => idx !== i))} className="text-red-600 hover:text-red-800 cursor-pointer">×</button>
                     </div>
                   ))}
-                  <select 
-                    value="" 
+                  <select
+                    value=""
                     onChange={e => {
                       if (e.target.value && !selectedSpecialties.includes(e.target.value)) {
                         setSelectedSpecialties([...selectedSpecialties, e.target.value]);
                       }
-                    }} 
+                    }}
                     className="flex-1 min-w-[150px] border-none bg-transparent focus:outline-none"
                   >
                     <option value="">Qo'shish...</option>
@@ -763,22 +765,22 @@ function AllDoctorsEdit() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-1">Latitude</label>
-                  <input 
-                    type="text" 
-                    value={location.lat} 
-                    onChange={e => setLocation({ ...location, lat: e.target.value })} 
-                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" 
-                    placeholder="41.3111" 
+                  <input
+                    type="text"
+                    value={location.lat}
+                    onChange={e => setLocation({ ...location, lat: e.target.value })}
+                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none"
+                    placeholder="41.3111"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Longitude</label>
-                  <input 
-                    type="text" 
-                    value={location.lng} 
-                    onChange={e => setLocation({ ...location, lng: e.target.value })} 
-                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" 
-                    placeholder="69.2797" 
+                  <input
+                    type="text"
+                    value={location.lng}
+                    onChange={e => setLocation({ ...location, lng: e.target.value })}
+                    className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none"
+                    placeholder="69.2797"
                   />
                 </div>
               </div>
@@ -805,16 +807,16 @@ function AllDoctorsEdit() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <label className="border border-cyan-200 py-5 rounded-lg px-6 cursor-pointer hover:bg-cyan-50 transition" style={{ backgroundColor: selectedDoctor?.isActive ? '#e6f7ff' : 'white' }}>
                   <div className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" {...register('isActive')} className="w-5 h-5 cursor-pointer focus:ring-cyan-500 focus:outline-none" />
-                  <span className="text-gray-700">Faol</span>
-                </div>
+                    <input type="checkbox" {...register('isActive')} className="w-5 h-5 cursor-pointer focus:ring-cyan-500 focus:outline-none" />
+                    <span className="text-gray-700">Faol</span>
+                  </div>
                 </label>
 
                 <label className="border border-cyan-200 py-5 rounded-lg px-6 cursor-pointer hover:bg-cyan-50 transition" style={{ backgroundColor: selectedDoctor?.isActive ? '#e6f7ff' : 'white' }}>
                   <div className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" {...register('isAvailable24x7')} className="w-5 h-5 cursor-pointer focus:ring-cyan-500 focus:outline-none" />
-                  <span className="text-gray-700">24/7 mavjud</span>
-                </div>
+                    <input type="checkbox" {...register('isAvailable24x7')} className="w-5 h-5 cursor-pointer focus:ring-cyan-500 focus:outline-none" />
+                    <span className="text-gray-700">24/7 mavjud</span>
+                  </div>
                 </label>
               </div>
 
@@ -823,9 +825,9 @@ function AllDoctorsEdit() {
                 <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 cursor-pointer border border-cyan-300 rounded-lg hover:bg-cyan-50 text-cyan-700 transition">
                   Bekor qilish
                 </button>
-                <button 
-                  type="submit" 
-                  disabled={saving} 
+                <button
+                  type="submit"
+                  disabled={saving}
                   className="px-6 py-3 cursor-pointer text-white rounded-lg hover:opacity-90 flex items-center gap-2 disabled:opacity-50 transition"
                   style={{ backgroundColor: '#00BCE4' }}
                 >
