@@ -15,11 +15,11 @@ function AddMahsulot() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  
+
   const [editForm, setEditForm] = useState({
     name: '',
     sku: '',
@@ -124,6 +124,7 @@ function AddMahsulot() {
 
   const BASE_URL = "https://app.dentago.uz";
   const TOKEN = localStorage.getItem('accessToken');
+  const userRole = localStorage.getItem('userRole');
 
   useEffect(() => {
     fetchProducts();
@@ -156,26 +157,26 @@ function AddMahsulot() {
 
   // Pagination funksiyalari
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  
+
   const nextPage = () => {
     if (currentPage < Math.ceil(searchResults.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
-  
+
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
-  
+
   // Joriy sahifadagi mahsulotlarni olish
   const getCurrentProducts = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     return searchResults.slice(indexOfFirstItem, indexOfLastItem);
   };
-  
+
   // Sahifalash ma'lumotlari
   const totalPages = Math.ceil(searchResults.length / itemsPerPage);
   const showNotification = (message, type = 'success') => {
@@ -249,7 +250,7 @@ function AddMahsulot() {
   // Tahrirlashni boshlash
   const handleEditClick = (product) => {
     setEditingProduct(product);
-    
+
     // Form ma'lumotlarini to'ldirish
     const editData = {
       name: product.name || '',
@@ -268,7 +269,7 @@ function AddMahsulot() {
     };
 
     setEditForm(editData);
-    
+
     // Preview rasmlarni o'rnatish
     if (editData.imageUrl && editData.imageUrl.length > 0) {
       const previews = editData.imageUrl.map(img => {
@@ -282,7 +283,7 @@ function AddMahsulot() {
     } else {
       setPreviewImages([]);
     }
-    
+
     setSelectedFiles([]);
     setEditModalOpen(true);
   };
@@ -498,10 +499,10 @@ function AddMahsulot() {
 
       // Mahsulotlar ro'yxatini yangilash
       const updatedProducts = products.map(p =>
-        p._id === editingProduct._id ? { 
-          ...p, 
+        p._id === editingProduct._id ? {
+          ...p,
           ...dataToSend,
-          imageUrl: uploadedImageUrls 
+          imageUrl: uploadedImageUrls
         } : p
       );
 
@@ -509,7 +510,7 @@ function AddMahsulot() {
       setSearchResults(updatedProducts);
 
       showNotification("Mahsulot muvaffaqiyatli yangilandi!");
-      
+
       // Modalni yopish va ma'lumotlarni tozalash
       setEditModalOpen(false);
       setEditingProduct(null);
@@ -518,7 +519,7 @@ function AddMahsulot() {
 
     } catch (err) {
       console.error("Tahrirlashda xatolik:", err);
-      
+
       let errorMsg = "Tahrirlashda xatolik yuz berdi";
 
       if (err.response?.status === 401) {
@@ -591,7 +592,7 @@ function AddMahsulot() {
         URL.revokeObjectURL(img);
       }
     });
-    
+
     setEditModalOpen(false);
     setEditingProduct(null);
     setSelectedFiles([]);
@@ -653,12 +654,14 @@ function AddMahsulot() {
               >
                 <Plus size={20} /> Yangi qo'shish
               </button>
-              <button
-              onClick={() => navigate("/Categories")}
-                className="flex items-center cursor-pointer gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"
-              >
-                Kategoriyalar
-              </button>
+              {userRole === 'admin' && (
+                <button
+                  onClick={() => navigate("/Categories")}
+                  className="flex items-center cursor-pointer gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+                >
+                  Kategoriyalar
+                </button>
+              )}
             </div>
           </div>
 
@@ -808,15 +811,15 @@ function AddMahsulot() {
               </table>
             </div>
           </div>
-          
+
           {/* Pagination */}
           {searchResults.length > itemsPerPage && (
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-200">
               <div className="text-sm text-gray-600">
-                Jami: <span className="font-semibold">{searchResults.length}</span> ta mahsulot, 
+                Jami: <span className="font-semibold">{searchResults.length}</span> ta mahsulot,
                 Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <button
                   onClick={prevPage}
@@ -825,7 +828,7 @@ function AddMahsulot() {
                 >
                   <ChevronLeft size={20} />
                 </button>
-                
+
                 <div className="flex items-center gap-1">
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     let pageNum;
@@ -838,23 +841,22 @@ function AddMahsulot() {
                     } else {
                       pageNum = currentPage - 2 + i;
                     }
-                    
+
                     return (
                       <button
                         key={pageNum}
                         onClick={() => paginate(pageNum)}
-                        className={`w-10 h-10 rounded-lg cursor-pointer ${
-                          currentPage === pageNum
-                            ? 'bg-[#00BCE4] text-white'
-                            : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-                        } transition-colors`}
+                        className={`w-10 h-10 rounded-lg cursor-pointer ${currentPage === pageNum
+                          ? 'bg-[#00BCE4] text-white'
+                          : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                          } transition-colors`}
                       >
                         {pageNum}
                       </button>
                     );
                   })}
                 </div>
-                
+
                 <button
                   onClick={nextPage}
                   disabled={currentPage === totalPages}

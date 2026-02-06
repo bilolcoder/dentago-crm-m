@@ -452,7 +452,7 @@ function AdminProduct() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                  <span className="px-3 py-1 bg-blue-50 text-[#00BCE4] text-xs rounded-full">
                     {product.category || '—'}
                   </span>
                 </td>
@@ -463,7 +463,7 @@ function AdminProduct() {
                   <div className="flex justify-center gap-2">
                     <button
                       onClick={() => openEditModal(product)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+                      className="p-2 text-[#00BCE4] hover:bg-blue-50 rounded-lg cursor-pointer"
                     >
                       <Edit2 size={18} />
                     </button>

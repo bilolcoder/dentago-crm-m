@@ -129,7 +129,7 @@ function AllCategories() {
   }
 
   return (
-    <div className="p-5 md:p-6 max-w-7xl mx-auto">
+    <div className="">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
@@ -195,7 +195,7 @@ function AllCategories() {
                       )}
                     </td>
                     <td className="px-5 py-3">
-                      <span className="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
+                      <span className="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-blue-50 text-[#00BCE4]">
                         {cat.catType === 'dentalMaterials' ? 'Stomatologik materiallar' :
                          cat.catType === 'dentalEquipment' ? 'Stomatologiya uskunalari' :
                          cat.catType === 'dentalTech' ? 'Texnik vositalar' : cat.catType}
@@ -205,7 +205,7 @@ function AllCategories() {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => handleEditClick(cat)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors cursor-pointer"
+                          className="p-1.5 text-[#00BCE4] hover:bg-blue-50 rounded transition-colors cursor-pointer"
                           title="Tahrirlash"
                         >
                           <Edit3 size={18} />

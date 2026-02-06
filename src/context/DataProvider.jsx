@@ -297,6 +297,7 @@ export const DataProvider = ({ children }) => {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userPhone');
         localStorage.removeItem('userData');
+        localStorage.removeItem('userRole');
         setIsAuthenticated(false);
         setUser(null);
         setCartItems([]);
