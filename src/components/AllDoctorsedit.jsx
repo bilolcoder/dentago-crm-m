@@ -508,7 +508,7 @@ function AllDoctorsEdit() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <AlertCircle className="h-16 w-16 text-red-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Xato yuz berdi</h2>
