@@ -17,7 +17,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import axios from 'axios';
 
 const DashboardContent = () => {
-    const { data, t, logout } = useData();
+    const { user, t, logout } = useData();
     const navigate = useNavigate();
     const dateInputRef = useRef(null);
 
@@ -88,7 +88,7 @@ const DashboardContent = () => {
         if (!accepted) {
             setShowOfferModal(true);
         }
-        
+
         // Barcha ma'lumotlarni yuklash
         fetchOrderStats();
         fetchServices();
@@ -149,27 +149,69 @@ const DashboardContent = () => {
             link: "#",
             color: "#22c55e"
         },
+
     ];
+
+    // Role bo'yicha filtrlash
+    const getVisibleStats = () => {
+        const role = user?.role;
+        const allStats = topStats;
+
+        if (role === 'doctor') {
+            return allStats.filter(s =>
+                s.title === "Jami Buyurtmalar" ||
+                s.title === "Jarayonda" ||
+                s.title === "To'langanlar" ||
+                s.title === "Yetkazib berildi"
+            );
+        }
+        if (role === 'user') {
+            return allStats.filter(s =>
+                s.title === "Jami Buyurtmalar" ||
+                s.title === "To'langanlar" ||
+                s.title === "Yetkazib berildi" ||
+                s.title === "Yetkazilmoqda"
+            );
+        }
+        if (role === 'technician') {
+            return allStats.filter(s =>
+                s.title === "Jami Buyurtmalar" ||
+                s.title === "To'langanlar" ||
+                s.title === "Yetkazib berildi"
+            );
+        }
+        if (role === 'master') {
+            return allStats.filter(s =>
+                s.title === "Jami Buyurtmalar" ||
+                s.title === "Jarayonda"
+            );
+        }
+
+        // Default holat (masalan admin uchun hammasi)
+        return topStats;
+    };
+
+    const visibleStats = getVisibleStats();
 
     // To'lovlar statistikasi
     const chartData = [
-        { 
-            name: t('cash') || 'Naqd', 
+        {
+            name: t('cash') || 'Naqd',
             value: payments
                 .filter(p => p.payment_type === 'cash' || p.type === 'Naqd')
-                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0) 
+                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0)
         },
-        { 
-            name: t('card') || 'Karta', 
+        {
+            name: t('card') || 'Karta',
             value: payments
                 .filter(p => p.payment_type === 'card' || p.type === 'Karta')
-                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0) 
+                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0)
         },
-        { 
-            name: 'Bank', 
+        {
+            name: 'Bank',
             value: payments
                 .filter(p => p.payment_type === 'bank' || p.type === 'Hisob raqam' || p.type === 'Bank')
-                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0) 
+                .reduce((s, p) => s + (parseInt(p.amount) || 0), 0)
         },
     ];
 
@@ -210,7 +252,7 @@ const DashboardContent = () => {
             <div className="space-y-6">
                 {/* Dashboard Kartalari */}
                 <section className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                    {topStats.map((stat, index) => (
+                    {visibleStats.map((stat, index) => (
                         <Link
                             to={stat.link}
                             key={index}
@@ -251,17 +293,17 @@ const DashboardContent = () => {
                                 <h3 className="text-lg font-bold text-slate-800 tracking-tight">{t('payments') || "To'lovlar"}</h3>
                                 <p className="text-xs text-slate-400 font-medium">To'lovlar dinamikasi</p>
                             </div>
-                            <button 
-                                onClick={() => dateInputRef.current?.showPicker()} 
+                            <button
+                                onClick={() => dateInputRef.current?.showPicker()}
                                 className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl text-xs font-bold text-[#00BCE4] cursor-pointer"
                             >
                                 <Calendar className="w-4 h-4" />
                                 <span>{selectedDate}</span>
-                                <input 
-                                    type="date" 
-                                    ref={dateInputRef} 
-                                    className="absolute opacity-0 pointer-events-none" 
-                                    onChange={(e) => setSelectedDate(e.target.value)} 
+                                <input
+                                    type="date"
+                                    ref={dateInputRef}
+                                    className="absolute opacity-0 pointer-events-none"
+                                    onChange={(e) => setSelectedDate(e.target.value)}
                                     value={selectedDate}
                                 />
                             </button>
@@ -276,63 +318,30 @@ const DashboardContent = () => {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis 
-                                        dataKey="name" 
-                                        axisLine={false} 
-                                        tickLine={false} 
-                                        tick={{ fontSize: 12, fill: '#94a3b8' }} 
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fontSize: 12, fill: '#94a3b8' }}
                                     />
                                     <YAxis hide />
-                                    <Tooltip 
-                                        contentStyle={{ 
-                                            borderRadius: '16px', 
-                                            border: 'none', 
-                                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' 
-                                        }} 
+                                    <Tooltip
+                                        contentStyle={{
+                                            borderRadius: '16px',
+                                            border: 'none',
+                                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                                        }}
                                         formatter={(value) => [`${value} so'm`, 'To\'lov']}
                                     />
-                                    <Area 
-                                        type="monotone" 
-                                        dataKey="value" 
-                                        stroke="#00BCE4" 
-                                        strokeWidth={3} 
-                                        fill="url(#colorValue)" 
+                                    <Area
+                                        type="monotone"
+                                        dataKey="value"
+                                        stroke="#00BCE4"
+                                        strokeWidth={3}
+                                        fill="url(#colorValue)"
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
-                        </div>
-                    </div>
-
-                    {/* Ommabop xizmatlar */}
-                    <div className="bg-white rounded-3xl border border-gray-100 p-6">
-                        <h3 className="text-lg font-bold text-slate-800 mb-6">
-                            {t('top_services') || "Ommabop xizmatlar"}
-                        </h3>
-                        <div className="space-y-3">
-                            {formattedServices.slice(0, 6).map((service, index) => (
-                                <div 
-                                    key={service.id || index} 
-                                    className="flex items-center justify-between p-4 rounded-2xl bg-white border border-gray-50 transition-colors hover:bg-gray-50"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-[#00BCE4] flex items-center justify-center text-white text-xs font-bold">
-                                            {index + 1}
-                                        </div>
-                                        <p className="text-sm font-bold text-slate-800 truncate w-32">
-                                            {service.name}
-                                        </p>
-                                    </div>
-                                    <p className="text-sm font-black text-slate-700">
-                                        {service.price.toLocaleString()} so'm
-                                    </p>
-                                </div>
-                            ))}
-                            
-                            {formattedServices.length === 0 && (
-                                <div className="text-center py-8 text-slate-400">
-                                    Xizmatlar mavjud emas
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

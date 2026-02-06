@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-    Home,Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
+    Home, Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
     ChevronDown, ListOrdered, Archive, User, PlusCircle, X, Package
 } from 'lucide-react';
 import { IoIosStats } from "react-icons/io";
@@ -14,7 +14,7 @@ import Logo from '../../assets/dentago.png';
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { t } = useData();
+    const { t, user } = useData();
 
     const [openMenus, setOpenMenus] = useState({
         ombor: false,
@@ -63,7 +63,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
     const navItems = [
         { icon: Home, label: "Dentago", route: "/DentagoStore", type: "link" },
-        { icon: IoIosStats , label: t('main'), route: "/dashboard", type: "link" },
+        { icon: IoIosStats, label: t('main'), route: "/dashboard", type: "link" },
         { icon: HiOutlineInformationCircle, label: t('my_information'), route: "/my-information", type: "link" },
         { icon: Users, label: t('bemorlarim'), route: "/bemorlarim", type: "link" },
         { icon: ListOrdered, label: t('orders_bts'), route: "/orders", type: "link" },
@@ -123,6 +123,55 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         //     ]
         // },
     ];
+
+    const getVisibleNavItems = () => {
+        const role = user?.role;
+
+        // Agar admin bo'lsa, hammasini ko'rsatamiz
+        if (role === 'admin') return navItems;
+
+        if (role === 'doctor') {
+            return navItems.filter(item =>
+                item.route === "/DentagoStore" ||
+                item.route === "/dashboard" ||
+                item.route === "/my-information" ||
+                item.route === "/bemorlarim" ||
+                item.route === "/orders" ||
+                item.route === "/result"
+            );
+        }
+
+        if (role === 'user') {
+            return navItems.filter(item =>
+                item.route === "/DentagoStore" ||
+                item.route === "/dashboard" ||
+                item.route === "/orders" ||
+                item.route === "/addproduct"
+            );
+        }
+
+        if (role === 'technician') {
+            return navItems.filter(item =>
+                item.route === "/DentagoStore" ||
+                item.route === "/dashboard" ||
+                item.route === "/my-information" ||
+                item.route === "/orders"
+            );
+        }
+
+        if (role === 'master') { 
+            return navItems.filter(item =>
+                item.route === "/DentagoStore" ||
+                item.route === "/dashboard" ||
+                item.route === "/orders"
+            );
+        }
+
+        // Agar role noma'lum bo'lsa yoki login qilmagan bo'lsa - faqat asosiylarini (yoki hech narsa)
+        return navItems.filter(item => item.route === "/DentagoStore");
+    };
+
+    const visibleNavItems = getVisibleNavItems();
 
     const renderNavItem = (item, index) => {
         const isActive = item.route === "/"
@@ -230,20 +279,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
                     {/* Navigation */}
                     <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-55px] px-4 space-y-2 custom-scrollbar pb-1">
-                        {navItems.map((item, index) => renderNavItem(item, index))}
-
-                        {/* <div
-                            onClick={() => handleNavigation("/manual")}
-                            className={`
-                                cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all mt-4
-                                ${location.pathname === '/manual'
-                                    ? 'text-[#00BCE4] border-b-2'
-                                    : 'text-slate-500 font-bold'}
-                            `}
-                        >
-                            <BookOpen size={15} />
-                            <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
-                        </div> */}
+                        {visibleNavItems.map((item, index) => renderNavItem(item, index))}
                     </nav>
                 </div>
 

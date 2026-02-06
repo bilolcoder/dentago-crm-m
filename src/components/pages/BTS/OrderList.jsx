@@ -38,7 +38,7 @@ function Aperator() {
         "https://via.placeholder.com/400x400?text=Rasm+3"
       ],
       description: "Tish protezini ta'mir lash kerak, uzoq vaqtdan beri ishlatilmoqda va sinish belgilari bor.",
-      phone1: "+998 77 297 22 22",
+      phone1: "+998700386666",
       phone2: "+998 95 219 26 99",
       status: "kutilmoqda",
       date: "29.01.2026"
@@ -51,7 +51,7 @@ function Aperator() {
         "https://via.placeholder.com/400x400?text=Mahsulot+3"
       ],
       description: "Yangi uskuna o'rnatish bo'yicha maslahat so'ralmoqda.",
-      phone1: "+998 77 297 22 22",
+      phone1: "+998700386666",
       phone2: "+998 95 219 26 99",
       status: "tasdiqlandi",
       date: "28.01.2026"
@@ -64,7 +64,7 @@ function Aperator() {
         "https://via.placeholder.com/400x400?text=Uskuna+3"
       ],
       description: "Eski uskunani yangilash bo'yicha buyurtma rad etildi.",
-      phone1: "+998 77 297 22 22",
+      phone1: "+998700386666",
       phone2: "+998 95 219 26 99",
       status: "bekor qilindi",
       date: "27.01.2026"
@@ -413,7 +413,6 @@ function Aperator() {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
                           <Phone size={12} strokeWidth={3} />
-                          {/* <span>+998 77 297 22 22</span> */}
                           <span>+99870 038 66 66</span>
                         </div>
                       </div>
@@ -531,7 +530,7 @@ function Aperator() {
                           </div>
                           <div>
                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Asosiy raqam</p>
-                            <p className="text-sm font-black text-[#00BCE4]">+998 77 297 22 22</p>
+                            <p className="text-sm font-black text-[#00BCE4]">+998700386666</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-slate-300 transition-all">

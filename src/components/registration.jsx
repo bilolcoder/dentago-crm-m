@@ -481,7 +481,7 @@ const Registration = () => {
     }, []);
 
     const userTypeOptions = [
-        { value: 'user', label: 'Bemor', icon: BriefcaseMedical },
+        { value: 'user', label: 'Sotuvchi', icon: BriefcaseMedical },
         { value: 'doctor', label: 'Stomatolog', icon: Stethoscope },
         { value: 'master', label: 'Usta', icon: Wrench },
         { value: 'technician', label: 'Zub-texnik', icon: Award }

@@ -79,65 +79,12 @@ function Elonlar() {
           </div>
         </header>
 
-        {/* 2. HERO BANNER – Bosh sahifadagi bilan bir xil dizayn */}
 
-        {/* 2. HERO BANNER – Bosh sahifadagi bilan bir xil dizayn */}
         <StoreBanner slides={slides} />
-
-        {/* CATEGORIES */}
-
-        {/* CATEGORIES */}
         <StoreCategories />
 
-        {/* 4. TITLE */}
-        <div className="mb-6">
-          <h1 className="font-bold text-[22px] md:text-[28px] text-gray-800">Barcha e'lonlar</h1>
-        </div>
-
-        {/* 5. ADS LIST (Bosh sahifa kabi sifatli Card dizayni) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {ads.map((ad) => (
-            <div
-              key={ad.id}
-              className="bg-white rounded-[30px] p-4 shadow-sm border border-gray-100 flex gap-5 relative group hover:shadow-md transition-all cursor-pointer"
-              onClick={() => navigate(`/mahsulot/${ad.id}`)}
-            >
-              {/* Rasm qismi */}
-              <div className="w-40 h-32 md:w-48 md:h-40 bg-gray-50 rounded-[25px] flex items-center justify-center overflow-hidden flex-shrink-0">
-                <img src={ad.img} alt={ad.name} className="object-contain h-full w-full p-3 group-hover:scale-110 transition-transform duration-300" />
-              </div>
-
-              {/* Ma'lumot qismi */}
-              <div className="flex-1 flex flex-col justify-between py-2">
-                <div>
-                  <h3 className="text-gray-800 font-bold text-[16px] md:text-[19px] leading-tight mb-1 pr-8 line-clamp-2">
-                    {ad.name}
-                  </h3>
-                  <span className="bg-gray-100 text-gray-500 text-[12px] px-3 py-1 rounded-full font-medium">
-                    {ad.status}
-                  </span>
-                </div>
-
-                <div className="mt-auto">
-                  <p className="text-[#00C2FF] font-extrabold text-[20px] md:text-[24px]">
-                    {ad.price} <span className="text-sm font-semibold text-gray-500 uppercase">uzs</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Sevimlilar tugmasi */}
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="absolute cursor-pointer right-5 top-5 text-gray-300 hover:text-red-500 transition-colors"
-              >
-                <Heart size={24} />
-              </button>
-            </div>
-          ))}
-        </div>
+              <h1 className="font-bold text-center text-[22px] md:text-[28px] text-[#00BCE4]">Tez kunda...</h1>
       </div>
-
-
     </div>
   );
 }
