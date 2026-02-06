@@ -3,6 +3,7 @@ import { MdDeleteOutline, MdCheck } from "react-icons/md";
 import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2, X, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useData } from '../../../context/DataProvider';
 import Rasm from "../../../assets/dentago.png"
 // Swiper imports
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -13,6 +14,7 @@ import 'swiper/css/pagination';
 import { FaScrewdriverWrench } from "react-icons/fa6";
 
 function Aperator() {
+  const { user } = useData();
   const navigate = useNavigate();
   const PRIMARY_COLOR = "#00BCE4";
   const BASE_URL = "https://app.dentago.uz";
@@ -199,7 +201,7 @@ function Aperator() {
     } catch (err) {
       console.error("Xatolik:", err);
       setError(err.message || "Internet yoki server bilan muammo");
-      
+
       // API ishlamasa ham statik ma'lumotlar ko'rinadi
       const staticOrders = [
         {
@@ -227,7 +229,7 @@ function Aperator() {
           selectedAction: null
         }
       ];
-      
+
       setOrders(staticOrders);
       setTotalOrders(staticOrders.length);
       setTotalPages(1);
@@ -243,7 +245,7 @@ function Aperator() {
 
   // Amalni tanlash funksiyasi
   const handleAction = (orderId, actionName) => {
-    setOrders(prev => prev.map(order => 
+    setOrders(prev => prev.map(order =>
       order.id === orderId ? { ...order, selectedAction: actionName } : order
     ));
     setActiveMenu(null);
@@ -326,7 +328,7 @@ function Aperator() {
                   <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
                     {order.totalNarx.toLocaleString()} so'm
                   </td>
-                  
+
                   {/* Amallar Ustuni */}
                   <td className="px-6 py-5">
                     <div className="flex items-center justify-center gap-2">
@@ -361,79 +363,81 @@ function Aperator() {
         </div>
       </div>
 
-      {/* Ustaga buyurtmalar bo'limi */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
-            <FaScrewdriverWrench size={24} />
+      {/* Ustaga buyurtmalar bo'limi - agar role 'master' BO'LMASA ko'rinadi */}
+      {user?.role !== 'master' && (
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
+              <FaScrewdriverWrench size={24} />
+            </div>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
+              Ustaga <span style={{ color: PRIMARY_COLOR }}>Buyurtmalar</span>
+            </h2>
           </div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">
-            Ustaga <span style={{ color: PRIMARY_COLOR }}>Buyurtmalar</span>
-          </h2>
-        </div>
 
-        <div className="bg-white rounded-[1rem] shadow-sm overflow-hidden border border-slate-100">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rasmi</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tavsif (Description)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aloqa (Tel)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Batafsil</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {masterOrders.map((mOrder) => (
-                  <tr 
-                    key={mOrder.id} 
-                    onClick={() => {
-                      setSelectedMasterOrder(mOrder);
-                      setIsDetailModalOpen(true);
-                    }}
-                    className="hover:bg-[#00BCE4]/[0.02] transition-all cursor-pointer group"
-                  >
-                    <td className="px-8 py-5">
-                      <div className="w-14 h-14 rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center group-hover:border-[#00BCE4]/30 transition-all">
-                        <img 
-                          src={Rasm} 
-                          alt="order" 
-                          className="w-full h-full object-cover"
-                          // onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
-                        />
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <p className="text-sm font-bold text-slate-700 max-w-[400px] truncate">
-                        {mOrder.description}
-                      </p>
-                    </td>
-                    <td className="px-8 py-5">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
-                          <Phone size={12} strokeWidth={3} />
-                          <span>+99870 038 66 66</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${getMasterStatusStyle(mOrder.status)}`}>
-                        {mOrder.status}
-                      </span>
-                    </td>
-                    <td className="px-8  py-5 text-center">
-                      <button className="p-2 rounded-xl cursor-pointer bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
-                        <MoreHorizontal size={18} />
-                      </button>
-                    </td>
+          <div className="bg-white rounded-[1rem] shadow-sm overflow-hidden border border-slate-100">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-slate-50/50 border-b border-slate-100">
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Rasmi</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tavsif (Description)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aloqa (Tel)</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Batafsil</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {masterOrders.map((mOrder) => (
+                    <tr
+                      key={mOrder.id}
+                      onClick={() => {
+                        setSelectedMasterOrder(mOrder);
+                        setIsDetailModalOpen(true);
+                      }}
+                      className="hover:bg-[#00BCE4]/[0.02] transition-all cursor-pointer group"
+                    >
+                      <td className="px-8 py-5">
+                        <div className="w-14 h-14 rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center group-hover:border-[#00BCE4]/30 transition-all">
+                          <img
+                            src={Rasm}
+                            alt="order"
+                            className="w-full h-full object-cover"
+                          // onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
+                          />
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <p className="text-sm font-bold text-slate-700 max-w-[400px] truncate">
+                          {mOrder.description}
+                        </p>
+                      </td>
+                      <td className="px-8 py-5">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-xs font-black text-[#00BCE4]">
+                            <Phone size={12} strokeWidth={3} />
+                            <span>+99870 038 66 66</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${getMasterStatusStyle(mOrder.status)}`}>
+                          {mOrder.status}
+                        </span>
+                      </td>
+                      <td className="px-8  py-5 text-center">
+                        <button className="p-2 rounded-xl cursor-pointer bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
+                          <MoreHorizontal size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {/* Ustaga buyurtma tafsilotlari Modali */}
       {isDetailModalOpen && selectedMasterOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
@@ -476,9 +480,9 @@ function Aperator() {
                     >
                       {selectedMasterOrder.images?.map((img, index) => (
                         <SwiperSlide key={index}>
-                          <img 
-                            src={Rasm} 
-                            alt={`Order detail ${index + 1}`} 
+                          <img
+                            src={Rasm}
+                            alt={`Order detail ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
                         </SwiperSlide>
@@ -496,11 +500,10 @@ function Aperator() {
                   <div className="flex gap-2">
                     <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                      <span className={`text-[9px] font-black uppercase tracking-widest ${
-                        selectedMasterOrder.status === 'tasdiqlandi' ? 'text-emerald-500' :
-                        selectedMasterOrder.status === 'kutilmoqda' ? 'text-amber-500' :
-                        'text-rose-500'
-                      }`}>
+                      <span className={`text-[9px] font-black uppercase tracking-widest ${selectedMasterOrder.status === 'tasdiqlandi' ? 'text-emerald-500' :
+                          selectedMasterOrder.status === 'kutilmoqda' ? 'text-amber-500' :
+                            'text-rose-500'
+                        }`}>
                         {selectedMasterOrder.status}
                       </span>
                     </div>
@@ -546,7 +549,7 @@ function Aperator() {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     className="w-full cursor-pointer mt-8 py-5 rounded-3xl bg-[#00BCE4] text-white font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-[#00BCE4]/30 hover:-translate-y-1 transition-all active:scale-95"
                     onClick={() => {
                       // API call placeholder
