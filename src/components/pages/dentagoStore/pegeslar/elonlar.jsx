@@ -7,13 +7,10 @@ import { Link, useNavigate } from "react-router-dom";
 // Rasmlar
 import Chair from "../../../../assets/elon.png";
 import Logo from "../../../../assets/logo.png";
+import StoreBanner from "../components/StoreBanner";
+import StoreCategories from "../components/StoreCategories";
 
-const categories = [
-  { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/DentagoStore' },
-  { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
-  { id: 'texniklar', label: 'Texniklar', Icon: RiToothLine, path: '/texniklar' },
-  { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
-];
+// Categories array removed - used in StoreCategories component
 
 const ads = [
   {
@@ -33,18 +30,20 @@ const ads = [
 ];
 
 function Elonlar() {
-  const [activeTab, setActiveTab] = useState("elonlar");
+  // activeTab state removed
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
   const slides = [
     {
       title: "Sotmoqchimisiz? Muammo emas!",
-      description: "Mahsulotingizni e’lonlar bo’limiga joylang va tezda soting!"
+      description: "Mahsulotingizni e’lonlar bo’limiga joylang va tezda soting!",
+      img: Chair
     },
     {
       title: "Sotmoqchimisiz? Muammo emas!",
-      description: "Mahsulotingizni e’lonlar bo’limiga joylang va tezda soting!"
+      description: "Mahsulotingizni e’lonlar bo’limiga joylang va tezda soting!",
+      img: Chair
     },
   ];
   const notification = () => {
@@ -60,10 +59,10 @@ function Elonlar() {
   return (
     <div className="min-h-screen bg-white pb-24 font-sans">
       {/* Bosh sahifadagidek Max-width Konteyner */}
-      <div className="  mx-auto">
+      <div className="">
 
         {/* 1. HEADER (Bosh sahifa bilan bir xil dizayn) */}
-        <header className="p-4 sticky top-0 bg-white z-30">
+        <header className="sticky top-0 bg-white z-30">
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -80,87 +79,23 @@ function Elonlar() {
           </div>
         </header>
 
-       {/* 2. HERO BANNER – Bosh sahifadagi bilan bir xil dizayn */}
-<section className="px-4 md:px-8 py-6">
-  <div className="relative group">
-    <div className="overflow-hidden rounded-3xl shadow-lg">
-      <div
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-      >
-        {slides.map((slide, index) => (
-          <div key={index} className="w-full flex-shrink-0">
-            <div className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-[300px] md:h-[450px] p-8 md:p-16 flex items-center relative">
-              {/* Chap taraf – text + logo */}
-              <div className="w-full md:w-1/2 z-10">
-                <img
-                  src={Logo}
-                  className="w-52 transform max-sm:w-32 translate-x-[-12px] mb-4 md:mb-6"
-                  alt="Logo"
-                />
-                <h2 className="text-2xl md:text-5xl text-white mb-4 leading-tight whitespace-pre-line font-bold max-h-[140px] md:max-h-[200px] overflow-hidden">
-                  {slide.title}
-                </h2>
-                <p className="text-sm md:text-lg text-cyan-50 mb-8 max-w-md line-clamp-3 md:line-clamp-none">
-                  {slide.description}
-                </p>
-              </div>
+        {/* 2. HERO BANNER – Bosh sahifadagi bilan bir xil dizayn */}
 
-              {/* O'ng taraf – rasm */}
-              <div className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 w-1/2 flex justify-end">
-                <img
-                  src={slide.img || Chair}
-                  alt={slide.title}
-                  className="h-48 md:h-[350px] object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { e.target.src = Chair; }} // fallback
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+        {/* 2. HERO BANNER – Bosh sahifadagi bilan bir xil dizayn */}
+        <StoreBanner slides={slides} />
 
-    {/* Oldinga / Orqaga tugmalar – bosh sahifadagi kabi */}
-    <button
-      onClick={() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)}
-      className="absolute cursor-pointer left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity"
-    >
-      <ArrowLeft className="text-white" size={24} />
-    </button>
-    <button
-      onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
-      className="absolute  cursor-pointer right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity rotate-180"
-    >
-      <ArrowLeft className="text-white" size={24} />
-    </button>
+        {/* CATEGORIES */}
 
- 
-  </div>
-</section>
-
-        {/* 3. CATEGORIES (Grid ko'rinishi) */}
-        <section className="px-4 md:px-8 pb-12">
-          <div className="grid grid-cols-4 max-sm:grid-cols-2 gap-4 md:gap-8">
-            {categories.map(({ id, label, Icon, path }) => (
-              <Link key={id} to={path} onClick={() => setActiveTab(id)} className="flex flex-col items-center gap-3">
-                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex border-2 items-center justify-center transition-all
-                  ${activeTab === id ? 'bg-[#00C2FF] border-[#00C2FF] text-white shadow-lg' : 'bg-white border-[#00C2FF] text-[#00C2FF]'}`}>
-                  <Icon className="text-2xl md:text-3xl" />
-                </div>
-                <span className={`text-xs md:text-lg font-semibold ${activeTab === id ? 'text-[#00C2FF]' : 'text-gray-600'}`}>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {/* CATEGORIES */}
+        <StoreCategories />
 
         {/* 4. TITLE */}
-        <div className="px-4 md:px-8 mb-6">
+        <div className="mb-6">
           <h1 className="font-bold text-[22px] md:text-[28px] text-gray-800">Barcha e'lonlar</h1>
         </div>
 
         {/* 5. ADS LIST (Bosh sahifa kabi sifatli Card dizayni) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {ads.map((ad) => (
             <div
               key={ad.id}
@@ -202,7 +137,7 @@ function Elonlar() {
         </div>
       </div>
 
-    
+
     </div>
   );
 }

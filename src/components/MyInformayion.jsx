@@ -990,12 +990,15 @@ function MyInformation() {
           <div className="mb-4">
             <h3 className="text-xl font-bold text-gray-800 mb-1">{doctorName}</h3>
             <div className="flex flex-wrap gap-2">
-              {specialtiesArray.map((spec, index) => (
+              {specialtiesArray.slice(0, 2).map((spec, index) => (
                 <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-medium">
                   <BriefcaseMedical className="w-4 h-4" />
                   {spec}
                 </div>
               ))}
+              {specialtiesArray.length > 2 && (
+                <div className="flex items-center text-[#00BCE4] font-medium">...</div>
+              )}
             </div>
 
             {/* Viloyat va tuman ko'rsatish */}
@@ -1062,11 +1065,11 @@ function MyInformation() {
     <div className="bg-white">
       <div className="">
         {/* Debug info */}
-        {debugInfo && (
+        {/* {debugInfo && (
           <div className="mb-4 p-3 bg-white border border-blue-200 rounded-lg text-sm text-blue-700">
             <strong>Debug Info:</strong> {debugInfo}
           </div>
-        )}
+        )} */}
 
         {/* Sarlavha */}
         <div className="mb-8">

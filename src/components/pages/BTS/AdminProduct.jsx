@@ -405,16 +405,9 @@ function AdminProduct() {
               placeholder="Qidirish..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00BCE4]"
+              className="w-full pl-10 pr-4 py-2 border focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00BCE4]"
             />
           </div>
-
-          {/* <button
-            onClick={openAddModal}
-            className="flex items-center gap-2 bg-[#00BCE4] text-white px-5 py-2 rounded-lg hover:bg-[#0099c2] transition"
-          >
-            <Plus size={18} /> Yangi mahsulot
-          </button> */}
         </div>
       </div>
 

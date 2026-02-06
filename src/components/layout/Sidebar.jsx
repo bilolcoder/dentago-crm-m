@@ -229,7 +229,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white shadow-sm mt-[-50px] px-4 space-y-2 custom-scrollbar pb-1">
+                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-55px] px-4 space-y-2 custom-scrollbar pb-1">
                         {navItems.map((item, index) => renderNavItem(item, index))}
 
                         {/* <div
@@ -248,7 +248,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </div>
 
                 {/* Footer Section */}
-                <div className="px-6 py-1 bg-white border-t border-gray-200">
+                <div className="px-6 py-1 bg-white">
                     {/* Social Connect */}
                     <div className="flex justify-center mb-1 gap-4 h-8 items-end">
                         <div onClick={() => handleNavigation("https://t.me/Dentago_uz", true)} className="cursor-pointer text-[#00BCE4] hover:scale-110 transition-all">

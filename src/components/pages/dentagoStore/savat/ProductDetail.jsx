@@ -197,14 +197,14 @@ const ProductDetail = () => {
             <ArrowLeft size={26} className="text-gray-700" />
           </button>
 
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
               <Heart size={22} className="text-gray-700" />
             </button>
             <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
               <Share2 size={22} className="text-gray-700" />
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -11,6 +11,8 @@ import axios from "axios";
 
 import Chair from "../../../assets/chair.png";
 import Logo from "../../../assets/logo.png";
+import StoreBanner from "./components/StoreBanner";
+import StoreCategories from "./components/StoreCategories";
 
 // Custom ThLarge icon SVG - HAMMASI BIR XIL ICON
 const CategoryIcon = ({ className = "w-5 h-5", color = "#0891b2" }) => (
@@ -245,13 +247,13 @@ function Boshsaxifa() {
           // Mahsulot kategoriyasini tekshirish
           const productCat = product.categoryName?.toLowerCase() || product.category?.toLowerCase() || '';
           const catLabel = selectedCat.label.toLowerCase();
-          
+
           // Kategoriya label'i va subkategoriyalarni tekshirish
           const matchesMainCategory = productCat.includes(catLabel);
-          const matchesSubcategory = selectedCat.subcategories?.some(subcat => 
+          const matchesSubcategory = selectedCat.subcategories?.some(subcat =>
             productCat.includes(subcat.label.toLowerCase())
           );
-          
+
           return matchesMainCategory || matchesSubcategory;
         });
       }
@@ -264,7 +266,7 @@ function Boshsaxifa() {
         const productName = product.name?.toLowerCase() || '';
         const productCategory = product.categoryName?.toLowerCase() || product.category?.toLowerCase() || '';
         const productDesc = product.description?.toLowerCase() || '';
-        
+
         return (
           productName.includes(searchLower) ||
           productCategory.includes(searchLower) ||
@@ -367,7 +369,7 @@ function Boshsaxifa() {
 
       // Subkategoriya label'ini tekshirish
       const subcategoryLabel = subcategory.label.toLowerCase();
-      
+
       // Mahsulotlarni filterlash
       const filtered = products.filter(product => {
         const productCategory = (product.categoryName || product.category || '').toLowerCase();
@@ -430,7 +432,7 @@ function Boshsaxifa() {
         quantity: 1,
         price: priceNumber
       };
-      
+
       const response = await axios.post(`${BASE_URL}api/cart/add`, cartData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -468,9 +470,9 @@ function Boshsaxifa() {
 
   return (
     <div className="min-h-screen bg-white relative">
-      <div className=" mx-auto">
+      <div className="">
         {/* HEADER */}
-        <header className="sticky top-0 bg-white z-30 p-4">
+        <header className="sticky top-0 bg-white z-30">
           <div className="flex items-center gap-4">
             {/* Input qismi - Dropdown bilan */}
             <div className="flex-1 relative" ref={dropdownRef}>
@@ -571,46 +573,18 @@ function Boshsaxifa() {
         </header>
 
         {/* Hero Banner */}
-        <section className="px-4 md:px-8 py-6">
-          <div className="relative group">
-            <div className="overflow-hidden rounded-3xl shadow-lg">
-              <div className="flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-                {slides.map((slide, index) => (
-                  <div key={index} className="w-full flex-shrink-0">
-                    <div className="bg-gradient-to-r from-cyan-400 to-cyan-500 h-[300px] md:h-[450px] p-8 md:p-16 flex items-center relative">
-                      <div className="w-full md:w-1/2 z-10">
-                        <img src={Logo} className="w-52 transform max-sm:w-32 translate-x-[-12px]" alt="Logo" />
-                        <h2 className="text-2xl md:text-5xl text-white mb-4 leading-tight whitespace-pre-line font-bold">{slide.title}</h2>
-                        <p className="text-sm md:text-lg text-cyan-50 mb-8 max-w-md">{slide.description}</p>
-                      </div>
-                      <div className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 w-1/2 flex justify-end">
-                        <img src={Chair} alt="Dental Chair" className="h-48 md:h-[350px] object-contain drop-shadow-2xl" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button onClick={prevSlide} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100"><ArrowLeft className="text-white" /></button>
-            <button onClick={nextSlide} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 rotate-180"><ArrowLeft className="text-white" /></button>
-          </div>
-        </section>
- 
-        <section className="px-4 md:px-8 pb-12">
-          <div className="grid grid-cols-4 max-sm:grid-cols-2 gap-4 md:gap-8">
-            {categories.map(({ id, label, Icon, path }) => (
-              <Link key={id} to={path} onClick={() => setActiveTab(id)} className="flex flex-col items-center gap-4">
-                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex border-2 items-center justify-center transition-all ${activeTab === id ? 'bg-cyan-500 border-cyan-500 text-white shadow-lg' : 'bg-white border-cyan-500 text-cyan-500'}`}>
-                  <Icon className="text-3xl md:text-4xl" />
-                </div>
-                <span className={`text-sm md:text-lg font-semibold ${activeTab === id ? 'text-cyan-700' : 'text-gray-600'}`}>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
+
+        {/* Hero Banner */}
+        <StoreBanner slides={slides} />
+
+        {/* Categories */}
+
+        {/* Categories */}
+        <StoreCategories />
+
 
         {/* Title */}
-        <div className="flex items-center justify-between px-4 md:px-8 mb-6">
+        <div className="flex items-center justify-between mb-6">
           <h1 className="font-bold text-[22px] md:text-[25px]">Ommabop mahsulotlar</h1>
           <div onClick={openModal} className="px-6 py-2 font-medium text-[16px] bg-[#BDF3FF] rounded-[10px] cursor-pointer text-black hover:bg-[#a2e9f7] transition-colors">
             Barchasi ({filteredProducts.length})
@@ -637,7 +611,7 @@ function Boshsaxifa() {
 
         {/* Products */}
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-8 mt-6 pb-10">
+          <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 pb-10">
             {filteredProducts.slice(0, 20).map((product) => (
               <ProductCard
                 key={product.id}
@@ -812,7 +786,7 @@ function Boshsaxifa() {
                   <X size={24} />
                 </button>
               </div>
-              
+
               {/* Filter va saralash - Sticky */}
               {/* Desktop version */}
               <div className="hidden sm:block sticky top-[73px] md:top-[81px] z-10 bg-white px-4 md:px-6 py-4 border-b border-gray-100 shadow-sm">
@@ -820,7 +794,7 @@ function Boshsaxifa() {
                   <div className="flex flex-row gap-4">
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Kategoriya bo'yicha</label>
-                      <select 
+                      <select
                         className="w-full p-3 cursor-pointer bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500"
                         value={selectedFilterCategory}
                         onChange={(e) => setSelectedFilterCategory(e.target.value)}
@@ -831,7 +805,7 @@ function Boshsaxifa() {
                         ))}
                       </select>
                     </div>
-                   
+
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Qidirish</label>
                       <div className="relative">
@@ -853,7 +827,7 @@ function Boshsaxifa() {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="flex items-end">
                       <button
                         onClick={clearFilters}
@@ -863,7 +837,7 @@ function Boshsaxifa() {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Natija ko'rsatkichlari */}
                   {selectedFilterCategory && (
                     <div className="mt-4 flex items-center gap-2">
@@ -892,14 +866,14 @@ function Boshsaxifa() {
                     <Search size={20} />
                   </button>
                 </div>
-                
+
                 {/* Mobile filter dropdown */}
                 {isMobileSearchOpen && (
                   <div className="mt-3 p-4 bg-gray-50 rounded-2xl">
                     <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Kategoriya</label>
-                        <select 
+                        <select
                           className="w-full p-2.5 cursor-pointer bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 text-sm"
                           value={selectedFilterCategory}
                           onChange={(e) => setSelectedFilterCategory(e.target.value)}
@@ -910,7 +884,7 @@ function Boshsaxifa() {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Qidirish</label>
                         <div className="relative">
@@ -932,7 +906,7 @@ function Boshsaxifa() {
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-2 pt-1">
                         <button
                           onClick={() => {
@@ -954,7 +928,7 @@ function Boshsaxifa() {
                   </div>
                 )}
               </div>
-              
+
               <div className="p-4 md:p-6">
 
                 {/* Mahsulotlar */}
@@ -992,7 +966,7 @@ function Boshsaxifa() {
                     <div className="text-gray-400 text-6xl mb-4">🔍</div>
                     <h3 className="text-xl font-semibold text-gray-700 mb-2">Mahsulotlar topilmadi</h3>
                     <p className="text-gray-500 mb-6">
-                      {selectedFilterCategory || searchFilter 
+                      {selectedFilterCategory || searchFilter
                         ? "Tanlangan filterlar bo'yicha hech qanday mahsulot topilmadi"
                         : "Hozircha mahsulotlar mavjud emas"}
                     </p>
@@ -1024,11 +998,11 @@ function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
   return (
     <div
       onClick={() => navigate(`/mahsulot/${product.id}`)}
-      className="bg-white cursor-pointer rounded-[20px] p-3 md:rounded-[30px] md:p-4 shadow-sm border border-gray-100 flex flex-col relative group transition-all hover:shadow-xl hover:-translate-y-1 h-full"
+      className="cursor-pointer rounded-[20px] p-3 md:rounded-[30px] md:p-4 shadow-sm border border-gray-100 flex flex-col relative group transition-all hover:shadow-xl hover:-translate-y-1 h-full"
     >
-      <button className="absolute right-3 top-3 z-1 p-1 rounded-full bg-white/80 hover:bg-red-100 text-gray-500 hover:text-red-500 transition-all">
+      {/* <button className="absolute right-3 top-3 z-1 p-1 rounded-full bg-white/80 hover:bg-red-100 text-gray-500 hover:text-red-500 transition-all">
         <Heart size={20} />
-      </button>
+      </button> */}
       <div className="bg-gradient-to-br  rounded-[15px] md:rounded-[20px] overflow-hidden mb-3 md:mb-4 flex items-center justify-center h-32 md:h-48">
         <img
           src={product.img}
@@ -1054,13 +1028,12 @@ function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
         <button
           onClick={handleAddToCart}
           disabled={isLoading}
-          className={`w-full cursor-pointer py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${
-            isLoading
+          className={`w-full cursor-pointer py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${isLoading
               ? 'bg-gray-400'
-              : isInCart 
+              : isInCart
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg'
-                : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
-          }`}
+                : 'bg-[#00BCE4] hover:bg-[#00ACE4] text-white shadow-lg'
+            }`}
         >
           {isLoading ? (
             <>
