@@ -69,7 +69,7 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
     const getCurrentUser = () => {
         // Contextdan yoki LocalStorage dan ma'lumotlarni qidirish
         const userData = contextUser || JSON.parse(localStorage.getItem('userData') || 'null');
-        
+
         // ProfileContent dagi kabi role ni olish
         const rawRole = localStorage.getItem('userRole') || (userData && userData.role) || 'user';
 
@@ -203,17 +203,17 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
 
                 {/* Qo'llanma */}
                 <div
-                                            onClick={() => handleNavigation("/manual")}
-                                            className={`
+                    onClick={() => handleNavigation("/manual")}
+                    className={`
                                                 cursor-pointer flex items-center gap-2 w-[105px] m-auto mb-[20px] py-1 justify-center transition-all mt-4
                                                 ${location.pathname === '/manual'
-                                                    ? 'text-[#00BCE4] border-b-2'
-                                                    : 'text-slate-500  '}
+                            ? 'text-[#00BCE4] border-b-2'
+                            : 'text-slate-500  '}
                                             `}
-                                        >
-                                            <BookOpen size={15} />
-                                            <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
-                                        </div>
+                >
+                    <BookOpen size={15} />
+                    <span className="text-[11px] uppercase tracking-widest">{t('manual')}</span>
+                </div>
 
                 {/* Fullscreen */}
                 {/* <button
@@ -267,9 +267,6 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                             <span className="text-sm font-bold text-slate-900 leading-tight  ">
                                 {user.username}
                             </span>
-                            <span className="text-[10px] font-bold text-[#00BCE4] uppercase tracking-wider">
-                                {user.role}
-                            </span>
                         </div>
                         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
@@ -280,7 +277,6 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                             <div className="absolute right-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-2xl z-20 border border-blue-50 py-3">
                                 <div className="px-4 py-2 mb-2 border-b border-blue-50 lg:hidden">
                                     <p className="text-sm font-bold text-slate-900">{user.username}</p>
-                                    <p className="text-xs text-[#00BCE4] font-medium">{user.role}</p>
                                 </div>
 
                                 <button onClick={() => { navigate('/profile'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group cursor-pointer ">

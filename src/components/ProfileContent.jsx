@@ -40,7 +40,7 @@ const ProfileContent = () => {
       try {
         const response = await fetch('https://app.dentago.uz/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
-        }); 
+        });
 
         if (!response.ok) throw new Error('Maʼlumotlar olinmadi');
 
@@ -274,8 +274,8 @@ const ProfileContent = () => {
 
             <h2 className="mt-6 text-2xl font-bold text-gray-900">
               {user?.fullName || 'Foydalanuvchi'}
-            </h2> 
-            <p className="mt-2 text-lg text-[#00BCE4] font-semibold">                                                                                                             
+            </h2>
+            <p className="mt-2 text-lg text-[#00BCE4] font-semibold">
               {formData.gender === 'male' ? 'Erkak' : 'Ayol'}
             </p>
           </div>
@@ -328,16 +328,7 @@ const ProfileContent = () => {
               />
             </div>
 
-            {/* Role (Lavozim) - Read Only */}
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">Роль</label>
-              <input
-                type="text"
-                readOnly
-                value={formData.role || 'Foydalanuvchi'}
-                className="w-full px-5 py-4 bg-white border border-gray-100 rounded-2xl text-gray-900 font-medium cursor-not-allowed opacity-80"
-              />
-            </div>
+
 
             {/* Tug'ilgan sana */}
             <div>
