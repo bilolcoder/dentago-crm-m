@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 function AddMahsulot() {
   const [products, setProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -653,6 +652,12 @@ function AddMahsulot() {
                 className="flex items-center cursor-pointer gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"
               >
                 <Plus size={20} /> Yangi qo'shish
+              </button>
+              <button
+              onClick={() => navigate("/Categories")}
+                className="flex items-center cursor-pointer gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+              >
+                Kategoriyalar
               </button>
             </div>
           </div>
