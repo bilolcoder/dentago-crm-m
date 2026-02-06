@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useData } from '../../context/DataProvider';
 function AddMahsulot() {
   const [products, setProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -124,7 +125,7 @@ function AddMahsulot() {
 
   const BASE_URL = "https://app.dentago.uz";
   const TOKEN = localStorage.getItem('accessToken');
-  const userRole = localStorage.getItem('userRole');
+  const { user } = useData();
 
   useEffect(() => {
     fetchProducts();
@@ -654,7 +655,7 @@ function AddMahsulot() {
               >
                 <Plus size={20} /> Yangi qo'shish
               </button>
-              {userRole === 'admin' && (
+              {user?.role === 'admin' && (
                 <button
                   onClick={() => navigate("/Categories")}
                   className="flex items-center cursor-pointer gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-3 rounded-xl font-semibold transition-colors shadow-lg"

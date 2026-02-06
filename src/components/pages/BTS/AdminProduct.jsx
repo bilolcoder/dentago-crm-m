@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Package, Edit2, Trash2, Loader2, Plus, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
+import { useData } from '../../../context/DataProvider';
 
 function AdminProduct() {
+  const { user } = useData();
   const PRIMARY_COLOR = "#00BCE4";
   const BASE_URL = "https://app.dentago.uz";
 
@@ -12,7 +14,7 @@ function AdminProduct() {
   const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -169,36 +171,36 @@ function AdminProduct() {
 
   // Pagination functions
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  
+
   const nextPage = () => {
     if (currentPage < Math.ceil(filteredProducts.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
-  
+
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
-  
+
   // Qidiruv filtri
   const filteredProducts = products.filter(p =>
     (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.sku || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.category || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
+
   // Get current page products
   const getCurrentProducts = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     return filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
   };
-  
+
   // Pagination info
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  
+
   // Effect for search - reset to first page
   useEffect(() => {
     setCurrentPage(1);
@@ -386,6 +388,18 @@ function AdminProduct() {
     );
   }
 
+  // Agar admin bo'lmasa, hech narsa ko'rsatmaymiz (yoki ruxsat yo'qligini bildiramiz)
+  if (user?.role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Kirish cheklangan</h1>
+          <p className="text-gray-600">Bu sahifa faqat administratorlar uchun.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 bg-white min-h-screen">
       {/* Header + Search + Add button */}
@@ -485,15 +499,15 @@ function AdminProduct() {
           </tbody>
         </table>
       </div>
-      
+
       {/* Pagination */}
       {filteredProducts.length > itemsPerPage && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl">
           <div className="text-sm text-slate-600">
-            Jami: <span className="font-semibold">{filteredProducts.length}</span> ta mahsulot, 
+            Jami: <span className="font-semibold">{filteredProducts.length}</span> ta mahsulot,
             Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <button
               onClick={prevPage}
@@ -502,7 +516,7 @@ function AdminProduct() {
             >
               <ChevronLeft size={20} />
             </button>
-            
+
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 let pageNum;
@@ -515,23 +529,22 @@ function AdminProduct() {
                 } else {
                   pageNum = currentPage - 2 + i;
                 }
-                
+
                 return (
                   <button
                     key={pageNum}
                     onClick={() => paginate(pageNum)}
-                    className={`w-10 h-10 rounded-lg cursor-pointer ${
-                      currentPage === pageNum
+                    className={`w-10 h-10 rounded-lg cursor-pointer ${currentPage === pageNum
                         ? 'bg-[#00BCE4] text-white'
                         : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     {pageNum}
                   </button>
                 );
               })}
             </div>
-            
+
             <button
               onClick={nextPage}
               disabled={currentPage === totalPages}
@@ -574,7 +587,7 @@ function AdminProduct() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     required
                   />
@@ -586,7 +599,7 @@ function AdminProduct() {
                   <input
                     type="text"
                     value={formData.sku}
-                    onChange={e => setFormData({...formData, sku: e.target.value})}
+                    onChange={e => setFormData({ ...formData, sku: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     required
                   />
@@ -598,7 +611,7 @@ function AdminProduct() {
                   <input
                     type="number"
                     value={formData.price}
-                    onChange={e => setFormData({...formData, price: e.target.value})}
+                    onChange={e => setFormData({ ...formData, price: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     min="0"
                     required
@@ -611,7 +624,7 @@ function AdminProduct() {
                   <input
                     type="number"
                     value={formData.quantity}
-                    onChange={e => setFormData({...formData, quantity: e.target.value})}
+                    onChange={e => setFormData({ ...formData, quantity: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     min="0"
                   />
@@ -622,7 +635,7 @@ function AdminProduct() {
                   <label className="block text-sm font-medium mb-1">Kategoriya *</label>
                   <select
                     value={formData.category}
-                    onChange={e => setFormData({...formData, category: e.target.value})}
+                    onChange={e => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     required
                   >
@@ -638,7 +651,7 @@ function AdminProduct() {
                   <label className="block text-sm font-medium mb-1">Kod *</label>
                   <select
                     value={formData.code}
-                    onChange={e => setFormData({...formData, code: e.target.value})}
+                    onChange={e => setFormData({ ...formData, code: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     required
                   >
@@ -657,7 +670,7 @@ function AdminProduct() {
                   <input
                     type="text"
                     value={formData.package_code}
-                    onChange={e => setFormData({...formData, package_code: e.target.value})}
+                    onChange={e => setFormData({ ...formData, package_code: e.target.value })}
                     className="w-full px-4 py-2 border rounded-lg"
                     required
                   />
@@ -701,7 +714,7 @@ function AdminProduct() {
                   <label className="block text-sm font-medium mb-1">Tavsif</label>
                   <textarea
                     value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    onChange={e => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
                     className="w-full px-4 py-2 border rounded-lg"
                   />
