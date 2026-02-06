@@ -234,7 +234,7 @@ function AllCategories() {
 
         {/* Pagination - mahsulotlar sahifasidagi kabi */}
         {totalPages > 1 && (
-          <div className="px-5 py-4 border-t bg-white flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+          <div className="px-5 py-4  bg-white flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
             {/* Chap taraf */}
             <div className="text-center sm:text-left">
               Jami <span className="font-semibold text-gray-800">{categories.length}</span> ta kategoriya, 
@@ -357,7 +357,7 @@ function AllCategories() {
               </div>
             </div>
 
-            <div className="p-5 border-t flex justify-end gap-3">
+            <div className="p-5  flex justify-end gap-3">
               <button
                 onClick={() => setModalOpen(false)}
                 className="px-5 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer"
