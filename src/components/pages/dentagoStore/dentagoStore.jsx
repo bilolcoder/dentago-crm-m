@@ -774,7 +774,7 @@ function Boshsaxifa() {
                   <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-xl">
                     <ArrowLeft size={28} />
                   </button>
-                  <h2 className="text-2xl font-bold text-gray-800">Barcha Mahsulotlar ({filteredProducts.length})</h2>
+                  <h2 className="text-2xl font-bold text-gray-800">Barcha Mahsulotlar </h2>
                 </div>
                 <button
                   onClick={() => {

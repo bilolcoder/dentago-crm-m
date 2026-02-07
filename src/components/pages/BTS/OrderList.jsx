@@ -326,7 +326,7 @@ function Aperator() {
                     <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">{order.soni} ta</span>
                   </td>
                   <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
-                    {order.totalNarx.toLocaleString()} so'm
+                    {order.totalNarx.toLocaleString()} so'm+
                   </td>
 
                   {/* Amallar Ustuni */}

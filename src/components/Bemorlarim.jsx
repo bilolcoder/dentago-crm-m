@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { TiTick } from "react-icons/ti";
 import { CiViewTable } from "react-icons/ci";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function Bemorlarim() {
   const [appointments, setAppointments] = useState([]);
@@ -29,6 +30,10 @@ function Bemorlarim() {
   const [confirmId, setConfirmId] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
@@ -40,6 +45,21 @@ function Bemorlarim() {
     if (statusFilter === 'all') return true;
     return app.status?.toLowerCase() === statusFilter;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredAppointments.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedAppointments = filteredAppointments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // Sahifa o'zgarganda yuqoriga chiqish
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  // Filter o'zgarganda 1-sahifaga qaytish
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
 
   const fetchAppointments = async () => {
     try {
@@ -53,7 +73,7 @@ function Bemorlarim() {
       }
 
       const response = await axios.get(
-        'https://app.dentago.uz/api/admin/appointments',
+        'https://app.dentago.uz/api/admin/appointments?limit=1000000',
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -286,7 +306,7 @@ function Bemorlarim() {
     setConfirmId(id);
     setIsConfirmModalOpen(true);
   };
-  
+
   // Tasdiqlash so'rovini yuborish
   const confirmAppointment = async () => {
     try {
@@ -296,7 +316,7 @@ function Bemorlarim() {
         alert("Token topilmadi. Iltimos qayta kirish qiling.");
         return;
       }
-  
+
       const response = await axios.put(
         `https://app.dentago.uz/api/admin/appointments/${confirmId}/status`,
         { status: "confirmed" },
@@ -308,7 +328,7 @@ function Bemorlarim() {
           timeout: 5000,
         }
       );
-  
+
       if (response.data?.success || response.status === 200) {
         // Ro'yxatni yangilash
         setAppointments(prev =>
@@ -316,12 +336,12 @@ function Bemorlarim() {
             app._id === confirmId ? { ...app, status: 'confirmed' } : app
           )
         );
-  
+
         // Agar modalda bo'lsa, uni ham yangilash
         if (selectedAppointment && selectedAppointment._id === confirmId) {
           setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
         }
-  
+
         setIsConfirmModalOpen(false);
         setConfirmId(null);
       } else {
@@ -342,7 +362,7 @@ function Bemorlarim() {
       setIsConfirming(false);
     }
   };
-  
+
   const closeConfirmModal = () => {
     setIsConfirmModalOpen(false);
     setConfirmId(null);
@@ -401,8 +421,8 @@ function Bemorlarim() {
               <button
                 onClick={() => setViewMode('card')}
                 className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'card'
-                    ? 'bg-white text-[#00BCE4] shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white text-[#00BCE4] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -414,8 +434,8 @@ function Bemorlarim() {
               <button
                 onClick={() => setViewMode('table')}
                 className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'table'
-                    ? 'bg-white text-[#00BCE4] shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white text-[#00BCE4] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 <CiViewTable />
@@ -436,48 +456,48 @@ function Bemorlarim() {
           </div>
         </div>
 
-          {/* Status filter tugmalari */}
-      <div className="flex mt-8 bg-gray-100 p-1 rounded-xl border border-gray-200 lg:w-[473px] md:w-[473px] sm:w-[398px] max-sm:w-[315px]">
-        <button
-          onClick={() => setStatusFilter('all')}
-          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
+        {/* Status filter tugmalari */}
+        <div className="flex mt-8 bg-gray-100 p-1 rounded-xl border border-gray-200 lg:w-[473px] md:w-[473px] sm:w-[398px] max-sm:w-[315px]">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
               ? 'bg-white text-[#00BCE4] shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
-            }`}
-        >
-          <span>Barchasi</span>
-        </button>
+              }`}
+          >
+            <span>Barchasi</span>
+          </button>
 
-        <button
-          onClick={() => setStatusFilter('pending')}
-          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
+          <button
+            onClick={() => setStatusFilter('pending')}
+            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
               ? 'bg-white text-yellow-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
-            }`}
-        >
-          <span>Kutilmoqda</span>
-        </button>
+              }`}
+          >
+            <span>Kutilmoqda</span>
+          </button>
 
-        <button
-          onClick={() => setStatusFilter('confirmed')}
-          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
+          <button
+            onClick={() => setStatusFilter('confirmed')}
+            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
               ? 'bg-white text-blue-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
-            }`}
-        >
-          <span>Yakunlangan</span>
-        </button>
+              }`}
+          >
+            <span>Yakunlangan</span>
+          </button>
 
-        <button
-          onClick={() => setStatusFilter('cancelled')}
-          className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
+          <button
+            onClick={() => setStatusFilter('cancelled')}
+            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
               ? 'bg-white text-red-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
-            }`}
-        >
-          <span>Bekor qilingan</span>
-        </button>
-      </div>
+              }`}
+          >
+            <span>Bekor qilingan</span>
+          </button>
+        </div>
 
       </div>
 
@@ -494,7 +514,8 @@ function Bemorlarim() {
       ) : viewMode === 'card' ? (
         // CARD VIEW
         <div className="grid grid-cols-2 md:grid-cols-1 max-[725px]:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredAppointments.map((appointment) => (
+
+          {paginatedAppointments.map((appointment) => (
             <div
               key={appointment._id}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 group"
@@ -573,6 +594,16 @@ function Bemorlarim() {
                     </button>
                   )}
 
+                  <button
+                    onClick={() => handleDelete(appointment._id)}
+                    className="bg-red-50 hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                    title="O'chirish"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+
                 </div>
               </div>
             </div>
@@ -606,7 +637,7 @@ function Bemorlarim() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
-                {appointments.map((appointment) => (
+                {paginatedAppointments.map((appointment) => (
                   <tr key={appointment._id} className="hover:bg-gray-50 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -662,6 +693,16 @@ function Bemorlarim() {
                           </button>
                         )}
 
+                        {/* <button
+                          onClick={() => handleDelete(appointment._id)}
+                          className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-all duration-300"
+                          title="O'chirish"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button> */}
+
                         {appointment.status === 'pending' && (
                           <button
                             onClick={() => handleConfirm(appointment._id)}
@@ -677,6 +718,60 @@ function Bemorlarim() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-8 p-4">
+          <div className="text-sm text-gray-600">
+            Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let pageNum;
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${currentPage === pageNum
+                    ? 'bg-[#00BCE4] text-white shadow-md'
+                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
         </div>
       )}
@@ -780,6 +875,16 @@ function Bemorlarim() {
                         Bekor qilish
                       </button>
                     )}
+
+                    <button
+                      onClick={() => handleDelete(selectedAppointment._id)}
+                      className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      O'chirish
+                    </button>
                   </div>
                 </div>
               ) : null}
