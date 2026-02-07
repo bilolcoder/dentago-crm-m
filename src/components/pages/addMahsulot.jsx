@@ -720,7 +720,7 @@ function AddMahsulot() {
                       <tr key={product._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden border flex-shrink-0">
+                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden  flex-shrink-0">
                               {product.imageUrl?.[0] ? (
                                 <img
                                   src={`${BASE_URL}/images/${product.imageUrl[0]}`}
