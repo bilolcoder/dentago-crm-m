@@ -762,7 +762,7 @@ function Boshsaxifa() {
           </div>
         )}
 
-        {/* Modal - Barcha mahsulotlar */}
+        {/* Modal xolos - Barcha mahsulotlar */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-start justify-center p-0 md:p-4 overflow-y-auto">
             <div
