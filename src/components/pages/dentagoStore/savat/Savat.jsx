@@ -258,28 +258,34 @@ const Savat = () => {
   };
 
   const jamiSumma = apiCartItems.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
+  // jamiTovarlar faqat bir marta yuqorida e'lon qilinadi
+
+  // Umumiy mahsulotlar sonini hisoblash
   const jamiTovarlar = apiCartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const handlePurchase = async (purchaseData) => {
     try {
       // Here you would send the purchase data to your API
       console.log('Purchase data:', purchaseData);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // To'lov usuli nomini o'zbekchaga tarjima qilish
       const paymentMethodNames = {
         'humo': 'Humo',
         'uzcard': 'UzCard',
-        'visa': 'Visa'
+        'visa': 'Visa',
+        'payme': 'Payme',
+        'click': 'Click',
+        'rahmat': 'Rahmat'
       };
-      
+
       // alert(`Buyurtma muvaffaqiyatli jo'natildi!\n\nIsm: ${purchaseData.firstName} ${purchaseData.lastName}\nManzil: ${purchaseData.address}\nTo'lov usuli: ${paymentMethodNames[purchaseData.paymentMethod] || purchaseData.paymentMethod}\nJami summa: ${purchaseData.totalAmount.toLocaleString()} so'm`);
-      
+
       // Clear cart after successful purchase
       await handleClearCart();
-      
+
     } catch (error) {
       console.error('Purchase error:', error);
       alert('Xato yuz berdi. Iltimos, qayta urinib ko\'ring.');
@@ -369,7 +375,7 @@ const Savat = () => {
             </button>
 
             <div
-              className="w-20 h-20 mr-4 bg-gray-50 rounded-lg overflow-hidden cursor-pointer flex-shrink-0"
+              className="w-20 h-20 mr-4 bg-gray-50 rounded-lg overflow-hidden cursor-pointer shrink-0"
               onClick={() => navigate(`/mahsulot/${item.product_id}`)}
             >
               <img src={item.image} alt={item.nomi} className="w-full h-full object-contain p-1" loading="lazy" />
@@ -426,27 +432,28 @@ const Savat = () => {
               <span className="font-bold text-2xl text-gray-600"> {jamiSumma.toLocaleString()} so'm</span>
             </div>
           </div>
-        <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center">
 
-          <button
-            onClick={() => setIsPurchaseModalOpen(true)}
-            className="py-2 px-16 cursor-pointer bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
-            disabled={clearing}
+            <button
+              onClick={() => setIsPurchaseModalOpen(true)}
+              className="py-2 px-16 cursor-pointer bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+              disabled={clearing}
             >
-            {clearing ? 'Kutilmoqda...' : `Sotib olish`}
-          </button>
-            </div>
+              {clearing ? 'Kutilmoqda...' : `Sotib olish`}
+            </button>
+          </div>
 
         </div>
 
       </div>
-      
+
       {/* Purchase Modal */}
       <PurchaseModal
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}
         totalAmount={jamiSumma}
         items={apiCartItems}
+        itemsCount={jamiTovarlar}
         onConfirm={handlePurchase}
       />
     </div>

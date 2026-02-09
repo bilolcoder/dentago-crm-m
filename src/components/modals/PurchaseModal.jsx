@@ -8,7 +8,7 @@ import PaymeSvg from '../../assets/payme.png';
 import ClickSvg from '../../assets/click.png';
 import RahmatSvg from '../../assets/rahmat.png';
 
-const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
+const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConfirm }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -38,11 +38,11 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.firstName.trim()) newErrors.firstName = "Ism kiriting";
     if (!formData.lastName.trim()) newErrors.lastName = "Familiya kiriting";
     if (!formData.address.trim()) newErrors.address = "Manzil kiriting";
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -106,13 +106,13 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // To'lov usuliga mos saytga yo'naltirish
       const paymentUrls = {
@@ -120,7 +120,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
         'click': 'https://click.uz/',
         'rahmat': 'https://rhmt.uz/'
       };
-      
+
       const paymentUrl = paymentUrls[formData.paymentMethod];
       if (paymentUrl) {
         // Foydalanuvchiga xabar berish
@@ -131,12 +131,12 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
         // Agar to'lov tizimi uchun manzil mavjud bo'lmasa, xabar berish
         alert(`${formData.paymentMethod.toUpperCase()} to'lov tizimi hozircha mavjud emas. Boshqa usulni tanlang.`);
       }
-      
+
       // Bu yerda siz hali ham API ga ma'lumotlarni yuborishingiz mumkin
       await onConfirm({
         ...formData,
         totalAmount,
-        itemsCount: items.length,
+        itemsCount: itemsCount,
         paymentMethod: formData.paymentMethod,
         items: items.map(item => ({
           id: item.id,
@@ -145,7 +145,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
           price: item.narxi
         }))
       });
-      
+
       // Formani tozalash va yopish
       setFormData({
         firstName: '',
@@ -166,7 +166,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
 
   if (showLocationPermission) {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
           <div className="flex flex-col items-center text-center mb-6">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -207,7 +207,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
             <button
               onClick={getCurrentLocation}
               disabled={isGettingLocation}
-              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-linear-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50"
             >
               {isGettingLocation ? (
                 <div className="flex items-center justify-center gap-2">
@@ -256,9 +256,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${
-                  errors.firstName ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${errors.firstName ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="Ali"
               />
               {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
@@ -270,9 +269,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${
-                  errors.lastName ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="Valiyev"
               />
               {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
@@ -282,13 +280,11 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
           {/* Manzil */}
           <div>
             {locationStatus !== 'pending' && (
-              <div className={`flex items-center justify-between p-3 rounded-xl mb-4 border ${
-                locationStatus === 'granted' ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'
-              }`}>
+              <div className={`flex items-center justify-between p-3 rounded-xl mb-4 border ${locationStatus === 'granted' ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'
+                }`}>
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    locationStatus === 'granted' ? 'bg-green-100' : 'bg-gray-200'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${locationStatus === 'granted' ? 'bg-green-100' : 'bg-gray-200'
+                    }`}>
                     <MapPin className={`w-4 cursor-pointer h-4 ${locationStatus === 'granted' ? 'text-green-600' : 'text-gray-500'}`} />
                   </div>
                   <div>
@@ -324,9 +320,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
                 value={formData.address}
                 onChange={handleChange}
                 rows={3}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none resize-none pr-12 ${
-                  errors.address ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none resize-none pr-12 ${errors.address ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 placeholder="Manzilingizni kiriting yoki GPS orqali aniqlang"
               />
               <button
@@ -354,7 +349,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Mahsulotlar soni:</span>
-                <span className="font-medium">{items.length} ta</span>
+                <span className="font-medium">{itemsCount} dona</span>
               </div>
               <div className="flex justify-between text-lg">
                 <span className="text-gray-700 font-medium">Umumiy:</span>
@@ -383,23 +378,22 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
 
           {/* Payment Method Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
               <CreditCard className="w-5 h-5" /> To'lov usuli
             </label>
             <div className="grid grid-cols-3 gap-4">
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'payme' }))}
-                className={`p-4 rounded-2xl cursor-pointer border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
-                  formData.paymentMethod === 'payme'
+                className={`p-4 rounded-2xl cursor-pointer border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'payme'
                     ? 'border-[#05CBCA] bg-green-50/70 scale-[1.03]'
                     : 'border-gray-200 hover:border-gray-300'
-                }`}
+                  }`}
               >
-                <img 
-                  src={PaymeSvg} 
-                  alt="Payme" 
-                  className="w-14 cursor-pointer h-10 object-contain rounded-md drop-shadow-sm" 
+                <img
+                  src={PaymeSvg}
+                  alt="Payme"
+                  className="w-14 cursor-pointer h-10 object-contain rounded-md drop-shadow-sm"
                 />
                 <span className="text-sm font-medium text-gray-800">Payme</span>
               </button>
@@ -407,16 +401,15 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'click' }))}
-                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
-                  formData.paymentMethod === 'click'
+                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'click'
                     ? 'border-[#0868FC] bg-blue-50/70 scale-[1.03]'
                     : 'border-gray-200 hover:border-gray-300'
-                }`}
+                  }`}
               >
-                <img 
-                  src={ClickSvg} 
-                  alt="Click" 
-                  className="w-14  h-10 object-contain rounded-md drop-shadow-sm" 
+                <img
+                  src={ClickSvg}
+                  alt="Click"
+                  className="w-14  h-10 object-contain rounded-md drop-shadow-sm"
                 />
                 <span className="text-sm font-medium text-gray-800">Click</span>
               </button>
@@ -424,16 +417,15 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, onConfirm }) => {
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'rahmat' }))}
-                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${
-                  formData.paymentMethod === 'rahmat'
+                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'rahmat'
                     ? 'border-[#FF4B34] bg-red-50/70 scale-[1.03]'
                     : 'border-gray-200 hover:border-gray-300'
-                }`}
+                  }`}
               >
-                <img 
-                  src={RahmatSvg} 
-                  alt="Rahmat" 
-                  className="w-14 h-10 object-contain rounded-md drop-shadow-sm" 
+                <img
+                  src={RahmatSvg}
+                  alt="Rahmat"
+                  className="w-14 h-10 object-contain rounded-md drop-shadow-sm"
                 />
                 <span className="text-sm font-medium text-gray-800">Rahmat</span>
               </button>

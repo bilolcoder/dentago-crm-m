@@ -279,7 +279,7 @@ const ProductDetail = () => {
               ? 'bg-gray-400'
               : isInCart 
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg'
-                : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg'
+                : 'bg-[#00BCE4] text-white shadow-lg'
           }`}
         >
           {isLoading ? (
