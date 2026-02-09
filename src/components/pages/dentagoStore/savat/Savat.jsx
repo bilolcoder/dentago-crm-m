@@ -281,8 +281,6 @@ const Savat = () => {
         'rahmat': 'Rahmat'
       };
 
-      // alert(`Buyurtma muvaffaqiyatli jo'natildi!\n\nIsm: ${purchaseData.firstName} ${purchaseData.lastName}\nManzil: ${purchaseData.address}\nTo'lov usuli: ${paymentMethodNames[purchaseData.paymentMethod] || purchaseData.paymentMethod}\nJami summa: ${purchaseData.totalAmount.toLocaleString()} so'm`);
-
       // Clear cart after successful purchase
       await handleClearCart();
 
