@@ -346,6 +346,7 @@ function MyInformation() {
   const [selectedSpecialties, setSelectedSpecialties] = useState([]);
   const [location, setLocation] = useState({ lat: '', lng: '' });
   const [showMapModal, setShowMapModal] = useState(false);
+  const [isMapLoading, setIsMapLoading] = useState(false); // Yangi state - xarita yuklanmoqda
 
   // Yangi state'lar - viloyat va tuman uchun
   const [selectedRegion, setSelectedRegion] = useState('');
@@ -540,7 +541,7 @@ function MyInformation() {
       );
       setSelectedCity(cityData ? cityData.value : formValues.city);
     }
-    
+
     // Joylashuv ma'lumotlarini o'rnatish (agar mavjud bo'lsa)
     if (doctor.clinic?.location) {
       setLocation({
@@ -604,6 +605,7 @@ function MyInformation() {
   });
 
   const openMapSelector = () => {
+    setIsMapLoading(true);
     // Foydalanuvchi joriy joylashuvini aniqlash
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -611,11 +613,13 @@ function MyInformation() {
           const { latitude, longitude } = position.coords;
           setLocation({ lat: latitude.toString(), lng: longitude.toString() });
           alert(`Joriy joylashuvingiz aniqlandi: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+          setIsMapLoading(false);
         },
         (error) => {
           console.error('Geolokatsiya xatosi:', error);
           // Agar foydalanuvchi ruxsat bermasa yoki aniqlash imkonsiz bo'lsa, standart joylashuvni qo'shamiz
           alert('Joylashuvni aniqlashda xatolik yuz berdi. Iltimos, koordinatalarni qo\'lda kiriting.');
+          setIsMapLoading(false);
         },
         {
           enableHighAccuracy: true,
@@ -625,6 +629,7 @@ function MyInformation() {
       );
     } else {
       alert('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi. Iltimos, koordinatalarni qo\'lda kiriting.');
+      setIsMapLoading(false);
     }
   };
 
@@ -745,9 +750,9 @@ function MyInformation() {
         clinic: {
           name: data.clinicName?.trim() || 'Noma\'lum Klinika',
           address: data.clinicAddress?.trim() || 'Manzil kiritilmagan',
-          location: { 
-            lat: location.lat ? parseFloat(location.lat) : 41.3111, 
-            lng: location.lng ? parseFloat(location.lng) : 69.2797 
+          location: {
+            lat: location.lat ? parseFloat(location.lat) : 41.3111,
+            lng: location.lng ? parseFloat(location.lng) : 69.2797
           },
           distanceKm: 2.5
         },
@@ -1200,56 +1205,55 @@ function MyInformation() {
                   <div className="text-sm text-gray-600">
                     Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
 
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`w-10 h-10 rounded-lg cursor-pointer ${
-                          currentPage === pageNum
-                            ? 'bg-[#00BCE4] text-white'
-                            : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
-                        } transition-colors`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
 
-                  {/* {totalPages > 5 && (
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-10 h-10 rounded-lg cursor-pointer ${currentPage === pageNum
+                              ? 'bg-[#00BCE4] text-white'
+                              : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                            } transition-colors`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+
+                    {/* {totalPages > 5 && (
                     <span className="px-2 text-gray-500">...</span>
                   )} */}
 
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
                 </div>
-              </div>
               )}
             </>
           )}
@@ -1470,8 +1474,8 @@ function MyInformation() {
                         {selectedSpecialties.map((specialty, index) => (
                           <div key={index} className="bg-[#00BCE4] text-white px-3 py-1 rounded-lg flex items-center gap-1">
                             <span>{specialty}</span>
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={() => {
                                 const updatedSpecialties = selectedSpecialties.filter((_, i) => i !== index);
                                 setSelectedSpecialties(updatedSpecialties);
@@ -1525,7 +1529,7 @@ function MyInformation() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Joylashuvni belgilash
                   </label>
-                  
+
                   <div className="flex gap-2">
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1534,7 +1538,7 @@ function MyInformation() {
                       <input
                         type="text"
                         value={location.lat || ''}
-                        onChange={(e) => setLocation({...location, lat: e.target.value})}
+                        onChange={(e) => setLocation({ ...location, lat: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
                         placeholder="41.3111"
                       />
@@ -1546,22 +1550,34 @@ function MyInformation() {
                       <input
                         type="text"
                         value={location.lng || ''}
-                        onChange={(e) => setLocation({...location, lng: e.target.value})}
+                        onChange={(e) => setLocation({ ...location, lng: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
                         placeholder="69.2797"
                       />
                     </div>
                     <div className="flex items-end">
+
+                      {/* openMapSelector button  */}
                       <button
                         type="button"
                         onClick={openMapSelector}
-                        className="h-12 px-4 bg-blue-100 hover:bg-blue-200 rounded-xl border border-blue-300 text-blue-700 font-medium transition-colors ml-2"
+                        className="h-12 px-4 bg-blue-100 hover:bg-blue-200 rounded-xl border border-blue-300 text-blue-700 font-medium transition-colors ml-2 flex items-center justify-center"
+                        disabled={isMapLoading}
                       >
-                        <MapPin className="w-5 h-5" />
+                        {isMapLoading ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                            </svg>
+                          </span>
+                        ) : (
+                          <MapPin className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                   </div>
-                  
+
                   {location.lat && location.lng && (
                     <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">

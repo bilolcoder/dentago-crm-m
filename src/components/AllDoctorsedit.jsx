@@ -6,7 +6,6 @@ import {
   UserCircle, BriefcaseMedical, Calendar, Building, Clock, DollarSign,
   Save, Eye, Trash2, Plus, Globe
 } from 'lucide-react';
-
 const uzbekistanCities = [
   // =========================
   // QORAQALPOG'ISTON
@@ -291,7 +290,6 @@ const uzbekistanCities = [
     region: "Xorazm viloyati"
   }
 ];
-
 const specialties = [
   'Terapevt', 'Ortoped', 'Ayol shifokor', 'Bolalar stomatologi', 'Хирург',
   'Ортодонт', 'Пародонтолог', 'Имплантолог', 'Гигиенист', 'Эндодонт',
@@ -303,12 +301,14 @@ function AllDoctorsEdit() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const [selectedRegion, setSelectedRegion] = useState('');
@@ -389,7 +389,37 @@ function AllDoctorsEdit() {
       workTimeEnd: doctor.workTime?.end || '18:00',
     });
 
-    setShowModal(true);
+    setShowEditModal(true);
+  };
+
+  const handleDeleteClick = (doctor) => {
+    setSelectedDoctor(doctor);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedDoctor?._id) return;
+    setDeleting(true);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      await axios.delete(
+        `https://app.dentago.uz/api/admin/doctors/${selectedDoctor._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setDoctors(prev => prev.filter(d => d._id !== selectedDoctor._id));
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error('O‘chirish xatosi:', err);
+      alert('❌ O‘chirishda xato: ' + (err.response?.data?.message || err.message || 'Noma\'lum xato'));
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -469,14 +499,13 @@ function AllDoctorsEdit() {
         }
       );
 
-      // Ro'yxatni yangilash
       setDoctors(prev =>
         prev.map(d =>
           d._id === selectedDoctor._id ? { ...d, ...payload, clinic: { ...d.clinic, ...payload.clinic } } : d
         )
       );
 
-      setShowModal(false);
+      setShowEditModal(false);
       alert('✅ Ma\'lumotlar muvaffaqiyatli yangilandi!');
     } catch (err) {
       console.error('Yangilash xatosi:', err);
@@ -486,7 +515,6 @@ function AllDoctorsEdit() {
     }
   };
 
-  // Qidiruv bo'yicha filtr
   const filteredDoctors = doctors.filter(doctor => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -573,7 +601,7 @@ function AllDoctorsEdit() {
               <tbody className="divide-y divide-gray-100">
                 {filteredDoctors.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-gray-600">
+                    <td colSpan={7} className="py-12 text-center text-gray-600">
                       Shifokor topilmadi yoki qidiruv bo'yicha natija yo'q
                     </td>
                   </tr>
@@ -613,19 +641,26 @@ function AllDoctorsEdit() {
                           {doctor.phone || '-'}
                         </a>
                       </td>
-
                       <td className="py-4 px-6">
                         <span className={`px-3 py-1 rounded-full text-sm ${doctor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                           {doctor.isActive ? 'Faol' : 'Faol emas'}
                         </span>
                       </td>
-                      <td className="py-4 px-6">
+                      <td className="py-6 px-6 flex items-center gap-3">
                         <button
                           onClick={() => handleEdit(doctor)}
-                          className="cursor-pointer text-white px-4 py-2 rounded-lg hover:opacity-90 flex items-center gap-2"
-                          style={{ backgroundColor: '#00BCE4' }}
+                          className="p-2 rounded-lg hover:bg-cyan-100 transition cursor-pointer text-cyan-600"
+                          title="Tahrirlash"
                         >
-                          <Edit size={16} /> Tahrirlash
+                          <Edit size={20} />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteClick(doctor)}
+                          className="p-2 rounded-lg hover:bg-red-100 transition cursor-pointer text-red-600"
+                          title="O'chirish"
+                        >
+                          <Trash2 size={20} />
                         </button>
                       </td>
                     </tr>
@@ -637,13 +672,13 @@ function AllDoctorsEdit() {
         </div>
       </div>
 
-      {/* Tahrirlash Modal */}
-      {showModal && selectedDoctor && (
+      {/* Tahrirlash Modal — o'zgarmagan */}
+      {showEditModal && selectedDoctor && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl border border-cyan-200">
             <div className="sticky top-0 bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 border-b border-cyan-300 flex justify-between items-center z-10">
               <h2 className="text-2xl font-bold text-white">Shifokorni Tahrirlash</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/20 rounded cursor-pointer transition">
+              <button onClick={() => setShowEditModal(false)} className="p-2 hover:bg-white/20 rounded cursor-pointer transition">
                 <X size={24} className="text-white" />
               </button>
             </div>
@@ -836,6 +871,46 @@ function AllDoctorsEdit() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Yangi: O'chirish tasdiqlash modal */}
+      {showDeleteModal && selectedDoctor && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-red-100">
+            <div className="bg-red-50 p-6 border-b border-red-100 flex items-center gap-3">
+              <AlertCircle className="text-red-600" size={28} />
+              <h3 className="text-xl font-bold text-red-800">O‘chirishni tasdiqlang</h3>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-2">
+                Haqiqatan ham quyidagi shifokorni o‘chirmoqchimisiz?
+              </p>
+              <p className="font-semibold text-gray-900 mb-6">
+                {selectedDoctor.fullName || 'Noma\'lum shifokor'}
+              </p>
+
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer disabled:opacity-50"
+                >
+                  Bekor qilish
+                </button>
+
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {deleting && <Loader2 className="animate-spin" size={18} />}
+                  O‘chirish
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
