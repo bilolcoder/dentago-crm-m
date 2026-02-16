@@ -16,6 +16,7 @@ import SmsTemplatesContent from './components/SmsTemplatesContent';
 import SmsSettingsContent from './components/SmsSettingsContent';
 import GeneralSettingsContent from './components/GeneralSettingsContent';
 import ManualContent from './components/ManualContent';
+import UstlarBuyurtmasi from './components/pages/UstlarBuyurtmasi';
 
 // Storage
 import DocumentsContent from './components/storage/DocumentsContent';
@@ -195,6 +196,7 @@ const ProtectedLayout = () => {
               <Route path="/payments/tariffs" element={<TariffsContent />} />
               <Route path="/my-information" element={<MyInformation />} />
               <Route path="/bemorlarim" element={<Bemorlarim />} />
+              <Route path="/UstlarBuyurtmasi" element={<UstlarBuyurtmasi />} />
 
               {/* Dentago Store qo'shimcha sahifalar */}
               <Route path="/elonlar" element={<Elonlar />} />

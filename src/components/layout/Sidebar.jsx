@@ -62,74 +62,83 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }, [location.pathname]);
 
     const navItems = [
-        { icon: Home, label: "Dentago", route: "/DentagoStore", type: "link" },
-        { icon: IoIosStats, label: t('main'), route: "/dashboard", type: "link" },
+        { icon: Home,       label: "Dentago",              route: "/DentagoStore",     type: "link" },
+        { icon: IoIosStats, label: t('main'),              route: "/dashboard",        type: "link" },
         { icon: HiOutlineInformationCircle, label: t('my_information'), route: "/my-information", type: "link" },
-        { icon: Users, label: t('bemorlarim'), route: "/bemorlarim", type: "link" },
-        { icon: ListOrdered, label: t('orders_bts'), route: "/orders", type: "link" },
-        { icon: User, label: t('my_results'), route: "/result", type: "link" },
-        { icon: PlusCircle, label: "Mahsulot qo'shish", route: "/addproduct", type: "link" },
-        { icon: Package, label: "Admin Product", route: "/admin-product", type: "link" },
-        { icon: Package, label: "All Doctors Edit", route: "/AllDoctorsEdit", type: "link" },
+        { icon: Users,      label: t('bemorlarim'),        route: "/bemorlarim",       type: "link" },
+        { icon: ListOrdered,label: t('orders_bts'),        route: "/orders",           type: "link" },
+        { icon: User,       label: t('my_results'),        route: "/result",           type: "link" },
+        { icon: PlusCircle, label: "Mahsulot qo'shish",    route: "/addproduct",       type: "link" },
+        { icon: Package,    label: "Admin Product",        route: "/admin-product",    type: "link" },
+        { icon: Package,    label: "All Doctors Edit",     route: "/AllDoctorsEdit",   type: "link" },
+        
+        // Yangi qo'shilgan — faqat admin ko'radi
+        { icon: ListOrdered, label: "Ustalar buyurtmalari", route: "/UstlarBuyurtmasi", type: "link" },
 
-        // {
-        //     icon: Archive,
-        //     label: t('warehouse'),
-        //     route: "/storage",
-        //     type: "group",
-        //     name: "ombor",
-        //     subItems: [
-        //         { label: t('documents'), route: "/storage/documents" },
-        //         { label: t('product_usage'), route: "/storage/usage" },
-        //         { label: t('products'), route: "/storage/products" },
-        //         { label: t('categories'), route: "/storage/categories" },
-        //         { label: t('brands'), route: "/storage/brands" },
-        //         { label: t('units'), route: "/storage/units" },
-        //         { label: t('suppliers'), route: "/storage/suppliers" },
-        //     ]
-        // },
-        // {
-        //     icon: FileText,
-        //     label: t('reports'),
-        //     route: "/hisobot",
-        //     type: "group",
-        //     name: "hisobot",
-        //     subItems: [
-        //         { label: t('payments'), route: "/hisobot/to'lovlar" },
-        //         { label: t('lead_statistics'), route: "/hisobot/lead-statistika" },
-        //         { label: t('daily_expenses'), route: "/hisobot/kunilik-xarajatlar" },
-        //         { label: t('daily_expense_categories'), route: "/hisobot/kunilik-xarajatlar-kategoriyalari" },
-        //     ]
-        // },
-        // {
-        //     icon: Send,
-        //     label: t('sms'),
-        //     route: "/sms",
-        //     type: "group",
-        //     name: "sms",
-        //     subItems: [
-        //         { label: t('sms_templates'), route: "/sms/shablonlar" },
-        //         { label: t('sms_settings'), route: "/sms/sozlamalar" },
-        //     ]
-        // },
-        // {
-        //     icon: Settings,
-        //     label: t('settings'),
-        //     route: "/settings",
-        //     type: "group",
-        //     name: "settings",
-        //     subItems: [
-        //         { label: t('general_settings'), route: "/settings/general" },
-        //     ]
-        // },
+        // Quyidagilar hozircha kommentda (agar kerak bo'lsa ochasiz)
+        /*
+        {
+            icon: Archive,
+            label: t('warehouse'),
+            route: "/storage",
+            type: "group",
+            name: "ombor",
+            subItems: [
+                { label: t('documents'), route: "/storage/documents" },
+                { label: t('product_usage'), route: "/storage/usage" },
+                { label: t('products'), route: "/storage/products" },
+                { label: t('categories'), route: "/storage/categories" },
+                { label: t('brands'), route: "/storage/brands" },
+                { label: t('units'), route: "/storage/units" },
+                { label: t('suppliers'), route: "/storage/suppliers" },
+            ]
+        },
+        {
+            icon: FileText,
+            label: t('reports'),
+            route: "/hisobot",
+            type: "group",
+            name: "hisobot",
+            subItems: [
+                { label: t('payments'), route: "/hisobot/to'lovlar" },
+                { label: t('lead_statistics'), route: "/hisobot/lead-statistika" },
+                { label: t('daily_expenses'), route: "/hisobot/kunilik-xarajatlar" },
+                { label: t('daily_expense_categories'), route: "/hisobot/kunilik-xarajatlar-kategoriyalari" },
+            ]
+        },
+        {
+            icon: Send,
+            label: t('sms'),
+            route: "/sms",
+            type: "group",
+            name: "sms",
+            subItems: [
+                { label: t('sms_templates'), route: "/sms/shablonlar" },
+                { label: t('sms_settings'), route: "/sms/sozlamalar" },
+            ]
+        },
+        {
+            icon: Settings,
+            label: t('settings'),
+            route: "/settings",
+            type: "group",
+            name: "settings",
+            subItems: [
+                { label: t('general_settings'), route: "/settings/general" },
+            ]
+        },
+        */
     ];
 
     const getVisibleNavItems = () => {
         const role = user?.role;
 
-        // Agar admin bo'lsa, hammasini ko'rsatamiz
-        if (role === 'admin') return navItems;
+        // Admin bo'lsa → hammasini ko'rsatamiz (shu jumladan Ustalar buyurtmalari)
+        if (role === 'admin') {
+            return navItems;
+        }
 
+        // Doctor
         if (role === 'doctor') {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
@@ -141,6 +150,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             );
         }
 
+        // User
         if (role === 'user') {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
@@ -150,6 +160,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             );
         }
 
+        // Technician
         if (role === 'technician') {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
@@ -159,7 +170,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             );
         }
 
-        if (role === 'master') { 
+        // Master
+        if (role === 'master') {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
@@ -167,7 +179,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             );
         }
 
-        // Agar role noma'lum bo'lsa yoki login qilmagan bo'lsa - faqat asosiylarini (yoki hech narsa)
+        // Default / login qilinmagan yoki noma'lum role
         return navItems.filter(item => item.route === "/DentagoStore");
     };
 
@@ -187,7 +199,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                             flex items-center gap-4 px-5 py-3 rounded-[7px] cursor-pointer transition-all duration-300
                             ${isActive
                                 ? 'bg-[#00BCE4] text-white font-bold'
-                                : 'text-slate-400  font-bold  hover:bg-[#00BCE4] hover:text-slate-50'}
+                                : 'text-slate-400 font-bold hover:bg-[#00BCE4] hover:text-slate-50'}
                         `}
                     >
                         <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
@@ -196,6 +208,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 </div>
             );
         } else {
+            // Group (dropdown) — hozircha faol emas, lekin kod saqlanib qoldi
             return (
                 <div key={index} className="space-y-1">
                     <button
@@ -299,7 +312,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
 
                     <p className="text-center text-[10px] font-medium text-black uppercase tracking-tighter">
-                        &copy; 2026 DentaGo Platform
+                        © 2026 DentaGo Platform
                     </p>
                 </div>
             </aside>
