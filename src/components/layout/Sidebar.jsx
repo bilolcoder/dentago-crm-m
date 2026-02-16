@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
     Home, Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
-    ChevronDown, ListOrdered, Archive, User, PlusCircle, X, Package
+    ChevronDown, ListOrdered, Archive, User, PlusCircle, X, Package,
+    MessageSquare
 } from 'lucide-react';
 import { IoIosStats } from "react-icons/io";
 import { HiOutlineInformationCircle } from "react-icons/hi";
@@ -10,6 +11,7 @@ import { BsInstagram, BsTelegram } from 'react-icons/bs';
 import { FaYoutube } from "react-icons/fa";
 import { useData } from '../../context/DataProvider';
 import Logo from '../../assets/dentago.png';
+import Need from '../Need';
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const location = useLocation();
@@ -22,6 +24,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         sms: false,
         settings: false,
     });
+    const [showNeedModal, setShowNeedModal] = useState(false);
 
     // Markazlashgan navigatsiya funksiyasi
     const handleNavigation = (route, isExternal = false) => {
@@ -70,6 +73,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: User,       label: t('my_results'),        route: "/result",           type: "link" },
         { icon: PlusCircle, label: "Mahsulot qo'shish",    route: "/addproduct",       type: "link" },
         { icon: Package,    label: "Admin Product",        route: "/admin-product",    type: "link" },
+        { icon: Package,    label: "All Doctors Edit",     route: "/AllDoctorsEdit",   type: "link" },
         { icon: Package,    label: "All Doctors Edit",     route: "/AllDoctorsEdit",   type: "link" },
         
         // Yangi qo'shilgan — faqat admin ko'radi
@@ -184,6 +188,22 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     };
 
     const visibleNavItems = getVisibleNavItems();
+    
+    // "Sizga nima kerak?" tugmasi uchun
+    const needButton = {
+        icon: MessageSquare,
+        label: "Sizga nima kerak?",
+        type: "button",
+        action: () => setShowNeedModal(true)
+    };
+    
+    // "Foydalanuvchi So'rovlari" tugmasi (faqat admin uchun)
+    const needAdminButton = {
+        icon: MessageSquare,
+        label: "Foydalanuvchi So'rovlari",
+        route: "/need-admin",
+        type: "link"
+    };
 
     const renderNavItem = (item, index) => {
         const isActive = item.route === "/"
@@ -291,8 +311,46 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-55px] px-4 space-y-2 custom-scrollbar pb-1">
+                    <nav className="flex-1 relative z-50 overflow-y-auto bg-white mt-[-55px] px-4 space-y-1 custom-scrollbar pb-1">
                         {visibleNavItems.map((item, index) => renderNavItem(item, index))}
+                        {/* Foydalanuvchi tugmalari */}
+                        <div className="space-y-1">
+                            {/* Sizga nima kerak? */}
+                            <div
+                                onClick={() => {
+                                    setShowNeedModal(true);
+                                    if (window.innerWidth < 768) {
+                                        setIsSidebarOpen(false);
+                                    }
+                                }}
+                                className="
+                                    flex items-center gap-4 px-5 py-3 rounded-[7px] cursor-pointer transition-all duration-300
+                                    text-slate-400 font-bold hover:bg-[#00BCE4] hover:text-slate-50
+                                "
+                            >
+                                <MessageSquare size={20} strokeWidth={2} />
+                                <span className="text-[11px] uppercase tracking-widest">{needButton.label}</span>
+                            </div>
+                            
+                            {/* Foydalanuvchi So'rovlari (faqat admin) */}
+                            {user?.role === 'admin' && (
+                                <div
+                                    onClick={() => {
+                                        handleNavigation('/need-admin');
+                                        if (window.innerWidth < 768) {
+                                            setIsSidebarOpen(false);
+                                        }
+                                    }}
+                                    className="
+                                        flex items-center gap-4 px-5 py-3 rounded-[7px] cursor-pointer transition-all duration-300
+                                        text-slate-400 font-bold hover:bg-[#00BCE4] hover:text-slate-50
+                                    "
+                                >
+                                    <MessageSquare size={20} strokeWidth={2} />
+                                    <span className="text-[11px] uppercase tracking-widest">{needAdminButton.label}</span>
+                                </div>
+                            )}
+                        </div>
                     </nav>
                 </div>
 
@@ -316,6 +374,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </p>
                 </div>
             </aside>
+            
+            {/* Need Modal */}
+            {showNeedModal && <Need onClose={() => setShowNeedModal(false)} />}
         </>
     );
 };

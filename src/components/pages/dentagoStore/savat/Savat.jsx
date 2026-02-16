@@ -42,7 +42,7 @@ export const addToCartAPI = async (productId, productName, productPrice, quantit
       },
       timeout: 10000
     });
-
+      
     if (response.data.success) {
       return { success: true, message: "Mahsulot savatga muvaffaqiyatli qo'shildi!", data: response.data };
     } else {

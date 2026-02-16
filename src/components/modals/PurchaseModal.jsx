@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ShoppingCart, User, MapPin, CreditCard, Navigation } from 'lucide-react';
 // import Humo from '../../assets/humo.png';
 // import Mastercard from '../assets/mastercard.png';
@@ -10,8 +10,8 @@ import RahmatSvg from '../../assets/rahmat.png';
 
 const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConfirm }) => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    fullName: '',
+    phone: '',
     address: '',
     paymentMethod: 'payme' // default to Payme
   });
@@ -21,6 +21,36 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
   const [showLocationPermission, setShowLocationPermission] = useState(false);
   const [locationStatus, setLocationStatus] = useState('pending');
   const [userLocation, setUserLocation] = useState(null);
+
+  // Foydalanuvchi ma'lumotlarini localStorage dan olish
+  useEffect(() => {
+    if (isOpen) {
+      fetchUserDataFromStorage();
+    }
+  }, [isOpen]);
+
+  const fetchUserDataFromStorage = () => {
+    try {
+      // userData dan ism va familiyani olish
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+      console.log("userData:", userData);
+      
+      // To'liq ismni olish
+      const fullName = userData.name || userData.username || '';
+      
+      setFormData(prev => ({
+        ...prev,
+        fullName: fullName,
+        phone: localStorage.getItem('userPhone') || userLocation.phone || userData.phone || ''
+      }));
+      
+      console.log("Ism Familiya:", fullName);
+      console.log("Telefon:", localStorage.getItem('userPhone') || userLocation.phone || userData.phone);
+      
+    } catch (error) {
+      console.error("localStorage dan ma'lumot olishda xato:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,8 +69,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = "Ism kiriting";
-    if (!formData.lastName.trim()) newErrors.lastName = "Familiya kiriting";
+    if (!formData.fullName.trim()) newErrors.fullName = "Ism va familiya kiriting";
+    if (!formData.phone.trim()) newErrors.phone = "Telefon raqam kiriting";
     if (!formData.address.trim()) newErrors.address = "Manzil kiriting";
 
     setErrors(newErrors);
@@ -148,8 +178,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
 
       // Formani tozalash va yopish
       setFormData({
-        firstName: '',
-        lastName: '',
+        fullName: '',
+        phone: '',
         address: '',
         paymentMethod: 'payme'
       });
@@ -245,35 +275,38 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Ism + Familiya */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Ism Familiya + Telefon */}
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <User className="w-4 h-4 inline mr-1" /> Ism
+                <User className="w-4 h-4 inline mr-1" /> Ism va Familiya
               </label>
               <input
                 type="text"
-                name="firstName"
-                value={formData.firstName}
+                name="fullName"
+                value={formData.fullName}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${errors.firstName ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                placeholder="Ali"
+                disabled
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${errors.fullName ? 'border-red-500' : 'border-gray-300'} bg-gray-100 cursor-not-allowed`}
+                placeholder="Ali Valiyev"
               />
-              {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
+              {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
             </div>
+            
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Familiya</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <User className="w-4 h-4 inline mr-1" /> Telefon raqam
+              </label>
               <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
+                type="tel"
+                name="phone"
+                value={formData.phone}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${errors.lastName ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                placeholder="Valiyev"
+                disabled
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none ${errors.phone ? 'border-red-500' : 'border-gray-300'} bg-gray-100 cursor-not-allowed`}
+                placeholder="+998 XX XXX XX XX"
               />
-              {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
+              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
             </div>
           </div>
 
@@ -409,7 +442,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 <img
                   src={ClickSvg}
                   alt="Click"
-                  className="w-14  h-10 object-contain rounded-md drop-shadow-sm"
+                  className="w-16 transform scale-170 h-10 object-contain rounded-md drop-shadow-sm"
                 />
                 <span className="text-sm font-medium text-gray-800">Click</span>
               </button>
@@ -441,6 +474,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 </p>
               </div>
             )} */}
+            
+            {/* Foydalanuvchi ma'lumotlari localStorage dan olingan */}
           </div>
 
           {/* Buttons */}
