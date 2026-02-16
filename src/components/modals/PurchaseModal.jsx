@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, ShoppingCart, User, MapPin, CreditCard, Navigation } from 'lucide-react';
-// import Humo from '../../assets/humo.png';
-// import Mastercard from '../assets/mastercard.png';
-// import Uzcard from '../../assets/uzcard.png';
-// import Visa from '../../assets/visa.png';
 import PaymeSvg from '../../assets/payme.png';
 import ClickSvg from '../../assets/click.png';
 import RahmatSvg from '../../assets/rahmat.png';
+import { useNavigate } from 'react-router-dom';
 
 const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConfirm }) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -140,7 +139,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
       // API ga yuboriladigan ma'lumotlar
       const orderData = {
         shippingAddress: formData.address.trim(),
-        notes: "Tez yetkazib berishni so'rayman", // ← bu yerni o'zingiz xohlagancha o'zgartiring yoki bo'sh qoldiring
+        notes: "Tez yetkazib berishni so'rayman",
         paymentMethod: formData.paymentMethod
       };
 
@@ -148,7 +147,6 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Agar token kerak bo'lsa quyidagi qatorni oching:
           "Authorization": `Bearer ${localStorage.getItem("accessToken") || ""}`,
         },
         body: JSON.stringify(orderData),
@@ -165,7 +163,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
 
       const result = await response.json();
 
-      // Muvaffaqiyat → to'lov sahifasiga o'tkazish
+      // To'lov sahifasiga o'tkazish (agar kerak bo'lsa)
       const paymentUrls = {
         payme:  "https://payme.uz/",
         click:  "https://click.uz/",
@@ -177,19 +175,20 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
       if (paymentUrl) {
         window.open(paymentUrl, "_blank");
       } else {
-        alert("To'lov usuli uchun sahifa topilmadi.");
+        console.warn("To'lov usuli uchun sahifa topilmadi.");
       }
 
-      // onConfirm chaqirish (agar parent komponentda kerak bo'lsa)
+      // Muvaffaqiyat → /orders sahifasiga o'tkazish
       onConfirm({
         ...formData,
         totalAmount,
         itemsCount,
-        orderId: result.id || null,     // agar backend id qaytarsa
+        orderId: result.id || null,
         paymentMethod: formData.paymentMethod
       });
 
-      alert("Buyurtma muvaffaqiyatli yuborildi! To'lov sahifasiga o'ting.");
+      // alert o'rniga navigatsiya
+      navigate("/orders");
 
       // Formani tozalash va modalni yopish
       setFormData({
@@ -215,7 +214,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
       <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="w-16 h-16 bg-blue-100 cursor-pointer rounded-full flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 cursor-pointer">
               <MapPin className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Lokatsiyangizni ulash</h3>
@@ -224,8 +223,8 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             </p>
           </div>
           <div className="space-y-3 mb-6">
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl">
-              <div className="w-8 h-8 cursor-pointer bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl cursor-pointer">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <Navigation className="w-4 h-4 text-blue-600" />
               </div>
               <div>
@@ -233,7 +232,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 <p className="text-xs text-gray-500">Yetkazib berish manzilini avtomatik to'ldirish</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl">
+            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl cursor-pointer">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                 <MapPin className="w-4 h-4 text-blue-600" />
               </div>
@@ -246,14 +245,14 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
           <div className="flex gap-3">
             <button
               onClick={() => { setShowLocationPermission(false); setLocationStatus('denied'); }}
-              className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+              className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
             >
               Qo'lda kiritish
             </button>
             <button
               onClick={getCurrentLocation}
               disabled={isGettingLocation}
-              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50 cursor-pointer"
             >
               {isGettingLocation ? (
                 <div className="flex items-center justify-center gap-2">
@@ -277,15 +276,15 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
-            <div className="bg-[#00C2FF]  p-2 rounded-full">
+            <div className="bg-[#00C2FF] p-2 rounded-full">
               <ShoppingCart className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold cursor-pointer text-gray-900">Sotib olish</h2>
+              <h2 className="text-xl font-bold text-gray-900">Sotib olish</h2>
               <p className="text-sm text-gray-500">{items.length} ta mahsulot</p>
             </div>
           </div>
-          <button  onClick={onClose} className="text-gray-400 cursor-pointer hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition cursor-pointer">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -349,7 +348,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                   <button
                     type="button"
                     onClick={() => setShowLocationPermission(true)}
-                    className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                    className="text-xs font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
                   >
                     Yoqish
                   </button>
@@ -367,20 +366,20 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 value={formData.address}
                 onChange={handleChange}
                 rows={3}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2  focus:ring-[#00C2FF] focus:border-transparent outline-none resize-none pr-12 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none resize-none pr-12 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="Manzilingizni kiriting yoki GPS orqali aniqlang"
               />
               <button
                 type="button"
                 onClick={getCurrentLocation}
                 disabled={isGettingLocation}
-                className="absolute right-3 top-3 p-2 text-[#00C2FF] hover:bg-[#00C2FF]/10 rounded-lg transition disabled:opacity-50"
+                className="absolute right-3 top-3 p-2 text-[#00C2FF] hover:bg-[#00C2FF]/10 rounded-lg transition disabled:opacity-50 cursor-pointer"
                 title="GPS orqali manzilni aniqlash"
               >
                 {isGettingLocation ? (
-                  <div className="animate-spin cursor-pointer   rounded-full h-5 w-5 border-2 border-[#00C2FF] border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#00C2FF] border-t-transparent"></div>
                 ) : (
-                  <Navigation className="w-5 cursor-pointer   h-5" /> 
+                  <Navigation className="w-5 h-5" />
                 )}
               </button>
             </div>
@@ -413,7 +412,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'payme' }))}
-                className={`p-4 rounded-2xl cursor-pointer border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'payme'
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md cursor-pointer ${formData.paymentMethod === 'payme'
                   ? 'border-[#05CBCA] bg-green-50/70 scale-[1.03]'
                   : 'border-gray-200 hover:border-gray-300'
                 }`}
@@ -425,7 +424,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'click' }))}
-                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'click'
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md cursor-pointer ${formData.paymentMethod === 'click'
                   ? 'border-[#0868FC] bg-blue-50/70 scale-[1.03]'
                   : 'border-gray-200 hover:border-gray-300'
                 }`}
@@ -437,7 +436,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'rahmat' }))}
-                className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'rahmat'
+                className={`p-4 rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md cursor-pointer ${formData.paymentMethod === 'rahmat'
                   ? 'border-[#FF4B34] bg-red-50/70 scale-[1.03]'
                   : 'border-gray-200 hover:border-gray-300'
                 }`}
@@ -453,7 +452,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3.5 px-6 border cursor-pointer border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex-1 py-3.5 px-6 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50 cursor-pointer"
               disabled={isSubmitting}
             >
               Bekor qilish
@@ -461,11 +460,11 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-3.5 px-6 bg-[#00C2FF] cursor-pointer text-white rounded-xl font-bold hover:bg-[#0099DD] transition disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
+              className="flex-1 py-3.5 px-6 bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] transition disabled:opacity-50 flex items-center justify-center gap-3 shadow-md cursor-pointer"
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin cursor-pointer rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                   <span>Jarayonda...</span>
                 </>
               ) : (

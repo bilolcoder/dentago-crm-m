@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { MdDeleteOutline, MdCheck } from "react-icons/md";
-import { Search, Filter, Download, MoreHorizontal, Package, Truck, Loader2, X, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MdCheck } from "react-icons/md";
+import { Search, Package, Loader2, X, Phone, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import axios from 'axios';
 import { useData } from '../../../context/DataProvider';
-import Rasm from "../../../assets/dentago.png"
+import Rasm from "../../../assets/dentago.png";
 // Swiper imports
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination as SwiperPagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import { useNavigate } from 'react-router-dom';
 import { FaScrewdriverWrench } from "react-icons/fa6";
 
 function Aperator() {
@@ -19,18 +19,16 @@ function Aperator() {
   const PRIMARY_COLOR = "#00BCE4";
   const BASE_URL = "https://app.dentago.uz";
 
-  // Statelar
-  const [orders, setOrders] = useState([]);
+  const ITEMS_PER_PAGE = 10;
+
+  // States
+  const [allFlatOrders, setAllFlatOrders] = useState([]); // har bir mahsulot alohida qator
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [totalOrders, setTotalOrders] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [activeMenu, setActiveMenu] = useState(null); // Qaysi qator menyusi ochiqligini saqlaydi
   const [selectedMasterOrder, setSelectedMasterOrder] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  // Namuna uchun ustaga buyurtmalar ma'lumotlari
+  // Namuna uchun ustaga buyurtmalar ma'lumotlari (to'liq saqlangan)
   const masterOrders = [
     {
       id: 1,
@@ -71,7 +69,6 @@ function Aperator() {
       status: "bekor qilindi",
       date: "27.01.2026"
     },
-    // Statik ma'lumotlar
     {
       id: 4,
       images: [
@@ -107,133 +104,105 @@ function Aperator() {
     }
   };
 
+  const determineStatus = (order) => {
+    if (order.paymentStatus === "paid") {
+      return order.deliveryStatus === "delivered" ? "yaxshi" : "o'rtacha";
+    }
+    return "yomon";
+  };
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      setError(null);
 
-      // API dan ma'lumot olish
       const token = localStorage.getItem('accessToken');
-
-      if (!token) {
-        throw new Error("Token topilmadi! Tizimga qayta kiring.");
-      }
+      if (!token) throw new Error("Token topilmadi!");
 
       const response = await axios.get(`${BASE_URL}/api/order/history`, {
-        params: { page: 1, limit: 10 },
+        params: { page: 1, limit: 500 },
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
       const result = response.data;
-
-      if (!result.success) {
-        throw new Error(result.message || "Ma'lumotlar olinmadi");
-      }
+      if (!result.success) throw new Error(result.message || "Ma'lumotlar olinmadi");
 
       const ordersData = Array.isArray(result.data) ? result.data : [];
 
-      const mappedOrders = ordersData.map(order => {
-        const firstItem = order.items?.[0] || {};
-        const snapshot = firstItem.productSnapshot || {};
+      // Har bir itemni alohida qator qilish
+      const flatOrders = ordersData.flatMap(order => {
+        const orderNumber = order.orderNumber || order._id.slice(-8).toUpperCase();
+        const createdAt = order.createdAt
+          ? new Date(order.createdAt).toLocaleString('uz-UZ', {
+              year: 'numeric', month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit'
+            })
+          : '—';
 
-        // Statusni aniqlash
-        let status = "o'rtacha";
-        if (order.paymentStatus === "paid") {
-          if (order.deliveryStatus === "delivered") status = "yaxshi";
-          else status = "o'rtacha";
-        } else {
-          status = "yomon";
-        }
-
-        return {
-          id: order._id,
-          orderNumber: order.orderNumber || order._id.slice(-8).toUpperCase(),
-          mahsulotNomi: snapshot.name || "Noma'lum mahsulot",
-          mahsulotNarxi: snapshot.price || 0,
-          soni: firstItem.quantity || 1,
-          mijoz: order.user?.username || order.user?.name || "Mijoz",
-          totalNarx: order.totalAmount || (snapshot.price * firstItem.quantity) || 0,
-          tadbirkor: snapshot.company || "Dentago",
-          status,
-          selectedAction: null,
-          manzil: order.shippingAddress || "Manzil ko'rsatilmagan",
-        };
+        return order.items?.map((item, index) => {
+          const snapshot = item.productSnapshot || {};
+          return {
+            id: `${order._id}-${index}`,
+            orderNumber,
+            createdAt,
+            mahsulotNomi: snapshot.name || "Noma'lum mahsulot",
+            soni: item.quantity || 1,
+            totalNarx: (snapshot.price || 0) * (item.quantity || 1),
+            tadbirkor: snapshot.company || "Dentago",
+            status: determineStatus(order),
+          };
+        }) || [];
       });
 
-      // Statik ma'lumotlar qo'shish
+      // Statik ma'lumotlar
       const staticOrders = [
         {
-          id: "static-1",
+          id: "static-1-0",
           orderNumber: "ORD001",
+          createdAt: "15.02.2026 14:30",
           mahsulotNomi: "Tish shifonieri Premium",
-          mahsulotNarxi: 150000,
           soni: 2,
-          mijoz: "Ibrohimov Shaxzod",
           totalNarx: 300000,
           tadbirkor: "Dentago",
           status: "yaxshi",
-          selectedAction: null
         },
         {
-          id: "static-2",
+          id: "static-2-0",
           orderNumber: "ORD002",
+          createdAt: "14.02.2026 09:15",
           mahsulotNomi: "Implant atsessorlar to'plami",
-          mahsulotNarxi: 850000,
           soni: 1,
-          mijoz: "Karimova Nigora",
           totalNarx: 850000,
           tadbirkor: "Dentago",
           status: "o'rtacha",
-          selectedAction: null
         }
       ];
 
-      // API ma'lumotlari va statik ma'lumotlarni birlashtirish
-      const allOrders = [...mappedOrders, ...staticOrders];
-
-      setOrders(allOrders);
-
-      const pag = result.pagination || {};
-      setTotalOrders(pag.total + staticOrders.length || allOrders.length);
-      setTotalPages(pag.pages || 1);
-      setCurrentPage(pag.page || 1);
-
+      setAllFlatOrders([...flatOrders, ...staticOrders]);
     } catch (err) {
       console.error("Xatolik:", err);
-      setError(err.message || "Internet yoki server bilan muammo");
-
-      // API ishlamasa ham statik ma'lumotlar ko'rinadi
-      const staticOrders = [
+      // fallback statik ma'lumotlar
+      setAllFlatOrders([
         {
-          id: "static-1",
+          id: "static-1-0",
           orderNumber: "ORD001",
+          createdAt: "15.02.2026 14:30",
           mahsulotNomi: "Tish shifonieri Premium",
-          mahsulotNarxi: 150000,
           soni: 2,
-          // mijoz: "Ibrohimov Shaxzod",
           totalNarx: 300000,
           tadbirkor: "Dentago",
-          // status: "yaxshi",
-          selectedAction: null
+          status: "yaxshi",
         },
         {
-          id: "static-2",
+          id: "static-2-0",
           orderNumber: "ORD002",
+          createdAt: "14.02.2026 09:15",
           mahsulotNomi: "Implant atsessorlar to'plami",
-          mahsulotNarxi: 850000,
           soni: 1,
-          // mijoz: "Karimova Nigora",
           totalNarx: 850000,
           tadbirkor: "Dentago",
-          // status: "o'rtacha",
-          selectedAction: null
+          status: "o'rtacha",
         }
-      ];
-
-      setOrders(staticOrders);
-      setTotalOrders(staticOrders.length);
-      setTotalPages(1);
-      setCurrentPage(1);
+      ]);
     } finally {
       setLoading(false);
     }
@@ -243,13 +212,11 @@ function Aperator() {
     fetchOrders();
   }, []);
 
-  // Amalni tanlash funksiyasi
-  const handleAction = (orderId, actionName) => {
-    setOrders(prev => prev.map(order =>
-      order.id === orderId ? { ...order, selectedAction: actionName } : order
-    ));
-    setActiveMenu(null);
-  };
+  // Pagination hisoblash
+  const totalItems = allFlatOrders.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedOrders = allFlatOrders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -274,7 +241,7 @@ function Aperator() {
   return (
     <div className="bg-white font-sans">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-6 px-6 pt-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
@@ -285,87 +252,143 @@ function Aperator() {
             </h1>
           </div>
           <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
-            Jami: {totalOrders} ta buyurtma
+            Jami: {totalItems} ta mahsulot
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input type="text" placeholder="Qidiruv..." className="pl-12 pr-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 outline-none w-full md:w-80 text-sm font-bold" />
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input type="text" placeholder="Qidiruv..." className="pl-12 pr-6 py-3.5 rounded-2xl bg-slate-50 border border-slate-100 outline-none w-full md:w-80 text-sm font-bold" />
+        </div>
+      </div>
+
+      {/* Buyurtmalar jadvali */}
+      <div className="px-6 pb-6">
+        <div className="bg-white rounded-[1rem] shadow-sm border border-slate-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1200px]">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">ID / Mahsulot</th>
+                  <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Kompaniya</th>
+                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Soni</th>
+                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Narxi</th>
+                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Sana / Vaqt</th>
+                  <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Amallar</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {paginatedOrders.length > 0 ? paginatedOrders.map(order => (
+                  <tr key={order.id} className="hover:bg-[#00BCE4]/[0.03] transition-colors duration-150">
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black text-[#00BCE4] mb-1">#{order.orderNumber}</span>
+                        <span className="text-sm font-bold text-slate-800">{order.mahsulotNomi}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-sm font-bold text-slate-600">{order.tadbirkor}</td>
+                    <td className="px-6 py-5 text-center">
+                      <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">{order.soni} ta</span>
+                    </td>
+                    <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
+                      {order.totalNarx.toLocaleString()} so'm
+                    </td>
+                    <td className="px-6 py-5 text-center text-sm font-bold text-slate-700">
+                      {order.createdAt}
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center justify-center gap-2">
+                        {order.id.includes("static-2") ? (
+                          <button className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors">
+                            <X className="w-6 h-6" />
+                          </button>
+                        ) : (
+                          <button className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors">
+                            <MdCheck size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-24 text-center">
+                      <Package size={64} className="mx-auto mb-4 text-slate-300" />
+                      <p className="text-xl font-bold text-slate-400 mb-2">Hech qanday buyurtma topilmadi</p>
+                      <p className="text-sm text-slate-500">Yangi buyurtmalar paydo bo'lganda bu yerda ko'rinadi</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-          {/* <button className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 cursor-pointer hover:text-[#00BCE4] transition-all"><Filter size={20} /></button>
-          <button className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#00BCE4] text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all cursor-pointer"><Download size={16} />Eksport</button> */}
+
+          {/* Pagination */}
+         {/* Pagination */}
+{totalPages > 1 && (
+  <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-white">
+    {/* Chap tarafdagi ma'lumot */}
+    <div className="text-sm text-slate-600">
+      Jami: {totalItems} ta mahsulot, Sahifa {currentPage} dan {totalPages}
+    </div>
+
+    {/* Sahifalar raqamlari va tugmalar */}
+    <div className="flex items-center gap-2">
+      {/* Oldingi */}
+      <button
+        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+        disabled={currentPage === 1}
+        className={`
+          flex items-center justify-center w-9 h-9 rounded-md border border-slate-300
+          ${currentPage === 1 
+            ? 'text-slate-400 cursor-not-allowed bg-slate-50' 
+            : 'text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors'
+          }
+        `}
+      >
+        <ChevronLeft size={18} />
+      </button>
+
+      {/* Raqamlar */}
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        <button
+          key={page}
+          onClick={() => setCurrentPage(page)}
+          className={`
+            flex items-center justify-center w-9 h-9 rounded-md border font-medium text-sm
+            ${currentPage === page
+              ? 'bg-[#00BCE4] text-white border-[#00BCE4] cursor-pointer'
+              : 'text-slate-700 border-slate-300 hover:bg-slate-100 cursor-pointer transition-colors'
+            }
+          `}
+        >
+          {page}
+        </button>
+      ))}
+
+      {/* Keyingi */}
+      <button
+        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+        disabled={currentPage === totalPages}
+        className={`
+          flex items-center justify-center w-9 h-9 rounded-md border border-slate-300
+          ${currentPage === totalPages 
+            ? 'text-slate-400 cursor-not-allowed bg-slate-50' 
+            : 'text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors'
+          }
+        `}
+      >
+        <ChevronRight size={18} />
+      </button>
+    </div>
+  </div>
+)}
         </div>
       </div>
 
-      {/* Jadval */}
-      <div className="bg-white rounded-[1rem] shadow-sm border border-slate-100 mb-12 overflow-hidden">
-        <div className="">
-          <table className="w-full min-w-[1200px]">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">ID / Mahsulot</th>
-                <th className="px-6 py-5 text-left text-[11px] font-black text-slate-500 uppercase tracking-widest">Kompaniya</th>
-                <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Soni</th>
-                <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Narxi</th>
-                <th className="px-6 py-5 text-center text-[11px] font-black text-slate-500 uppercase tracking-widest">Amallar</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {orders.length > 0 ? orders.map(order => (
-                <tr key={order.id} className="hover:bg-[#00BCE4]/[0.03] transition-colors duration-150">
-                  <td className="px-6 py-5">
-                    <div className="flex flex-col">
-                      <span className="text-xs font-black text-[#00BCE4] mb-1">#{order.orderNumber}</span>
-                      <span className="text-sm font-bold text-slate-800">{order.mahsulotNomi}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5 text-sm font-bold text-slate-600">Dentago</td>
-                  <td className="px-6 py-5 text-center">
-                    <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">{order.soni} ta</span>
-                  </td>
-                  <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
-                    {order.totalNarx.toLocaleString()} so'm+
-                  </td>
-
-                  {/* Amallar Ustuni */}
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center gap-2">
-                      {order.id === "static-2" ? (
-                        // Ikkinchi statik ma'lumot uchun "x" tugmasi
-                        <button className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors">
-                          <X className="w-6 h-6" />
-                        </button>
-                      ) : (
-                        // Boshqa buyurtmalar uchun "tick" tugmasi
-                        <button className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 transition-colors">
-                          <MdCheck size={18} />
-                        </button>
-                      )}
-                      {/* <button className="w-9 h-9 rounded-xl text-slate-400 flex items-center justify-center hover:bg-slate-100 transition-colors">
-                        <MoreHorizontal size={20} />
-                      </button> */}
-                    </div>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan="7" className="px-6 py-24 text-center">
-                    <Package size={64} className="mx-auto mb-4 text-slate-300" />
-                    <p className="text-xl font-bold text-slate-400 mb-2">Hech qanday buyurtma topilmadi</p>
-                    <p className="text-sm text-slate-500">Yangi buyurtmalar paydo bo'lganda bu yerda ko'rinadi</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Ustaga buyurtmalar bo'limi - agar role 'master' BO'LMASA ko'rinadi */}
+      {/* Ustaga buyurtmalar bo'limi */}
       {user?.role !== 'master' && (
-        <div className="mb-8">
+        <div className="mb-8 px-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
               <FaScrewdriverWrench size={24} />
@@ -399,12 +422,7 @@ function Aperator() {
                     >
                       <td className="px-8 py-5">
                         <div className="w-14 h-14 rounded-2xl border border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center group-hover:border-[#00BCE4]/30 transition-all">
-                          <img
-                            src={Rasm}
-                            alt="order"
-                            className="w-full h-full object-cover"
-                          // onError={(e) => { e.target.src = 'https://via.placeholder.com/50?text=Rasm'; }}
-                          />
+                          <img src={Rasm} alt="order" className="w-full h-full object-cover" />
                         </div>
                       </td>
                       <td className="px-8 py-5">
@@ -425,7 +443,7 @@ function Aperator() {
                           {mOrder.status}
                         </span>
                       </td>
-                      <td className="px-8  py-5 text-center">
+                      <td className="px-8 py-5 text-center">
                         <button className="p-2 rounded-xl cursor-pointer bg-slate-50 text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
                           <MoreHorizontal size={18} />
                         </button>
@@ -438,37 +456,34 @@ function Aperator() {
           </div>
         </div>
       )}
+
       {/* Ustaga buyurtma tafsilotlari Modali */}
       {isDetailModalOpen && selectedMasterOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
             <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-white">
               <div>
                 <h2 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">
                   Buyurtma <span style={{ color: PRIMARY_COLOR }}>Tafsilotlari</span>
                 </h2>
-                {/* <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">ID: #{selectedMasterOrder.id}</p> */}
               </div>
               <button
                 onClick={() => {
                   setIsDetailModalOpen(false);
                   setSelectedMasterOrder(null);
                 }}
-                className="w-14 cursor-pointer h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90"
+                className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all active:scale-90 cursor-pointer"
               >
                 <X size={28} />
               </button>
             </div>
 
-            {/* Modal Content */}
             <div className="p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {/* Rasm (Swiper) */}
                 <div className="space-y-4">
                   <div className="aspect-square rounded-[2rem] border-2 border-slate-100 overflow-hidden bg-slate-50 group relative">
                     <Swiper
-                      modules={[Navigation, Pagination]}
+                      modules={[Navigation, SwiperPagination]}
                       navigation={{
                         nextEl: '.swiper-button-next-custom',
                         prevEl: '.swiper-button-prev-custom',
@@ -489,7 +504,6 @@ function Aperator() {
                       ))}
                     </Swiper>
 
-                    {/* Custom Navigation Buttons */}
                     <button className="swiper-button-prev-custom absolute left-2 top-1/2 -translate-y-1/2 z-20 rounded-2xl border-white flex items-center justify-center text-[#00BCE4] transition-all active:scale-90 disabled:opacity-0 cursor-pointer">
                       <ChevronLeft size={24} strokeWidth={3} />
                     </button>
@@ -500,10 +514,11 @@ function Aperator() {
                   <div className="flex gap-2">
                     <div className="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                      <span className={`text-[9px] font-black uppercase tracking-widest ${selectedMasterOrder.status === 'tasdiqlandi' ? 'text-emerald-500' :
-                          selectedMasterOrder.status === 'kutilmoqda' ? 'text-amber-500' :
-                            'text-rose-500'
-                        }`}>
+                      <span className={`text-[9px] font-black uppercase tracking-widest ${
+                        selectedMasterOrder.status === 'tasdiqlandi' ? 'text-emerald-500' :
+                        selectedMasterOrder.status === 'kutilmoqda' ? 'text-amber-500' :
+                        'text-rose-500'
+                      }`}>
                         {selectedMasterOrder.status}
                       </span>
                     </div>
@@ -514,7 +529,6 @@ function Aperator() {
                   </div>
                 </div>
 
-                {/* Malumotlar */}
                 <div className="flex flex-col justify-between">
                   <div className="space-y-6">
                     <div>
@@ -528,12 +542,12 @@ function Aperator() {
                       <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Aloqa ma'lumotlari</h3>
                       <div className="space-y-3">
                         <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#00BCE4]/5 border border-[#00BCE4]/10 group hover:border-[#00BCE4]/30 transition-all">
-                          <div className="w-10 cursor-pointer h-10 rounded-xl bg-[#00BCE4] flex items-center justify-center text-white shadow-lg shadow-[#00BCE4]/20">
+                          <div className="w-10 h-10 rounded-xl bg-[#00BCE4] flex items-center justify-center text-white shadow-lg shadow-[#00BCE4]/20">
                             <Phone size={18} />
                           </div>
                           <div>
                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Asosiy raqam</p>
-                            <p className="text-sm font-black text-[#00BCE4]">+998700386666</p>
+                            <p className="text-sm font-black text-[#00BCE4]">{selectedMasterOrder.phone1}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-slate-300 transition-all">
@@ -542,7 +556,7 @@ function Aperator() {
                           </div>
                           <div>
                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Qo'shimcha</p>
-                            <p className="text-sm font-bold text-slate-700">+998 95 219 26 99</p>
+                            <p className="text-sm font-bold text-slate-700">{selectedMasterOrder.phone2}</p>
                           </div>
                         </div>
                       </div>
@@ -550,12 +564,8 @@ function Aperator() {
                   </div>
 
                   <button
-                    className="w-full cursor-pointer mt-8 py-5 rounded-3xl bg-[#00BCE4] text-white font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-[#00BCE4]/30 hover:-translate-y-1 transition-all active:scale-95"
-                    onClick={() => {
-                      // API call placeholder
-                      console.log("Bog'lanish uchun so'rov yuborildi ID:", selectedMasterOrder.id);
-                      alert("Mijoz bilan bog'lanish tizimi tayyorlanmoqda...");
-                    }}
+                    className="w-full mt-8 py-5 rounded-3xl bg-[#00BCE4] text-white font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl hover:shadow-[#00BCE4]/30 hover:-translate-y-1 transition-all active:scale-95 cursor-pointer"
+                    onClick={() => alert("Mijoz bilan bog'lanish tizimi tayyorlanmoqda...")}
                   >
                     Mijoz bilan bog'lanish
                   </button>
