@@ -31,22 +31,15 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
 
   const fetchUserDataFromStorage = () => {
     try {
-      // userData dan ism va familiyani olish
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      console.log("userData:", userData);
       
-      // To'liq ismni olish
       const fullName = userData.name || userData.username || '';
       
       setFormData(prev => ({
         ...prev,
         fullName: fullName,
-        phone: localStorage.getItem('userPhone') || userLocation.phone || userData.phone || ''
+        phone: localStorage.getItem('userPhone') || userData.phone || ''
       }));
-      
-      console.log("Ism Familiya:", fullName);
-      console.log("Telefon:", localStorage.getItem('userPhone') || userLocation.phone || userData.phone);
-      
     } catch (error) {
       console.error("localStorage dan ma'lumot olishda xato:", error);
     }
@@ -144,39 +137,61 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
     setIsSubmitting(true);
 
     try {
-      // To'lov usuliga mos saytga yo'naltirish
+      // API ga yuboriladigan ma'lumotlar
+      const orderData = {
+        shippingAddress: formData.address.trim(),
+        notes: "Tez yetkazib berishni so'rayman", // ← bu yerni o'zingiz xohlagancha o'zgartiring yoki bo'sh qoldiring
+        paymentMethod: formData.paymentMethod
+      };
+
+      const response = await fetch("https://app.dentago.uz/api/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Agar token kerak bo'lsa quyidagi qatorni oching:
+          "Authorization": `Bearer ${localStorage.getItem("accessToken") || ""}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Server xatosi: ${response.status}`;
+        try {
+          const errData = await response.json();
+          errorMsg = errData.message || errorMsg;
+        } catch {}
+        throw new Error(errorMsg);
+      }
+
+      const result = await response.json();
+
+      // Muvaffaqiyat → to'lov sahifasiga o'tkazish
       const paymentUrls = {
-        'payme': 'https://payme.uz/',
-        'click': 'https://click.uz/',
-        'rahmat': 'https://rhmt.uz/'
+        payme:  "https://payme.uz/",
+        click:  "https://click.uz/",
+        rahmat: "https://rhmt.uz/"
       };
 
       const paymentUrl = paymentUrls[formData.paymentMethod];
+
       if (paymentUrl) {
-        // Foydalanuvchiga xabar berish
-        // alert(`${formData.paymentMethod.toUpperCase()} to'lov tizimiga yo'naltirilmoqdasiz. Yangi tab ochiladi.`);
-        // Yangi tabda to'lov saytini ochish
-        window.open(paymentUrl, '_blank');
+        window.open(paymentUrl, "_blank");
       } else {
-        // Agar to'lov tizimi uchun manzil mavjud bo'lmasa, xabar berish
-        alert(`${formData.paymentMethod.toUpperCase()} to'lov tizimi hozircha mavjud emas. Boshqa usulni tanlang.`);
+        alert("To'lov usuli uchun sahifa topilmadi.");
       }
 
-      // Bu yerda siz hali ham API ga ma'lumotlarni yuborishingiz mumkin
-      await onConfirm({
+      // onConfirm chaqirish (agar parent komponentda kerak bo'lsa)
+      onConfirm({
         ...formData,
         totalAmount,
-        itemsCount: itemsCount,
-        paymentMethod: formData.paymentMethod,
-        items: items.map(item => ({
-          id: item.id,
-          name: item.nomi,
-          quantity: item.quantity,
-          price: item.narxi
-        }))
+        itemsCount,
+        orderId: result.id || null,     // agar backend id qaytarsa
+        paymentMethod: formData.paymentMethod
       });
 
-      // Formani tozalash va yopish
+      alert("Buyurtma muvaffaqiyatli yuborildi! To'lov sahifasiga o'ting.");
+
+      // Formani tozalash va modalni yopish
       setFormData({
         fullName: '',
         phone: '',
@@ -184,9 +199,10 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
         paymentMethod: 'payme'
       });
       onClose();
+
     } catch (error) {
-      console.error('Purchase error:', error);
-      alert('Xato yuz berdi. Iltimos, qayta urinib ko\'ring.');
+      console.error("Buyurtma yaratishda xato:", error);
+      alert(`Xato: ${error.message || "Server bilan ulanib bo'lmadi"}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -199,7 +215,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
       <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-blue-100 cursor-pointer rounded-full flex items-center justify-center mb-4">
               <MapPin className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Lokatsiyangizni ulash</h3>
@@ -209,7 +225,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
           </div>
           <div className="space-y-3 mb-6">
             <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 cursor-pointer bg-blue-100 rounded-full flex items-center justify-center">
                 <Navigation className="w-4 h-4 text-blue-600" />
               </div>
               <div>
@@ -237,7 +253,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             <button
               onClick={getCurrentLocation}
               disabled={isGettingLocation}
-              className="flex-1 py-3 px-4 bg-linear-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50"
             >
               {isGettingLocation ? (
                 <div className="flex items-center justify-center gap-2">
@@ -261,15 +277,15 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
-            <div className="bg-[#00C2FF] p-2 rounded-full">
+            <div className="bg-[#00C2FF]  p-2 rounded-full">
               <ShoppingCart className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Sotib olish</h2>
+              <h2 className="text-xl font-bold cursor-pointer text-gray-900">Sotib olish</h2>
               <p className="text-sm text-gray-500">{items.length} ta mahsulot</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 cursor-pointer hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition">
+          <button  onClick={onClose} className="text-gray-400 cursor-pointer hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -313,12 +329,10 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
           {/* Manzil */}
           <div>
             {locationStatus !== 'pending' && (
-              <div className={`flex items-center justify-between p-3 rounded-xl mb-4 border ${locationStatus === 'granted' ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'
-                }`}>
+              <div className={`flex items-center justify-between p-3 rounded-xl mb-4 border ${locationStatus === 'granted' ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${locationStatus === 'granted' ? 'bg-green-100' : 'bg-gray-200'
-                    }`}>
-                    <MapPin className={`w-4 cursor-pointer h-4 ${locationStatus === 'granted' ? 'text-green-600' : 'text-gray-500'}`} />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${locationStatus === 'granted' ? 'bg-green-100' : 'bg-gray-200'}`}>
+                    <MapPin className={`w-4 h-4 ${locationStatus === 'granted' ? 'text-green-600' : 'text-gray-500'}`} />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
@@ -353,8 +367,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 value={formData.address}
                 onChange={handleChange}
                 rows={3}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#00C2FF] focus:border-transparent outline-none resize-none pr-12 ${errors.address ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2  focus:ring-[#00C2FF] focus:border-transparent outline-none resize-none pr-12 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                 placeholder="Manzilingizni kiriting yoki GPS orqali aniqlang"
               />
               <button
@@ -365,9 +378,9 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 title="GPS orqali manzilni aniqlash"
               >
                 {isGettingLocation ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#00C2FF] border-t-transparent"></div>
+                  <div className="animate-spin cursor-pointer   rounded-full h-5 w-5 border-2 border-[#00C2FF] border-t-transparent"></div>
                 ) : (
-                  <Navigation className="w-5 h-5" />
+                  <Navigation className="w-5 cursor-pointer   h-5" /> 
                 )}
               </button>
             </div>
@@ -391,25 +404,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             </div>
           </div>
 
-          {/* Mahsulotlar ro'yxati */}
-          {/* <div>
-            <h4 className="font-medium text-gray-900 mb-3">Mahsulotlar:</h4>
-            <div className="max-h-48 overflow-y-auto space-y-3 pr-2">
-              {items.map((item) => (
-                <div key={item.id} className="flex justify-between items-center text-sm bg-white p-4 rounded-xl border shadow-sm">
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 truncate">{item.nomi}</div>
-                    <div className="text-gray-500 mt-0.5">× {item.quantity} dona</div>
-                  </div>
-                  <div className="font-bold text-gray-900 whitespace-nowrap ml-4">
-                    {(item.narxi * item.quantity).toLocaleString()} so'm
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
-          {/* Payment Method Selection */}
+          {/* To'lov usuli */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
               <CreditCard className="w-5 h-5" /> To'lov usuli
@@ -419,15 +414,11 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'payme' }))}
                 className={`p-4 rounded-2xl cursor-pointer border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'payme'
-                    ? 'border-[#05CBCA] bg-green-50/70 scale-[1.03]'
-                    : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  ? 'border-[#05CBCA] bg-green-50/70 scale-[1.03]'
+                  : 'border-gray-200 hover:border-gray-300'
+                }`}
               >
-                <img
-                  src={PaymeSvg}
-                  alt="Payme"
-                  className="w-14 cursor-pointer h-10 object-contain rounded-md drop-shadow-sm"
-                />
+                <img src={PaymeSvg} alt="Payme" className="w-14 h-10 object-contain rounded-md drop-shadow-sm" />
                 <span className="text-sm font-medium text-gray-800">Payme</span>
               </button>
 
@@ -435,15 +426,11 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'click' }))}
                 className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'click'
-                    ? 'border-[#0868FC] bg-blue-50/70 scale-[1.03]'
-                    : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  ? 'border-[#0868FC] bg-blue-50/70 scale-[1.03]'
+                  : 'border-gray-200 hover:border-gray-300'
+                }`}
               >
-                <img
-                  src={ClickSvg}
-                  alt="Click"
-                  className="w-16 transform scale-170 h-10 object-contain rounded-md drop-shadow-sm"
-                />
+                <img src={ClickSvg} alt="Click" className="w-16 h-10 object-contain rounded-md drop-shadow-sm scale-125" />
                 <span className="text-sm font-medium text-gray-800">Click</span>
               </button>
 
@@ -451,31 +438,14 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'rahmat' }))}
                 className={`p-4 cursor-pointer rounded-2xl border-2 transition-all duration-200 flex flex-col items-center gap-3 shadow-sm hover:shadow-md ${formData.paymentMethod === 'rahmat'
-                    ? 'border-[#FF4B34] bg-red-50/70 scale-[1.03]'
-                    : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  ? 'border-[#FF4B34] bg-red-50/70 scale-[1.03]'
+                  : 'border-gray-200 hover:border-gray-300'
+                }`}
               >
-                <img
-                  src={RahmatSvg}
-                  alt="Rahmat"
-                  className="w-14 h-10 object-contain rounded-md drop-shadow-sm"
-                />
+                <img src={RahmatSvg} alt="Rahmat" className="w-14 h-10 object-contain rounded-md drop-shadow-sm" />
                 <span className="text-sm font-medium text-gray-800">Rahmat</span>
               </button>
             </div>
-            {/* Tanlangan to'lov usulini ko'rsatish */}
-            {/* {formData.paymentMethod && (
-              <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800">
-                  <span className="font-medium">Tanlangan to'lov usuli:</span> {formData.paymentMethod.toUpperCase()}
-                </p>
-                <p className="text-xs text-blue-600 mt-1">
-                  "Sotib olish" tugmasini bosganingizda {formData.paymentMethod.toUpperCase()} veb-saytiga yo'naltirilasiz
-                </p>
-              </div>
-            )} */}
-            
-            {/* Foydalanuvchi ma'lumotlari localStorage dan olingan */}
           </div>
 
           {/* Buttons */}
@@ -483,7 +453,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3.5 cursor-pointer px-6 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex-1 py-3.5 px-6 border cursor-pointer border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition disabled:opacity-50"
               disabled={isSubmitting}
             >
               Bekor qilish
@@ -491,11 +461,11 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 cursor-pointer py-3.5 px-6 bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] transition disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
+              className="flex-1 py-3.5 px-6 bg-[#00C2FF] cursor-pointer text-white rounded-xl font-bold hover:bg-[#0099DD] transition disabled:opacity-50 flex items-center justify-center gap-3 shadow-md"
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                  <div className="animate-spin cursor-pointer rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                   <span>Jarayonda...</span>
                 </>
               ) : (

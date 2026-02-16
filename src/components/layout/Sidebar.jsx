@@ -74,7 +74,6 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: PlusCircle, label: "Mahsulot qo'shish",    route: "/addproduct",       type: "link" },
         { icon: Package,    label: "Admin Product",        route: "/admin-product",    type: "link" },
         { icon: Package,    label: "All Doctors Edit",     route: "/AllDoctorsEdit",   type: "link" },
-        { icon: Package,    label: "All Doctors Edit",     route: "/AllDoctorsEdit",   type: "link" },
         
         // Yangi qo'shilgan — faqat admin ko'radi
         { icon: ListOrdered, label: "Ustalar buyurtmalari", route: "/UstlarBuyurtmasi", type: "link" },
