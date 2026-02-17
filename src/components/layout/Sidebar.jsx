@@ -169,6 +169,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
                 item.route === "/my-information" ||
+                item.route === "/result"||
                 item.route === "/orders"
             );
         }
