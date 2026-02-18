@@ -453,7 +453,7 @@ function AdminProduct() {
                           src={`${BASE_URL}/images/${product.imageUrl[0]}`}
                           alt={product.name}
                           className="w-full h-full object-cover"
-                          onError={e => e.target.src = "https://via.placeholder.com/56?text="}
+                          onError={e => e.target.src = ""}
                         />
                       ) : (
                         <Package className="w-8 h-8 m-3 text-slate-300" />

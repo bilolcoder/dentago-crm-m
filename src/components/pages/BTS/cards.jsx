@@ -144,7 +144,7 @@ function Cards() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = "https://via.placeholder.com/400x400/f3f4f6/9ca3af?text=Rasm+yuklanmadi";
+                      e.target.src = "";
                     }}
                   />
                 ) : (

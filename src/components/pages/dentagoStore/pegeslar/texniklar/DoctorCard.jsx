@@ -5,7 +5,7 @@ function TechnicianCard({ id, img, name, exp, description }) {
   // Rasm bo'lmasa yoki xato yuklansa, default rasm qo'yish
   const handleImageError = (e) => {
     e.target.onerror = null;
-    e.target.src = "https://via.placeholder.com/300x300?text=Rasm+yo'q";
+    e.target.src = "";
   };
 
   // Textni 20 ta harfdan keyin qisqartirish
@@ -20,7 +20,7 @@ function TechnicianCard({ id, img, name, exp, description }) {
       {/* Image Section */}
       <div className="relative w-full h-[250px] overflow-hidden">
         <img
-          src={img || "https://via.placeholder.com/300x300?text=No+Image"}
+          src={img || ""}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           alt={name}
           onError={handleImageError}
