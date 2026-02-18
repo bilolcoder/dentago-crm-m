@@ -91,7 +91,7 @@ const TechniciansList = () => {
   };
 
   return (
-    <div className="py-6min-h-screen">
+    <div className="py-6 min-h-screen">
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>

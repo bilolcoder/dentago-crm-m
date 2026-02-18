@@ -1,66 +1,51 @@
 import React from "react";
-import { HiOutlineLocationMarker } from "react-icons/hi";
 import { Link } from "react-router-dom";
 
-function DoctorCard({ id, img, name, job, rating, distance, price, patients, exp, service }) {
-
-  // Rasm yuklanmagan holat 
+function TechnicianCard({ id, img, name, exp, description }) {
+  // Rasm bo'lmasa yoki xato yuklansa, default rasm qo'yish
   const handleImageError = (e) => {
     e.target.onerror = null;
-    e.target.src = "";
+    e.target.src = "https://via.placeholder.com/300x300?text=Rasm+yo'q";
+  };
+
+  // Textni 20 ta harfdan keyin qisqartirish
+  const truncateText = (text, limit = 20) => {
+    if (!text) return "Tavsif mavjud emas";
+    return text.length > limit ? text.substring(0, limit) + "..." : text;
   };
 
   return (
-    <div className="w-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div className="w-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100">
 
-      {/* Image */}
-      <div className="relative w-full h-[300px] rounded-[20px] overflow-hidden">
+      {/* Image Section */}
+      <div className="relative w-full h-[250px] overflow-hidden">
         <img
-          src={img}
-          className="w-full h-full object-cover"
-          alt={`${name} - ${job}`}
+          src={img || "https://via.placeholder.com/300x300?text=No+Image"}
+          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          alt={name}
           onError={handleImageError}
         />
-
-        <div className="absolute bottom-0 left-0 w-full h-[55px] bg-gradient-to-t from-[#00A7D7] to-transparent opacity-80"></div>
-
-        {/* Rating + distance */}
-        {/* <div className="absolute bottom-2 left-2 flex items-center gap-3 text-white text-[12px]">
-          <span className="flex items-center gap-1 bg-black/30 px-2 py-1 rounded-full">
-            ⭐️ {rating}
-          </span>
-          <span className="flex items-center gap-1 bg-black/30 px-2 py-1 rounded-full">
-            <HiOutlineLocationMarker /> {distance}
-          </span>
-        </div> */}
-
-        {/* 24/7 badge */}
-        {service && (
-          <div className="absolute top-2 right-2 bg-[#4cd964] text-white text-[10px] px-2 py-1 rounded-xl">
-            24/7
-          </div>
-        )}
+        {/* Pastki qismidagi gradient */}
+        <div className="absolute bottom-0 left-0 w-full h-[40px] bg-gradient-to-t from-black/20 to-transparent"></div>
       </div>
 
-      {/* Info */}
-      <div className="px-3 py-3">
-        <p className="font-semibold text-[14px] leading-4 line-clamp-2 h-10">{name}</p>
-        <p className="text-gray-500 text-[12px] mt-1">{job}</p>
+      {/* Info Section */}
+      <div className="px-4 py-4">
+        <h3 className="font-bold text-[16px] text-gray-800 truncate" title={name}>
+          {name || "Ism Familiya"}
+        </h3>
 
-        <div className="flex items-center justify-between mt-3 text-[12px] text-gray-600">
-          <div>
-            {/* <span className="block">{patients} ta bemor</span> */}
-            <span className="block">{exp} yil tajriba</span>
-          </div>
-        </div>
-
-        <p className="font-semibold text-[13px] mt-3 text-blue-600">
-          {price}
+        <p className="text-[#00BCE4] font-medium text-[13px] mt-1">
+          {exp || 0} yil tajriba
         </p>
 
-        <Link to={`/shifokorlar/${id}`}>
+        <p className="text-gray-500 text-[12px] mt-2 h-8 leading-4 italic">
+          {truncateText(description, 20)}
+        </p>
+
+        <Link to={`/technician/${id}`}>
           <button
-            className="w-full bg-[#00C1F3] text-white py-2.5 rounded-full mt-2 text-[14px] hover:bg-[#00a8d9] transition-colors duration-300"
+            className="w-full bg-[#00BCE4] text-white py-2.5 rounded-xl mt-4 text-[14px] font-semibold hover:bg-[#00a8d9] transition-all duration-300 shadow-sm active:scale-95"
           >
             Profilni ko'rish
           </button>
@@ -70,4 +55,4 @@ function DoctorCard({ id, img, name, job, rating, distance, price, patients, exp
   );
 }
 
-export default DoctorCard;
+export default TechnicianCard;
