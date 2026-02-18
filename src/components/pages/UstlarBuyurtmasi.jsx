@@ -17,46 +17,46 @@ const UstlarBuyurtmasi = () => {
     {
       id: 1,
       masterName: "Usta Sardor",
-      avatar: "https://via.placeholder.com/80?text=US",
+      avatar: "",
       description: "Yangi uskuna o'rnatish bo'yicha maslahat so'ralmoqda. Joyida ko'rib chiqish kerak.",
       phone1: "+998 95 219 26 99",
       phone2: null,
       status: "kutilmoqda",
       date: "28.01.2026",
       images: [
-        "https://via.placeholder.com/500x500?text=Rasm+1",
-        "https://via.placeholder.com/500x500?text=Rasm+2",
-        "https://via.placeholder.com/500x500?text=Rasm+3"
+        "",
+        "",
+        ""
       ]
     },
     {
       id: 2,
       masterName: "Usta Kamol",
-      avatar: "https://via.placeholder.com/80?text=UK",
+      avatar: "",
       description: "Protezni ta'mirlash kerak, eski model, bir nechta sinish joylari bor.",
       phone1: "+998 95 219 26 99",
       phone2: null,
       status: "tasdiqlandi",
       date: "27.01.2026",
       images: [
-        "https://via.placeholder.com/500x500?text=Protez+1",
-        "https://via.placeholder.com/500x500?text=Protez+2",
-        "https://via.placeholder.com/500x500?text=Protez+3"
+        "",
+        "",
+        ""
       ]
     },
     {
       id: 3,
       masterName: "Usta Dilshod",
-      avatar: "https://via.placeholder.com/80?text=UD",
+      avatar: "",
       description: "Implantatsiya uchun material tanlashda yordam kerak. Bemor fotosurat yuborgan.",
       phone1: "+998 95 219 26 99",
       phone2: null,
       status: "bekor qilindi",
       date: "26.01.2026",
       images: [
-        "https://via.placeholder.com/500x500?text=Implant+1",
-        "https://via.placeholder.com/500x500?text=Implant+2",
-        "https://via.placeholder.com/500x500?text=Implant+3"
+        "",
+        "",
+        ""
       ]
     }
   ]);
