@@ -18,6 +18,7 @@ import SmsSettingsContent from './components/SmsSettingsContent';
 import GeneralSettingsContent from './components/GeneralSettingsContent';
 import ManualContent from './components/ManualContent';
 import UstlarBuyurtmasi from './components/pages/UstlarBuyurtmasi';
+import TechnicanId from './components/pages/dentagoStore/pegeslar/texniklar/TechnicalId';
 
 // Storage
 import DocumentsContent from './components/storage/DocumentsContent';
@@ -206,6 +207,7 @@ const ProtectedLayout = () => {
               <Route path="/kurs" element={<Kurs />} />
               <Route path="/ustalar" element={<Ustalar />} />
               <Route path="/texniklar" element={<Texniklar />} />
+              <Route path="/technician/:id" element={<TechnicanId />} />
               <Route path="/technicians" element={<TechnicianManagement />} />
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
