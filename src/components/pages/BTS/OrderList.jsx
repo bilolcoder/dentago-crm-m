@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { MdCheck } from "react-icons/md";
-import { Search, Package, Loader2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Package, Loader2, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import axios from 'axios';
 import { useData } from '../../../context/DataProvider';
-import { useNavigate } from 'react-router-dom';
+
+const PRIMARY_COLOR = "#00BCE4";
+const BASE_URL = "https://app.dentago.uz";
+const ITEMS_PER_PAGE = 10;
 
 function Aperator() {
   const { user } = useData();
-  const navigate = useNavigate();
-  const PRIMARY_COLOR = "#00BCE4";
-  const BASE_URL = "https://app.dentago.uz";
+  const isAdmin = user?.role === 'admin' || user?.role === 'operator' || user?.isAdmin === true;
 
-  const ITEMS_PER_PAGE = 10;
-
+  const [activeTab, setActiveTab] = useState('products');
   const [allFlatOrders, setAllFlatOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [technicianOrders, setTechnicianOrders] = useState([]);
+  const [filteredTechOrders, setFilteredTechOrders] = useState([]);
+
   const [orderStats, setOrderStats] = useState({
     totalOrders: 0,
     totalAmount: 0,
@@ -24,94 +26,57 @@ function Aperator() {
     shipped: 0,
     delivered: 0
   });
+
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [actionLoading, setActionLoading] = useState({});
+  const [techActionLoading, setTechActionLoading] = useState({});
+  const [confirmModal, setConfirmModal] = useState({ open: false, requestId: null, status: null });
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Admin ekanligini tekshirish
-  const isAdmin = user?.role === 'admin' || user?.role === 'operator' || user?.isAdmin === true;
-
-  const fetchData = async () => {
+  const fetchProductOrders = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("Token topilmadi!");
 
-      // 1. Buyurtmalar tarixi - AGAR ADMIN BO'LSA ?all=true QO'SHAMIZ
       const historyUrl = isAdmin 
         ? `${BASE_URL}/api/order/history?all=true&page=1&limit=500`
         : `${BASE_URL}/api/order/history?page=1&limit=500`;
 
-      const historyRes = await axios.get(historyUrl, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const historyRes = await axios.get(historyUrl, { headers: { Authorization: `Bearer ${token}` } });
 
-      let ordersData = [];
-      if (historyRes.data.success) {
-        ordersData = Array.isArray(historyRes.data.data) ? historyRes.data.data : [];
-        console.log("Ma'lumotlar keldi:", ordersData.length, "ta buyurtma");
-      }
+      let ordersData = historyRes.data?.success && Array.isArray(historyRes.data.data)
+        ? historyRes.data.data
+        : [];
 
-      // 2. Statistika - ADMIN UCHUN ?all=true QO'SHAMIZ
-      let stats = {
-        totalOrders: 0,
-        totalAmount: 0,
-        pendingPayment: 0,
-        paid: 0,
-        processing: 0,
-        shipped: 0,
-        delivered: 0
-      };
-      
+      let stats = { totalOrders: 0, totalAmount: 0, pendingPayment: 0, paid: 0, processing: 0, shipped: 0, delivered: 0 };
       try {
-        const statsUrl = isAdmin 
-          ? `${BASE_URL}/api/order/stats?all=true`
-          : `${BASE_URL}/api/order/stats`;
-          
-        const statsRes = await axios.get(statsUrl, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (statsRes.data.success && statsRes.data.data) {
-          stats = statsRes.data.data;
-        }
+        const statsUrl = isAdmin ? `${BASE_URL}/api/order/stats?all=true` : `${BASE_URL}/api/order/stats`;
+        const statsRes = await axios.get(statsUrl, { headers: { Authorization: `Bearer ${token}` } });
+        if (statsRes.data?.success) stats = statsRes.data.data;
       } catch (e) {
         console.warn("Stats xatosi:", e);
       }
-
       setOrderStats(stats);
 
-      // Flat orders + statusni aniqroq boshqarish
       const flatOrders = ordersData.flatMap(order => {
         const orderNumber = order.orderNumber || order._id?.slice(-8)?.toUpperCase() || "—";
         const createdAt = order.createdAt
-          ? new Date(order.createdAt).toLocaleString('uz-UZ', {
-              year: 'numeric', month: '2-digit', day: '2-digit',
-              hour: '2-digit', minute: '2-digit'
-            })
+          ? new Date(order.createdAt).toLocaleString('uz-UZ', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
           : '—';
 
-        let displayStatus = "kutilmoqda";
-        if (order.paymentStatus === "paid") {
-          displayStatus = order.deliveryStatus === "delivered" ? "yetkazib berildi" : "to'langan";
-        } else if (order.paymentStatus === "cancelled") {
-          displayStatus = "bekor qilingan";
-        }
+        let displayStatus = order.paymentStatus === "paid"
+          ? (order.deliveryStatus === "delivered" ? "yetkazib berildi" : "to'langan")
+          : order.paymentStatus === "cancelled" ? "bekor qilingan" : "kutilmoqda";
 
-        // Foydalanuvchi ma'lumotlarini olish
         let userName = "Noma'lum foydalanuvchi";
         let userPhone = "—";
-        let userEmail = "—";
-        
-        if (order.userId) {
-          if (typeof order.userId === 'object') {
-            userName = order.userId.name || order.userId.firstName || order.userId.phone || 'Noma\'lum foydalanuvchi';
-            userPhone = order.userId.phone || '—';
-            userEmail = order.userId.email || '—';
-          } else if (typeof order.userId === 'string') {
-            userName = `User ID: ${order.userId.slice(-6)}`;
-          }
+
+        if (order.userId && typeof order.userId === 'object') {
+          userName = order.userId.fullName || order.userId.name || order.userId.firstName || order.userId.phone || 'Noma\'lum';
+          userPhone = order.userId.phone || '—';
         }
 
         return (order.items || []).map((item, index) => ({
@@ -125,64 +90,114 @@ function Aperator() {
           tadbirkor: item.productSnapshot?.company || "Dentago",
           status: displayStatus,
           paymentStatus: order.paymentStatus || "pending",
-          // Foydalanuvchi ma'lumotlari
-          userInfo: {
-            name: userName,
-            phone: userPhone,
-            email: userEmail,
-            userId: order.userId?._id || order.userId
-          }
+          userInfo: { name: userName, phone: userPhone }
         }));
       });
 
-      console.log("Flat orders:", flatOrders.length, "ta mahsulot");
       setAllFlatOrders(flatOrders);
       setFilteredOrders(flatOrders);
-
     } catch (err) {
-      console.error("Xatolik:", err);
+      console.error("Mahsulot buyurtmalari xatosi:", err);
       alert("Ma'lumotlarni yuklashda xatolik: " + err.message);
-      setAllFlatOrders([]);
-      setFilteredOrders([]);
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Filterlash funksiyasi
-  useEffect(() => {
-    let filtered = [...allFlatOrders];
+  const fetchTechnicianOrders = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error("Token topilmadi!");
 
-    // Qidiruv bo'yicha filter
+      const res = await axios.get(`${BASE_URL}/api/admin/technicians/requests`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        const techOrders = res.data.data.map(req => ({
+          id: req._id,
+          requestId: req._id,
+          technicianName: req.client?.fullName || req.client?.name || req.client?.phone || 'Noma\'lum texnik',
+          technicianPhone: req.client?.phone ? `(${req.client.phone})` : '',
+          productName: req.productId?.name || 'Noma\'lum mahsulot',
+          productCompany: req.productId?.company || 'Dentago',
+          quantity: req.quantity || 1,
+          totalPrice: Number(req.totalPrice || 0),
+          status: req.status || 'pending',
+          createdAt: req.createdAt
+            ? new Date(req.createdAt).toLocaleString('uz-UZ', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+            : '—'
+        }));
+
+        setTechnicianOrders(techOrders);
+        setFilteredTechOrders(techOrders);
+      }
+    } catch (err) {
+      console.error("Texnik buyurtmalari xatosi:", err);
+      alert("Texnik buyurtmalarini yuklashda xatolik: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchProductOrders(), fetchTechnicianOrders()]);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'products') return;
+    let filtered = [...allFlatOrders];
+    const term = searchTerm.toLowerCase();
+
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(order => 
-        order.orderNumber.toLowerCase().includes(term) ||
-        order.mahsulotNomi.toLowerCase().includes(term) ||
-        order.tadbirkor.toLowerCase().includes(term) ||
-        (order.userInfo?.name && order.userInfo.name.toLowerCase().includes(term)) ||
-        (order.userInfo?.phone && order.userInfo.phone.includes(term))
+      filtered = filtered.filter(o =>
+        o.orderNumber.toLowerCase().includes(term) ||
+        o.mahsulotNomi.toLowerCase().includes(term) ||
+        o.tadbirkor.toLowerCase().includes(term) ||
+        o.userInfo?.name?.toLowerCase().includes(term) ||
+        o.userInfo?.phone?.includes(term)
       );
     }
 
-    // Status bo'yicha filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => {
-        if (statusFilter === 'pending') return order.paymentStatus === 'pending';
-        if (statusFilter === 'paid') return order.paymentStatus === 'paid';
-        if (statusFilter === 'delivered') return order.status === 'yetkazib berildi';
-        if (statusFilter === 'cancelled') return order.paymentStatus === 'cancelled';
+      filtered = filtered.filter(o => {
+        if (statusFilter === 'pending') return o.paymentStatus === 'pending';
+        if (statusFilter === 'paid') return o.paymentStatus === 'paid';
+        if (statusFilter === 'delivered') return o.status === 'yetkazib berildi';
+        if (statusFilter === 'cancelled') return o.paymentStatus === 'cancelled';
         return true;
       });
     }
 
     setFilteredOrders(filtered);
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, allFlatOrders]);
+  }, [searchTerm, statusFilter, allFlatOrders, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'technicians') return;
+    let filtered = [...technicianOrders];
+    const term = searchTerm.toLowerCase();
+
+    if (searchTerm) {
+      filtered = filtered.filter(o =>
+        o.technicianName.toLowerCase().includes(term) ||
+        o.productName.toLowerCase().includes(term) ||
+        o.productCompany.toLowerCase().includes(term) ||
+        o.technicianPhone.includes(term)
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(o => o.status.toLowerCase() === statusFilter.toLowerCase());
+    }
+
+    setFilteredTechOrders(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, technicianOrders, activeTab]);
 
   const handleConfirmPayment = async (orderId) => {
     if (!orderId) return;
-
     setActionLoading(prev => ({ ...prev, [orderId]: true }));
 
     try {
@@ -190,68 +205,158 @@ function Aperator() {
       await axios.patch(
         `${BASE_URL}/api/order/payment/${orderId}`,
         { paymentStatus: "paid" },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setAllFlatOrders(prev =>
         prev.map(item =>
-          item.id === orderId
-            ? { ...item, paymentStatus: "paid", status: "to'langan" }
-            : item
+          item.id === orderId ? { ...item, paymentStatus: "paid", status: "to'langan" } : item
         )
       );
-
       alert("To'lov tasdiqlandi!");
     } catch (err) {
-      console.error("To'lov tasdiqlash xatosi:", err);
-      alert("Xatolik yuz berdi: " + (err.response?.data?.message || err.message));
+      alert("Xatolik: " + (err.response?.data?.message || err.message));
     } finally {
       setActionLoading(prev => ({ ...prev, [orderId]: false }));
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const openConfirmModal = (requestId, newStatus) => {
+    setConfirmModal({ open: true, requestId, status: newStatus });
+  };
 
-  const totalItems = filteredOrders.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedOrders = filteredOrders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const closeConfirmModal = () => {
+    setConfirmModal({ open: false, requestId: null, status: null });
+  };
+
+  const confirmAndUpdateStatus = async () => {
+    const { requestId, status } = confirmModal;
+    if (!requestId || !status) return;
+
+    closeConfirmModal();
+    setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error("Token topilmadi");
+
+      const response = await axios.put(
+        `${BASE_URL}/api/admin/technicians/requests/${requestId}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data?.success) {
+        setTechnicianOrders(prev =>
+          prev.map(o => o.requestId === requestId ? { ...o, status } : o)
+        );
+        setFilteredTechOrders(prev =>
+          prev.map(o => o.requestId === requestId ? { ...o, status } : o)
+        );
+
+      
+      } else {
+        throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
+      }
+    } catch (err) {
+      console.error("Status yangilash xatosi:", err);
+      alert("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+    } finally {
+      setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
+    }
+  };
+
+  const updateTechnicianOrderStatus = async (requestId, status) => {
+    if (!requestId) return;
+    setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error("Token topilmadi");
+
+      const response = await axios.put(
+        `${BASE_URL}/api/admin/technicians/requests/${requestId}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data?.success) {
+        setTechnicianOrders(prev =>
+          prev.map(o => o.requestId === requestId ? { ...o, status } : o)
+        );
+        setFilteredTechOrders(prev =>
+          prev.map(o => o.requestId === requestId ? { ...o, status } : o)
+        );
+
+       
+      } else {
+        throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
+      }
+    } catch (err) {
+      console.error("Status yangilash xatosi:", err);
+      alert("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+    } finally {
+      setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
+    }
+  };
 
   const getStatusBadge = (status) => {
+    const lower = (status || '').toLowerCase();
     let color = 'bg-gray-100 text-gray-700';
     let text = status || '—';
 
-    switch (status?.toLowerCase()) {
-      case 'yetkazib berildi':
-      case 'delivered':
-        color = 'bg-emerald-100 text-emerald-800';
-        text = 'Yetkazib berildi';
-        break;
-      case 'to\'langan':
-      case 'paid':
-        color = 'bg-blue-100 text-blue-800';
-        text = "To'langan";
-        break;
-      case 'kutilmoqda':
-      case 'pending':
-        color = 'bg-amber-100 text-amber-800';
-        text = 'Kutilmoqda';
-        break;
-      case 'bekor qilingan':
-      case 'cancelled':
-        color = 'bg-rose-100 text-rose-800';
-        text = 'Bekor qilingan';
-        break;
-      default:
-        color = 'bg-slate-100 text-slate-700';
+    if (lower === 'yetkazib berildi' || lower === 'delivered') {
+      color = 'bg-emerald-100 text-emerald-800';
+      text = 'Yetkazib berildi';
+    } else if (lower === 'to\'langan' || lower === 'paid') {
+      color = 'bg-blue-100 text-blue-800';
+      text = "To'langan";
+    } else if (lower === 'kutilmoqda' || lower === 'pending') {
+      color = 'bg-amber-100 text-amber-800';
+      text = 'Kutilmoqda';
+    } else if (lower === 'bekor qilingan' || lower === 'cancelled') {
+      color = 'bg-rose-100 text-rose-800';
+      text = 'Bekor qilingan';
+    }
+
+    return <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${color}`}>{text}</span>;
+  };
+
+  const getTechStatusBadge = (status) => {
+    const lower = (status || '').toLowerCase();
+    let color = 'bg-gray-100 text-gray-700';
+    let text = status || '—';
+    let icons = null;
+
+    if (lower === 'pending') {
+      color = 'bg-amber-100 text-amber-800';
+      text = 'Kutilmoqda';
+      icons = <Package className="w-3 h-3 mr-1" />;
+    } 
+    else if (lower === 'accepted') {
+      color = 'bg-blue-100 text-blue-800';
+      text = 'Qabul qilindi';
+      icons = <Check className="w-3 h-3 mr-1" />;
+    } 
+    else if (lower === 'completed') {
+      color = 'bg-emerald-100 text-emerald-800';
+      text = 'Bajarildi';
+      icons = (
+        <div className="flex items-center">
+          <Check className="w-3.5 h-3.5 mr-0.5" />
+          <Check className="w-3.5 h-3.5" />
+        </div>
+      );
+    } 
+    else if (lower === 'rejected') {
+      color = 'bg-rose-100 text-rose-800';
+      text = 'Bekor qilindi';
+      icons = <X className="w-3 h-3 mr-1" />;
     }
 
     return (
       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${color}`}>
+        {icons}
         {text}
       </span>
     );
@@ -259,7 +364,7 @@ function Aperator() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4] mx-auto mb-4" />
           <p className="text-slate-600 font-bold">Yuklanmoqda...</p>
@@ -268,261 +373,342 @@ function Aperator() {
     );
   }
 
+  const currentData = activeTab === 'technicians' ? filteredTechOrders : filteredOrders;
+  const totalItems = currentData.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedData = currentData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   return (
-    <div className="bg-white font-sans p-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-6">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
-              <Package size={24} />
-            </div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">
-              Buyurtmalar <span style={{ color: PRIMARY_COLOR }}>Tarixi</span>
-            </h1>
+    <div className="bg-white font-sans p-6 min-h-screen">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-[#00BCE4]/10 text-[#00BCE4]">
+            <Package size={28} />
           </div>
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">
-            Jami: {totalItems} ta mahsulot {isAdmin && `(barcha foydalanuvchilar - ${allFlatOrders.length} ta)`}
-          </p>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase italic">
+            Buyurtmalar <span style={{ color: PRIMARY_COLOR }}>Tarixi</span>
+          </h1>
         </div>
 
-        {/* Filter va qidiruv - faqat adminlar uchun */}
-        {isAdmin && (
-          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            {/* Qidiruv input */}
-            <div className="relative flex-1 sm:min-w-[300px]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="text"
-                placeholder="Buyurtma ID, mahsulot, foydalanuvchi..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 focus:border-[#00BCE4] transition-all text-sm"
-              />
-            </div>
-
-            {/* Status filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 focus:border-[#00BCE4] transition-all text-sm bg-white"
-            >
-              <option value="all">Barcha statuslar</option>
-              <option value="pending">Kutilmoqda</option>
-              <option value="paid">To'langan</option>
-              <option value="delivered">Yetkazib berilgan</option>
-              <option value="cancelled">Bekor qilingan</option>
-            </select>
+        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+          <div className="relative flex-1 min-w-[280px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder={activeTab === 'technicians' ? "Texnik, mahsulot, telefon..." : "Buyurtma ID, mahsulot, mijoz..."}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50"
+            />
           </div>
-        )}
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 bg-white min-w-[180px]"
+          >
+            <option value="all">Barcha statuslar</option>
+            {activeTab === 'technicians' ? (
+              <>
+                <option value="pending">Kutilmoqda</option>
+                <option value="accepted">Qabul qilindi</option>
+                <option value="completed">Bajarildi</option>
+                <option value="rejected">Bekor qilindi</option>
+              </>
+            ) : (
+              <>
+                <option value="pending">Kutilmoqda</option>
+                <option value="paid">To'langan</option>
+                <option value="delivered">Yetkazib berilgan</option>
+                <option value="cancelled">Bekor qilingan</option>
+              </>
+            )}
+          </select>
+        </div>
       </div>
 
-      {/* Umumiy statistika kartalari */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-sm text-slate-500 mb-1">Jami buyurtmalar</p>
-          <p className="text-3xl font-bold text-slate-800">{orderStats.totalOrders.toLocaleString()}</p>
-        </div>
+      <div className="mb-8 flex flex-wrap gap-3 border-b border-slate-200 pb-3">
+        <button
+          onClick={() => setActiveTab('products')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
+        >
+          <Package size={18} />
+          Mahsulot buyurtmalari
+        </button>
 
-        <div className="bg-white border border-amber-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-sm text-amber-700 mb-1">To'lov kutilmoqda</p>
-          <p className="text-3xl font-bold text-amber-700">{orderStats.pendingPayment.toLocaleString()}</p>
-        </div>
-
-        <div className="bg-white border border-blue-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-sm text-blue-700 mb-1">To'langan</p>
-          <p className="text-3xl font-bold text-blue-700">{orderStats.paid.toLocaleString()}</p>
-        </div>
-
-        <div className="bg-white border border-emerald-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-          <p className="text-sm text-emerald-700 mb-1">Yetkazib berilgan</p>
-          <p className="text-3xl font-bold text-emerald-700">{orderStats.delivered.toLocaleString()}</p>
-        </div>
+        <button
+          onClick={() => setActiveTab('technicians')}
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
+        >
+          Texnik buyurtmalari
+        </button>
       </div>
 
-      {/* Umumiy summa */}
-      <div className="mb-8 p-6 bg-gradient-to-r from-[#00BCE4]/10 to-blue-50 rounded-xl border border-[#00BCE4]/30">
-        <p className="text-lg font-medium text-slate-700 mb-2">Umumiy buyurtma summasi</p>
-        <p className="text-4xl font-black text-[#00BCE4]">
-          {orderStats.totalAmount.toLocaleString()} so'm
-        </p>
-      </div>
+      {activeTab === 'products' && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            <p className="text-sm text-slate-500">Jami buyurtmalar</p>
+            <p className="text-3xl font-bold text-slate-800 mt-1">{orderStats.totalOrders.toLocaleString()}</p>
+          </div>
+          <div className="bg-white border border-amber-200 rounded-xl p-6 shadow-sm">
+            <p className="text-sm text-amber-700">To'lov kutilmoqda</p>
+            <p className="text-3xl font-bold text-amber-700 mt-1">{orderStats.pendingPayment.toLocaleString()}</p>
+          </div>
+          <div className="bg-white border border-blue-200 rounded-xl p-6 shadow-sm">
+            <p className="text-sm text-blue-700">To'langan</p>
+            <p className="text-3xl font-bold text-blue-700 mt-1">{orderStats.paid.toLocaleString()}</p>
+          </div>
+          <div className="bg-white border border-emerald-200 rounded-xl p-6 shadow-sm">
+            <p className="text-sm text-emerald-700">Yetkazib berilgan</p>
+            <p className="text-3xl font-bold text-emerald-700 mt-1">{orderStats.delivered.toLocaleString()}</p>
+          </div>
+        </div>
+      )}
 
-      {/* Jadval */}
       <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1200px]">
+          <table className="w-full min-w-[1100px]">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-wider">ID / Mahsulot</th>
-                {isAdmin && (
-                  <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Foydalanuvchi</th>
-                )}
-                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Kompaniya</th>
-                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase tracking-wider">Soni</th>
-                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase tracking-wider">Narxi</th>
-                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase tracking-wider">Sana / Vaqt</th>
-                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase tracking-wider">Status</th>
-                {isAdmin && (
-                  <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase tracking-wider">To'lov</th>
+                {activeTab === 'products' ? (
+                  <>
+                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID / Mahsulot</th>
+                    {isAdmin && <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mijoz</th>}
+                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kompaniya</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Narx</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Sana</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Status</th>
+                    {isAdmin && <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">To'lov</th>}
+                  </>
+                ) : (
+                  <>
+                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID / Mahsulot</th>
+                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Texnik</th>
+                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kompaniya</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Narx</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Sana</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Status</th>
+                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Harakat</th>
+                  </>
                 )}
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-100">
-              {paginatedOrders.length > 0 ? paginatedOrders.map(order => {
-                const canConfirm = order.paymentStatus === "pending" || order.paymentStatus === "waiting";
-                const isLoading = actionLoading[order.id];
+              {paginatedData.length > 0 ? paginatedData.map((item) => {
+                if (activeTab === 'products') {
+                  const canConfirm = item.paymentStatus === "pending" || item.paymentStatus === "waiting";
+                  const isLoading = actionLoading[item.id];
 
-                return (
-                  <tr key={`${order.id}-${order.itemIndex}`} className="hover:bg-[#00BCE4]/[0.03] transition-colors">
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-black text-[#00BCE4] mb-1">#{order.orderNumber}</span>
-                        <span className="text-sm font-bold text-slate-800">{order.mahsulotNomi}</span>
-                      </div>
-                    </td>
-
-                    {isAdmin && (
+                  return (
+                    <tr key={`${item.id}-${item.itemIndex}`} className="hover:bg-[#00BCE4]/[0.03]">
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
-                          <span className="text-sm font-bold text-slate-800">{order.userInfo?.name || 'Noma\'lum'}</span>
-                          <span className="text-xs text-slate-500">{order.userInfo?.phone || '—'}</span>
+                          <span className="text-xs font-black text-[#00BCE4]">#{item.orderNumber}</span>
+                          <span className="text-sm font-bold text-slate-800">{item.mahsulotNomi}</span>
                         </div>
                       </td>
-                    )}
+                      {isAdmin && (
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-slate-800">{item.userInfo?.name || '—'}</span>
+                            <span className="text-xs text-slate-500">{item.userInfo?.phone || '—'}</span>
+                          </div>
+                        </td>
+                      )}
+                      <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.tadbirkor}</td>
+                      <td className="px-6 py-5 text-center">
+                        <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
+                          {item.soni} ta
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
+                        {(item.totalNarx || 0).toLocaleString()} so'm
+                      </td>
+                      <td className="px-6 py-5 text-center text-sm font-bold text-slate-700">
+                        {item.createdAt}
+                      </td>
+                      <td className="px-6 py-5 text-center">{getStatusBadge(item.status)}</td>
+                      {isAdmin && (
+                        <td className="px-6 py-5 text-center">
+                          {canConfirm ? (
+                            <button
+                              onClick={() => handleConfirmPayment(item.id)}
+                              disabled={isLoading}
+                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${isLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                            >
+                              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
+                            </button>
+                          ) : (
+                            <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center">
+                              <X size={20} />
+                            </div>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                }
 
-                    <td className="px-6 py-5 text-sm font-bold text-slate-600">{order.tadbirkor}</td>
-                    
+                const isTechLoading = techActionLoading[item.requestId];
+
+                return (
+                  <tr key={item.requestId} className="hover:bg-[#00BCE4]/[0.03]">
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black text-[#00BCE4]">#{item.requestId?.slice(-8)}</span>
+                        <span className="text-sm font-bold text-slate-800">{item.productName}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-800">{item.technicianName}</span>
+                        {item.technicianPhone && <span className="text-xs text-slate-500">{item.technicianPhone}</span>}
+                      </div>
+                    </td>
+                    <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.productCompany}</td>
                     <td className="px-6 py-5 text-center">
                       <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
-                        {order.soni} ta
+                        {item.quantity} ta
                       </span>
                     </td>
-                    
                     <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
-                      {order.totalNarx.toLocaleString()} so'm
+                      {(item.totalPrice || 0).toLocaleString()} so'm
                     </td>
-                    
                     <td className="px-6 py-5 text-center text-sm font-bold text-slate-700">
-                      {order.createdAt}
+                      {item.createdAt}
                     </td>
-                    
                     <td className="px-6 py-5 text-center">
-                      {getStatusBadge(order.status)}
+                      {getTechStatusBadge(item.status)}
                     </td>
+                    <td className="px-6 py-5 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {item.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'accepted')}
+                              disabled={isTechLoading}
+                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                            >
+                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
+                            </button>
 
-                    {isAdmin && (
-                      <td className="px-6 py-5 text-center">
-                        {canConfirm ? (
+                            <button
+                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
+                              disabled={isTechLoading}
+                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
+                            >
+                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
+                            </button>
+                          </>
+                        )}
+
+                        {item.status === 'accepted' && (
                           <button
-                            onClick={() => handleConfirmPayment(order.id)}
-                            disabled={isLoading}
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                              isLoading
-                                ? 'bg-gray-100 cursor-not-allowed'
-                                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
-                            }`}
-                            title="To'lovni tasdiqlash"
+                            onClick={() => openConfirmModal(item.requestId, 'completed')}
+                            disabled={isTechLoading}
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'}`}
                           >
-                            {isLoading ? (
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                              <MdCheck size={20} />
-                            )}
+                            {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
                           </button>
-                        ) : (
-                          <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center cursor-not-allowed" title="To'lov allaqachon tasdiqlangan">
+                        )}
+
+                        {(item.status === 'completed' || item.status === 'rejected') && (
+                          <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center">
                             <X size={20} />
                           </div>
                         )}
-                      </td>
-                    )}
+                      </div>
+                    </td>
                   </tr>
                 );
               }) : (
                 <tr>
-                  <td colSpan={isAdmin ? 8 : 6} className="py-20 text-center text-slate-500">
+                  <td colSpan={activeTab === 'products' ? (isAdmin ? 8 : 6) : 8} className="py-20 text-center text-slate-500">
                     <Package className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                    <p className="text-lg font-medium">Hech qanday buyurtma topilmadi</p>
-                    {searchTerm && (
-                      <button
-                        onClick={() => {
-                          setSearchTerm('');
-                          setStatusFilter('all');
-                        }}
-                        className="mt-4 text-[#00BCE4] hover:underline text-sm font-medium"
-                      >
-                        Filtrlarni tozalash
-                      </button>
-                    )}
+                    <p className="text-lg font-medium">
+                      {activeTab === 'technicians' ? 'Texnik buyurtmalari topilmadi' : 'Mahsulot buyurtmalari topilmadi'}
+                    </p>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-white">
-            <div className="text-sm text-slate-600">
-              Jami: {totalItems} ta mahsulot, Sahifa {currentPage} dan {totalPages}
-            </div>
-            <div className="flex items-center gap-2">
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 mt-4">
+          <div className="text-sm text-slate-600">
+            Jami: {totalItems} ta • Sahifa {currentPage} / {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className={`w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
+            >
+              <ChevronLeft size={18} />
+            </button>
+
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              let pageNum = i + 1;
+              if (totalPages > 5) {
+                if (currentPage <= 3) pageNum = i + 1;
+                else if (currentPage >= totalPages - 1) pageNum = totalPages - 4 + i;
+                else pageNum = currentPage - 2 + i;
+              }
+              if (pageNum < 1 || pageNum > totalPages) return null;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`w-9 h-9 rounded-md border text-sm font-medium ${currentPage === pageNum ? 'bg-[#00BCE4] text-white border-[#00BCE4]' : 'border-slate-300 hover:bg-slate-100'}`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className={`w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {confirmModal.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-800 mb-4">Tasdiqlang</h3>
+            <p className="text-slate-600 mb-6">
+              Buyurtmani <strong>"Bajarildi"</strong> holatiga o‘tkazmoqchimisiz? Bu amalni qaytarib bo‘lmaydi.
+            </p>
+            <div className="flex justify-end gap-3">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className={`w-9 h-9 flex items-center justify-center rounded-md border ${
-                  currentPage === 1 
-                    ? 'text-slate-400 cursor-not-allowed bg-slate-50' 
-                    : 'text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors'
-                }`}
+                onClick={closeConfirmModal}
+                className="px-5 py-2.5 bg-gray-200 text-slate-700 rounded-lg hover:bg-gray-300 transition"
               >
-                <ChevronLeft size={18} />
+                Yo‘q
               </button>
-
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`w-9 h-9 flex items-center justify-center rounded-md border text-sm font-medium ${
-                      currentPage === pageNum
-                        ? 'bg-[#00BCE4] text-white border-[#00BCE4] cursor-pointer'
-                        : 'border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className={`w-9 h-9 flex items-center justify-center rounded-md border ${
-                  currentPage === totalPages 
-                    ? 'text-slate-400 cursor-not-allowed bg-slate-50' 
-                    : 'text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors'
-                }`}
+                onClick={confirmAndUpdateStatus}
+                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition flex items-center gap-2"
               >
-                <ChevronRight size={18} />
+                <Check size={18} />
+                Ha, bajarildi
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
