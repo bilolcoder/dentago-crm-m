@@ -3,7 +3,7 @@ import { X, ShoppingCart, User, MapPin, CreditCard, Navigation } from 'lucide-re
 import PaymeSvg from '../../assets/payme.png';
 import ClickSvg from '../../assets/click.png';
 import RahmatSvg from '../../assets/rahmat.png';
-
+import { useNavigate } from 'react-router-dom';
 const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConfirm }) => {
   const navigate = useNavigate();
 
@@ -186,7 +186,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
         paymentMethod: formData.paymentMethod
       });
 
-      alert("Buyurtma muvaffaqiyatli yuborildi! To'lov sahifasiga o'ting.");
+      navigate('/orders');
 
       // Formani tozalash va modalni yopish
       setFormData({
