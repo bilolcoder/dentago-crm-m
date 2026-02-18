@@ -64,7 +64,6 @@ const uzbekistanCities = [
     value: "qongirot",
     region: "Qoraqalpog'iston Respublikasi"
   },
-
   // =========================
   // TOSHKENT SHAHAR
   // =========================
@@ -74,7 +73,6 @@ const uzbekistanCities = [
     value: "toshkent",
     region: "Toshkent shahri"
   },
-
   // =========================
   // TOSHKENT VILOYATI
   // =========================
@@ -108,7 +106,6 @@ const uzbekistanCities = [
     value: "yangiyol",
     region: "Toshkent viloyati"
   },
-
   // =========================
   // SAMARQAND
   // =========================
@@ -130,7 +127,6 @@ const uzbekistanCities = [
     value: "urgut",
     region: "Samarqand viloyati"
   },
-
   // =========================
   // BUXORO
   // =========================
@@ -152,7 +148,6 @@ const uzbekistanCities = [
     value: "kogon",
     region: "Buxoro viloyati"
   },
-
   // =========================
   // FARG'ONA
   // =========================
@@ -174,7 +169,6 @@ const uzbekistanCities = [
     value: "qoqon",
     region: "Farg'ona viloyati"
   },
-
   // =========================
   // ANDIJON
   // =========================
@@ -190,7 +184,6 @@ const uzbekistanCities = [
     value: "asaka",
     region: "Andijon viloyati"
   },
-
   // =========================
   // NAMANGAN
   // =========================
@@ -206,7 +199,6 @@ const uzbekistanCities = [
     value: "chust",
     region: "Namangan viloyati"
   },
-
   // =========================
   // QASHQADARYO
   // =========================
@@ -222,7 +214,6 @@ const uzbekistanCities = [
     value: "shahrisabz",
     region: "Qashqadaryo viloyati"
   },
-
   // =========================
   // SURXONDARYO
   // =========================
@@ -232,7 +223,6 @@ const uzbekistanCities = [
     value: "termiz",
     region: "Surxondaryo viloyati"
   },
-
   // =========================
   // JIZZAX
   // =========================
@@ -308,7 +298,6 @@ const uzbekistanCities = [
     value: "sharof_rashidov",
     region: "Jizzax viloyati"
   },
-
   // =========================
   // XORAZM
   // =========================
@@ -330,47 +319,39 @@ function MyInformation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [token, setToken] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [doctors, setDoctors] = useState([]);
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [entities, setEntities] = useState([]); // doctors or technicians
+  const [selectedEntity, setSelectedEntity] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewDoctor, setViewDoctor] = useState(null);
+  const [viewEntity, setViewEntity] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [debugInfo, setDebugInfo] = useState('');
   const [isFormCollapsed, setIsFormCollapsed] = useState(false);
   const [selectedSpecialties, setSelectedSpecialties] = useState([]);
   const [location, setLocation] = useState({ lat: '', lng: '' });
   const [showMapModal, setShowMapModal] = useState(false);
-  const [isMapLoading, setIsMapLoading] = useState(false); // Yangi state - xarita yuklanmoqda
-
-  // Yangi state'lar - viloyat va tuman uchun
+  const [isMapLoading, setIsMapLoading] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
-
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
-
   const ITEMS_PER_PAGE = 10;
 
-  // Barcha unikallik viloyatlarni olish
   const regions = [...new Set(uzbekistanCities.map(city => city.region))].sort();
+  const filteredCities = uzbekistanCities.filter(city => city.region === selectedRegion);
 
-  // Tanlangan viloyatga qarab tuman/shaharlar
-  const filteredCities = uzbekistanCities.filter(
-    city => city.region === selectedRegion
-  );
-
-  // Token yuklash
   useEffect(() => {
     const savedToken = localStorage.getItem('accessToken');
     setToken(savedToken);
+    const role = localStorage.getItem('userRole');
+    setUserRole(role);
     setIsLoading(false);
-
     if (!savedToken) {
       setSubmitMessage({
         type: 'error',
@@ -379,234 +360,183 @@ function MyInformation() {
     }
   }, []);
 
-  // Shifokorlarni yuklash
   useEffect(() => {
-    if (token) {
-      fetchDoctors();
+    if (token && userRole) {
+      fetchEntities();
     }
-  }, [token]);
+  }, [token, userRole]);
 
-  const fetchDoctors = async () => {
+  const getEndpoint = (type) => {
+    if (userRole === 'technician') {
+      switch (type) {
+        case 'list': return 'https://app.dentago.uz/api/admin/technicians?limit=100000';
+        case 'single': return 'https://app.dentago.uz/api/admin/technicians';
+        case 'base': return 'https://app.dentago.uz/api/admin/technicians';
+      }
+    } else {
+      switch (type) {
+        case 'list': return 'https://app.dentago.uz/api/admin/doctors?limit=100000';
+        case 'single': return 'https://app.dentago.uz/api/admin/doctors';
+        case 'base': return 'https://app.dentago.uz/api/admin/doctors';
+      }
+    }
+  };
+
+  const fetchEntities = async () => {
     try {
-      console.log('Shifokorlarni yuklash boshlandi...');
-      setDebugInfo('Shifokorlarni yuklash boshlandi...');
-
-      const response = await axios.get(
-        'https://app.dentago.uz/api/admin/doctors?limit=100000',
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
+      console.log('Yuklash boshlandi...');
+      setDebugInfo('Yuklash boshlandi...');
+      const response = await axios.get(getEndpoint('list'), {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       console.log('Server response:', response);
       setDebugInfo(`Response status: ${response.status}, Data length: ${response.data?.length || 0}`);
-
-      // Turli formatlarni qo'llab-quvvatlash
-      let doctorsData = [];
-
+      let entitiesData = [];
       if (Array.isArray(response.data)) {
-        doctorsData = response.data;
+        entitiesData = response.data;
       } else if (response.data && Array.isArray(response.data.data)) {
-        doctorsData = response.data.data;
+        entitiesData = response.data.data;
       } else if (response.data && response.data.doctors) {
-        doctorsData = response.data.doctors;
+        entitiesData = response.data.doctors;
       } else if (response.data && response.data.items) {
-        doctorsData = response.data.items;
+        entitiesData = response.data.items;
       } else if (response.data && typeof response.data === 'object') {
-        doctorsData = Object.values(response.data);
+        entitiesData = Object.values(response.data);
       }
-
-      console.log('Loaded doctors:', doctorsData);
-      setDoctors(doctorsData);
-      setDebugInfo(`Shifokorlar soni: ${doctorsData.length}`);
-
+      console.log('Loaded entities:', entitiesData);
+      setEntities(entitiesData);
+      setDebugInfo(`Son: ${entitiesData.length}`);
     } catch (error) {
-      console.error('Shifokorlarni yuklashda xato:', error);
+      console.error('Yuklashda xato:', error);
       setDebugInfo(`Xato: ${error.message}`);
       setSubmitMessage({
         type: 'error',
-        text: `Shifokorlarni yuklashda xato: ${error.message}`
+        text: `Yuklashda xato: ${error.message}`
       });
     }
   };
 
-  // ID orqali shifokorni ko'rish
-  const handleViewDoctor = async (id) => {
+  const handleViewEntity = async (id) => {
     try {
       if (!id) {
-        alert('Shifokor ID topilmadi');
+        alert('ID topilmadi');
         setDebugInfo('ID topilmadi');
         return;
       }
-
-      console.log('View doctor ID:', id);
-      setDebugInfo(`ID orqali shifokor yuklanmoqda: ${id}`);
-
+      console.log('View ID:', id);
+      setDebugInfo(`ID orqali yuklanmoqda: ${id}`);
       const response = await axios.get(
-        `https://app.dentago.uz/api/admin/doctors/${id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+        `${getEndpoint('single')}/${id}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
       );
-
-      console.log('View doctor response:', response.data);
-
-      // Response formatini to'g'ri qayta ishlash (agar nested bo'lsa)
-      const doctorData = response.data?.data || response.data || null;
-
-      if (doctorData) {
-        setViewDoctor(doctorData);
+      console.log('View response:', response.data);
+      const entityData = response.data?.data || response.data || null;
+      if (entityData) {
+        setViewEntity(entityData);
         setIsViewModalOpen(true);
-        setDebugInfo(`Shifokor ma'lumotlari yuklandi`);
+        setDebugInfo(`Ma'lumotlari yuklandi`);
       } else {
-        setDebugInfo('Shifokor ma\'lumotlari topilmadi');
-        alert('Shifokor ma\'lumotlari topilmadi');
+        setDebugInfo('Ma\'lumotlari topilmadi');
+        alert('Ma\'lumotlari topilmadi');
       }
     } catch (error) {
-      console.error('Shifokorni ko\'rishda xato:', error);
-      console.error('Error details:', error.response?.data || error.message);
+      console.error('Ko\'rishda xato:', error);
       setDebugInfo(`Xato: ${error.response?.status || error.message}`);
-
-      let errorMsg = 'Shifokor ma\'lumotlarini yuklashda xato yuz berdi';
-      if (error.response?.status === 404) {
-        errorMsg = 'Shifokor topilmadi (404)';
-      } else if (error.response?.status === 401) {
-        errorMsg = 'Kirish huquqi yo\'q (401) - Tokenni tekshiring';
-      } else if (error.response?.status === 403) {
-        errorMsg = 'Ruxsat yo\'q (403) - Admin huquqlarini tekshiring';
-      } else if (error.response?.status === 500) {
-        errorMsg = 'Server xatosi (500) - Backendni tekshiring';
-      }
+      let errorMsg = 'Ma\'lumotlarini yuklashda xato yuz berdi';
+      if (error.response?.status === 404) errorMsg = 'Topilmadi (404)';
+      else if (error.response?.status === 401) errorMsg = 'Kirish huquqi yo\'q (401)';
+      else if (error.response?.status === 403) errorMsg = 'Ruxsat yo\'q (403)';
+      else if (error.response?.status === 500) errorMsg = 'Server xatosi (500)';
       alert(errorMsg);
     }
   };
 
-  // Shifokorni tahrirlash
-  const handleEditDoctor = (doctor) => {
-    console.log('Edit doctor:', doctor);
-
-    if (!doctor || (!doctor._id && !doctor.id)) {
-      alert('Shifokor ma\'lumotlari noto\'g\'ri');
+  const handleEditEntity = (entity) => {
+    console.log('Edit:', entity);
+    if (!entity || (!entity._id && !entity.id)) {
+      alert('Ma\'lumotlari noto\'g\'ri');
       return;
     }
-
-    setSelectedDoctor(doctor);
+    setSelectedEntity(entity);
     setIsEditing(true);
     setShowForm(true);
     setIsFormCollapsed(false);
-
-    // Form qiymatlarini to'ldirish
     const formValues = {
-      fullName: doctor.fullName || doctor.name || '',
-      gender: doctor.gender || 'male',
-      experienceYears: doctor.experienceYears || doctor.experience || 5,
-      clinicName: doctor.clinic?.name || doctor.hospitalName || '',
-      clinicAddress: doctor.clinic?.address || doctor.address || '',
-      price: doctor.price || doctor.consultationPrice || 150000,
-      workTimeStart: doctor.workTime?.start || doctor.workHours?.start || '09:00',
-      workTimeEnd: doctor.workTime?.end || doctor.workHours?.end || '18:00',
-      isAvailable24x7: doctor.isAvailable24x7 || doctor.available24_7 || false,
-      isActive: doctor.isActive !== undefined ? doctor.isActive : true,
-      phone: doctor.phone || doctor.phoneNumber || '',
-      description: doctor.description || doctor.bio || '',
-      region: doctor.region || '',
-      city: doctor.city || ''
+      fullName: entity.fullName || entity.name || '',
+      experienceYears: entity.experienceYears || entity.experience || 5,
+      phone: entity.phone || entity.phoneNumber || '',
+      description: entity.description || entity.bio || '',
     };
-
-    // Handle specialty field - could be string or array
-    const doctorSpecialty = doctor.specialty || doctor.specialization || 'Terapevt';
-    if (Array.isArray(doctorSpecialty)) {
-      setSelectedSpecialties(doctorSpecialty);
+    if (userRole !== 'technician') {
+      formValues.gender = entity.gender || 'male';
+      formValues.clinicName = entity.clinic?.name || entity.hospitalName || '';
+      formValues.clinicAddress = entity.clinic?.address || entity.address || '';
+      formValues.price = entity.price || entity.consultationPrice || 150000;
+      formValues.workTimeStart = entity.workTime?.start || entity.workHours?.start || '09:00';
+      formValues.workTimeEnd = entity.workTime?.end || entity.workHours?.end || '18:00';
+      formValues.isAvailable24x7 = entity.isAvailable24x7 || entity.available24_7 || false;
+      formValues.isActive = entity.isActive !== undefined ? entity.isActive : true;
+      const entitySpecialty = entity.specialty || entity.specialization || 'Terapevt';
+      if (Array.isArray(entitySpecialty)) {
+        setSelectedSpecialties(entitySpecialty);
+      } else {
+        const specialtyArray = String(entitySpecialty).split(', ').filter(item => item.trim() !== '');
+        setSelectedSpecialties(specialtyArray.length > 0 ? specialtyArray : ['Terapevt']);
+      }
     } else {
-      // Split the string by comma if it contains multiple specialties
-      const specialtyArray = String(doctorSpecialty).split(', ').filter(item => item.trim() !== '');
-      setSelectedSpecialties(specialtyArray.length > 0 ? specialtyArray : ['Terapevt']);
+      formValues.address = entity.address || '';
     }
-
+    formValues.region = entity.region || '';
+    formValues.city = entity.city || '';
     console.log('Form values to reset:', formValues);
     reset(formValues);
-
-    // Viloyat va tumanlarni set qilish
-    if (formValues.region) {
-      setSelectedRegion(formValues.region);
-    }
+    if (formValues.region) setSelectedRegion(formValues.region);
     if (formValues.city) {
-      // FormValues.city label bo'lishi mumkin, lekin biz value ni saqlashimiz kerak
-      const cityData = uzbekistanCities.find(c =>
-        c.label === formValues.city || c.value === formValues.city
-      );
+      const cityData = uzbekistanCities.find(c => c.label === formValues.city || c.value === formValues.city);
       setSelectedCity(cityData ? cityData.value : formValues.city);
     }
-
-    // Joylashuv ma'lumotlarini o'rnatish (agar mavjud bo'lsa)
-    if (doctor.clinic?.location) {
+    if (entity.location || entity.clinic?.location) {
+      const loc = entity.location || entity.clinic?.location;
       setLocation({
-        lat: doctor.clinic.location.lat?.toString() || '',
-        lng: doctor.clinic.location.lng?.toString() || ''
+        lat: loc.lat?.toString() || '',
+        lng: loc.lng?.toString() || ''
       });
     } else {
       setLocation({ lat: '', lng: '' });
     }
-
-    if (doctor.avatar || doctor.profileImage || doctor.image) {
-      setPreviewUrl(doctor.avatar || doctor.profileImage || doctor.image);
+    if (entity.avatar || entity.profileImage || entity.image) {
+      setPreviewUrl(entity.avatar || entity.profileImage || entity.image);
     } else {
       setPreviewUrl(null);
     }
-
-    // Formga scroll qilish
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
-  // Shifokorni o'chirish
-  const handleDeleteDoctor = async (id) => {
+  const handleDeleteEntity = async (id) => {
     if (!id) {
-      alert('Shifokor ID topilmadi');
+      alert('ID topilmadi');
       return;
     }
-
-    if (!window.confirm('Haqiqatan ham bu shifokorni o\'chirmoqchimisiz?')) {
-      return;
-    }
-
+    if (!window.confirm('Haqiqatan ham o\'chirmoqchimisiz?')) return;
     try {
       await axios.delete(
-        `https://app.dentago.uz/api/admin/doctors/${id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+        `${getEndpoint('base')}/${id}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
       );
-
-      // Ro'yxatni yangilash
-      setDoctors(doctors.filter(doctor => (doctor._id || doctor.id) !== id));
-      setSubmitMessage({
-        type: 'success',
-        text: '✅ Shifokor muvaffaqiyatli o\'chirildi!'
-      });
+      setEntities(entities.filter(entity => (entity._id || entity.id) !== id));
+      setSubmitMessage({ type: 'success', text: '✅ Muvaffaqiyatli o\'chirildi!' });
     } catch (error) {
       console.error('O\'chirishda xato:', error);
-      setSubmitMessage({
-        type: 'error',
-        text: `❌ O'chirishda xato: ${error.message}`
-      });
+      setSubmitMessage({ type: 'error', text: `❌ O'chirishda xato: ${error.message}` });
     }
   };
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
-    mode: 'onChange'
-  });
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({ mode: 'onChange' });
 
   const openMapSelector = () => {
     setIsMapLoading(true);
-    // Foydalanuvchi joriy joylashuvini aniqlash
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -617,30 +547,21 @@ function MyInformation() {
         },
         (error) => {
           console.error('Geolokatsiya xatosi:', error);
-          // Agar foydalanuvchi ruxsat bermasa yoki aniqlash imkonsiz bo'lsa, standart joylashuvni qo'shamiz
           alert('Joylashuvni aniqlashda xatolik yuz berdi. Iltimos, koordinatalarni qo\'lda kiriting.');
           setIsMapLoading(false);
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     } else {
-      alert('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi. Iltimos, koordinatalarni qo\'lda kiriting.');
+      alert('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi.');
       setIsMapLoading(false);
     }
   };
 
-
-
-
-  // Formani yopish
   const handleCloseForm = () => {
     setShowForm(false);
     setIsEditing(false);
-    setSelectedDoctor(null);
+    setSelectedEntity(null);
     reset();
     setSelectedFile(null);
     setPreviewUrl(null);
@@ -656,22 +577,18 @@ function MyInformation() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith('image/')) {
       alert('Faqat rasm fayllarini tanlashingiz mumkin!');
       return;
     }
-
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  // Subscription maydonlarini yaratish
   const createSubscriptionData = () => {
     const now = new Date();
     const oneYearLater = new Date();
     oneYearLater.setFullYear(now.getFullYear() + 1);
-
     return {
       startAt: now.toISOString(),
       endAt: oneYearLater.toISOString(),
@@ -684,178 +601,117 @@ function MyInformation() {
       setSubmitMessage({ type: 'error', text: '❌ Token mavjud emas!' });
       return;
     }
-
     if (!selectedRegion || !selectedCity) {
       setSubmitMessage({ type: 'error', text: '❌ Viloyat va tuman/shaharni tanlang!' });
       return;
     }
-
     setIsSubmitting(true);
     setSubmitMessage({ type: '', text: '' });
     setDebugInfo('Form yuborilmoqda...');
-
     try {
-      let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName || 'Doctor')}&background=00BCE4&color=fff`;
-
-      // Rasm yuklash (agar yangi rasm tanlangan bo'lsa)
+      let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName || (userRole === 'technician' ? 'Technician' : 'Doctor'))}&background=00BCE4&color=fff`;
       if (selectedFile) {
         setDebugInfo('Rasm yuklanmoqda...');
         const formData = new FormData();
         formData.append('image', selectedFile);
-
         try {
           const uploadRes = await axios.post(
             'https://app.dentago.uz/api/upload/image',
             formData,
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${token}`
-              }
-            }
+            { headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${token}` } }
           );
-
           console.log('Upload response:', uploadRes.data);
-
-          let filename = uploadRes.data?.file?.savedName ||
-            uploadRes.data?.filename ||
-            (uploadRes.data?.url ? uploadRes.data.url.split('/').pop() : null);
-
-          if (filename) {
-            avatarUrl = `https://app.dentago.uz/images/${filename}`;
-          }
+          let filename = uploadRes.data?.file?.savedName || uploadRes.data?.filename || (uploadRes.data?.url ? uploadRes.data.url.split('/').pop() : null);
+          if (filename) avatarUrl = `https://app.dentago.uz/images/${filename}`;
         } catch (uploadError) {
           console.warn('Rasm yuklashda xato:', uploadError);
-          // Rasm yuklashda xato bo'lsa ham
         }
-      } else if (isEditing && selectedDoctor && (selectedDoctor.avatar || selectedDoctor.image)) {
-        // Tahrirlashda eski rasmni saqlash
-        avatarUrl = selectedDoctor.avatar || selectedDoctor.image;
+      } else if (isEditing && selectedEntity && (selectedEntity.avatar || selectedEntity.image)) {
+        avatarUrl = selectedEntity.avatar || selectedEntity.image;
       }
-
-      // Tanlangan shahar ma'lumotlarini olish
       const selectedCityData = uzbekistanCities.find(city => city.value === selectedCity);
-
-      // TO'G'RI FORMAT: Subscription maydonlarini qo'shish
-      const doctorData = {
-        fullName: data.fullName?.trim() || 'Noma\'lum Shifokor',
-        gender: data.gender || 'male',
-        specialty: selectedSpecialties.length > 0 ? selectedSpecialties.join(', ') : '',
+      let entityData = {
+        fullName: data.fullName?.trim() || 'Noma\'lum',
         experienceYears: Number(data.experienceYears) || 0,
-        price: Number(data.price) || 0,
-        phone: Number(data.phone) || 0,
-        // Yangi qo'shilgan: viloyat va tuman
-        region: selectedRegion,
-        city: selectedCityData ? selectedCityData.label : selectedCity, // Label ni yuborish
-        clinic: {
-          name: data.clinicName?.trim() || 'Noma\'lum Klinika',
-          address: data.clinicAddress?.trim() || 'Manzil kiritilmagan',
-          location: {
-            lat: location.lat ? parseFloat(location.lat) : 41.3111,
-            lng: location.lng ? parseFloat(location.lng) : 69.2797
-          },
-          distanceKm: 2.5
-        },
-        workTime: {
-          start: data.workTimeStart || '09:00',
-          end: data.workTimeEnd || '18:00'
-        },
-        // MUHIM: Subscription maydonlarini qo'shish
-        subscription: createSubscriptionData(),
-        avatar: avatarUrl,
         phone: data.phone?.trim() || '',
         description: data.description?.trim() || '',
-        isAvailable24x7: !!data.isAvailable24x7,
-        isActive: !!data.isActive
+        region: selectedRegion,
+        city: selectedCityData ? selectedCityData.label : selectedCity,
+        location: {
+          lat: location.lat ? parseFloat(location.lat) : 41.3111,
+          lng: location.lng ? parseFloat(location.lng) : 69.2797
+        },
+        avatar: avatarUrl
       };
-
-      console.log('Yuborilayotgan ma\'lumot:', doctorData);
+      if (userRole !== 'technician') {
+        entityData.gender = data.gender || 'male';
+        entityData.specialty = selectedSpecialties.length > 0 ? selectedSpecialties.join(', ') : '';
+        entityData.price = Number(data.price) || 0;
+        entityData.clinic = {
+          name: data.clinicName?.trim() || 'Noma\'lum Klinika',
+          address: data.clinicAddress?.trim() || 'Manzil kiritilmagan',
+          location: entityData.location,
+          distanceKm: 2.5
+        };
+        entityData.workTime = {
+          start: data.workTimeStart || '09:00',
+          end: data.workTimeEnd || '18:00'
+        };
+        entityData.subscription = createSubscriptionData();
+        entityData.isAvailable24x7 = !!data.isAvailable24x7;
+        entityData.isActive = !!data.isActive;
+      } else {
+        entityData.address = data.address?.trim() || 'Manzil kiritilmagan';
+      }
+      console.log('Yuborilayotgan ma\'lumot:', entityData);
       setDebugInfo(`Ma'lumot yuborilmoqda (${isEditing ? 'PUT' : 'POST'})...`);
-
       let response;
-      let doctorId = isEditing && selectedDoctor ? (selectedDoctor._id || selectedDoctor.id) : null;
-
-      if (isEditing && doctorId) {
-        // Tahrirlash - subscription maydonlari bilan
-        console.log(`Tahrirlash uchun ID: ${doctorId}`);
+      let entityId = isEditing && selectedEntity ? (selectedEntity._id || selectedEntity.id) : null;
+      if (isEditing && entityId) {
         response = await axios.put(
-          `https://app.dentago.uz/api/admin/doctors/${doctorId}`,
-          doctorData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          }
+          `${getEndpoint('base')}/${entityId}`,
+          entityData,
+          { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } }
         );
       } else {
-        // Yangi qo'shish - subscription maydonlari bilan
         response = await axios.post(
-          'https://app.dentago.uz/api/admin/doctors',
-          doctorData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          }
+          getEndpoint('base'),
+          entityData,
+          { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } }
         );
       }
-
       console.log('Server response:', response.data);
       setDebugInfo(`Muvaffaqiyatli: ${response.status}`);
-
       if (response.status === 200 || response.status === 201) {
-        // Tozalash
         reset();
         setSelectedFile(null);
         setPreviewUrl(null);
-        setSelectedDoctor(null);
+        setSelectedEntity(null);
         setIsEditing(false);
         setShowForm(false);
         setIsFormCollapsed(true);
         setSelectedRegion('');
         setSelectedCity('');
-
-        // Ro'yxatni yangilash
-        await fetchDoctors();
-
+        await fetchEntities();
         setSubmitMessage({
           type: 'success',
-          text: `✅ Shifokor ${isEditing ? 'tahrirlandi' : 'qo\'shildi'}!`
+          text: `✅ ${userRole === 'technician' ? 'Texnik' : 'Shifokor'} ${isEditing ? 'tahrirlandi' : 'qo\'shildi'}!`
         });
       }
     } catch (err) {
       console.error('Form yuborishda xato:', err);
       console.error('Error response:', err.response?.data);
-
       let msg = 'Xatolik yuz berdi';
-
       if (err.response) {
-        console.error('Error response data:', err.response.data);
-        console.error('Error response status:', err.response.status);
-
-        if (err.response.status === 400) {
-          msg = '❌ 400 Bad Request: ' + (err.response.data?.message || 'Maydonlar noto\'g\'ri yoki yetishmayapti');
-        } else if (err.response.status === 401) {
-          msg = '❌ Token noto\'g\'ri yoki muddati o\'tgan';
-        } else if (err.response.status === 403) {
-          msg = '❌ 403 Forbidden: Server ruxsat bermadi';
-        } else if (err.response.status === 409) {
-          msg = '❌ Bu ma\'lumot allaqachon mavjud';
-        } else if (err.response.status === 404) {
-          msg = '❌ 404 Not Found: URL topilmadi';
-        } else if (err.response.status === 500) {
-          msg = '❌ 500 Server Error: Ichki server xatosi';
-        } else {
-          msg = `❌ Server xatosi: ${err.response.status} - ${err.response.data?.message || ''}`;
-        }
-      } else if (err.code === 'ERR_NETWORK') {
-        msg = '❌ Internet aloqasi uzildi yoki serverga ulanishda xato';
-      } else if (err.code === 'ERR_BAD_REQUEST') {
-        msg = '❌ Noto\'g\'ri so\'rov: Maydonlar noto\'g\'ri kiritilgan';
-      }
-
+        if (err.response.status === 400) msg = '❌ 400 Bad Request: Maydonlar noto\'g\'ri';
+        else if (err.response.status === 401) msg = '❌ Token noto\'g\'ri';
+        else if (err.response.status === 403) msg = '❌ 403 Forbidden';
+        else if (err.response.status === 409) msg = '❌ Bu ma\'lumot allaqachon mavjud';
+        else if (err.response.status === 404) msg = '❌ 404 Not Found';
+        else if (err.response.status === 500) msg = '❌ 500 Server Error';
+        else msg = `❌ Server xatosi: ${err.response.status}`;
+      } else if (err.code === 'ERR_NETWORK') msg = '❌ Internet aloqasi uzildi';
+      else if (err.code === 'ERR_BAD_REQUEST') msg = '❌ Noto\'g\'ri so\'rov';
       setDebugInfo(`Xato: ${msg}`);
       setSubmitMessage({ type: 'error', text: msg });
     } finally {
@@ -878,184 +734,234 @@ function MyInformation() {
     'Челюстно-лицевой хирург'
   ];
 
-
-
-  // Yangi shifokor qo'shish tugmasi
-  const handleAddNewDoctor = () => {
+  const handleAddNew = () => {
     setIsEditing(false);
-    setSelectedDoctor(null);
+    setSelectedEntity(null);
     setShowForm(true);
     setIsFormCollapsed(false);
-
-    // Formani tozalash
     reset({
       fullName: '',
-      gender: 'male',
       experienceYears: 5,
-      clinicName: '',
-      clinicAddress: '',
-      price: 150000,
-      workTimeStart: '09:00',
-      workTimeEnd: '18:00',
-      isAvailable24x7: false,
-      isActive: true,
       phone: '',
       description: '',
       region: '',
       city: ''
     });
-    setSelectedSpecialties([]);
+    if (userRole !== 'technician') {
+      reset({
+        gender: 'male',
+        clinicName: '',
+        clinicAddress: '',
+        price: 150000,
+        workTimeStart: '09:00',
+        workTimeEnd: '18:00',
+        isAvailable24x7: false,
+        isActive: true
+      });
+      setSelectedSpecialties([]);
+    } else {
+      reset({ address: '' });
+    }
     setPreviewUrl(null);
     setSelectedFile(null);
     setSelectedRegion('');
     setSelectedCity('');
-
-    // Formaga scroll qilish
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
-  // Filtrlangan shifokorlar
-  const filteredDoctors = doctors.filter(doctor => {
-    const doctorName = (doctor.fullName || doctor.name || '').toLowerCase();
-    const doctorSpecialty = doctor.specialty || doctor.specialization || '';
-    const specialtiesArray = Array.isArray(doctorSpecialty) ? doctorSpecialty.map(s => s.toLowerCase()) : String(doctorSpecialty).toLowerCase().split(', ');
-    const clinicName = (doctor.clinic?.name || doctor.hospitalName || '').toLowerCase();
-    const doctorRegion = (doctor.region || '').toLowerCase();
-    const doctorCity = (doctor.city || '').toLowerCase();
+  const filteredEntities = entities.filter(entity => {
+    const name = (entity.fullName || entity.name || '').toLowerCase();
     const search = searchTerm.toLowerCase();
-
-    return (
-      doctorName.includes(search) ||
-      specialtiesArray.some(spec => spec.includes(search)) ||
-      clinicName.includes(search) ||
-      doctorRegion.includes(search) ||
-      doctorCity.includes(search)
-    );
+    let specialty = '';
+    if (userRole !== 'technician') {
+      specialty = entity.specialty || entity.specialization || '';
+      const specialtiesArray = Array.isArray(specialty) ? specialty.map(s => s.toLowerCase()) : String(specialty).toLowerCase().split(', ');
+      const clinicName = (entity.clinic?.name || entity.hospitalName || '').toLowerCase();
+      const region = (entity.region || '').toLowerCase();
+      const city = (entity.city || '').toLowerCase();
+      return (
+        name.includes(search) ||
+        specialtiesArray.some(spec => spec.includes(search)) ||
+        clinicName.includes(search) ||
+        region.includes(search) ||
+        city.includes(search)
+      );
+    } else {
+      const address = (entity.address || '').toLowerCase();
+      const region = (entity.region || '').toLowerCase();
+      const city = (entity.city || '').toLowerCase();
+      return name.includes(search) || address.includes(search) || region.includes(search) || city.includes(search);
+    }
   });
 
-  // Sahifalangan shifokorlar
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedDoctors = filteredDoctors.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredDoctors.length / ITEMS_PER_PAGE);
+  const paginatedEntities = filteredEntities.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredEntities.length / ITEMS_PER_PAGE);
 
-  // Shifokor kartasi komponenti
-  const DoctorCard = ({ doctor, onView, onEdit, onDelete }) => {
-    const doctorId = doctor._id || doctor.id;
-    const doctorName = doctor.fullName || doctor.name || 'Noma\'lum Shifokor';
-    const doctorSpecialty = doctor.specialty || doctor.specialization || 'Mutaxassislik kiritilmagan';
-    const experienceYears = doctor.experienceYears || doctor.experience || 0;
-    const price = doctor.price || doctor.consultationPrice || 0;
-
-    // Handle multiple specialties
-    const specialtiesArray = Array.isArray(doctorSpecialty) ? doctorSpecialty : String(doctorSpecialty).split(', ');
-
-    const avatar = doctor.avatar || doctor.profileImage || doctor.image || null;
-    const region = doctor.region || '';
-    const city = doctor.city || '';
-
-    return (
-      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300">
-        <div className="relative h-48 bg-gray-50">
-          {avatar ? (
-            <img
-              src={avatar}
-              alt={doctorName}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctorName)}&background=00BCE4&color=fff`;
-              }}
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <User className="w-16 h-16 text-gray-300" />
+  const EntityCard = ({ entity, onView, onEdit, onDelete }) => {
+    const id = entity._id || entity.id;
+    const name = entity.fullName || entity.name || (userRole === 'technician' ? 'Noma\'lum Texnik' : 'Noma\'lum Shifokor');
+    const experienceYears = entity.experienceYears || entity.experience || 0;
+    const avatar = entity.avatar || entity.profileImage || entity.image || null;
+    const region = entity.region || '';
+    const city = entity.city || '';
+    if (userRole !== 'technician') {
+      const specialty = entity.specialty || entity.specialization || 'Mutaxassislik kiritilmagan';
+      const specialtiesArray = Array.isArray(specialty) ? specialty : String(specialty).split(', ');
+      const price = entity.price || entity.consultationPrice || 0;
+      return (
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300">
+          <div className="relative h-48 bg-gray-50">
+            {avatar ? (
+              <img
+                src={avatar}
+                alt={name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00BCE4&color=fff`; }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <User className="w-16 h-16 text-gray-300" />
+              </div>
+            )}
+            <div className="absolute top-4 right-4">
+              <div className="bg-[#00BCE4] text-white px-4 py-2 rounded-xl font-bold">
+                {price > 0 ? (
+                  <div className="text-center">
+                    <div className="text-lg">{price.toLocaleString()}</div>
+                    <div className="text-xs opacity-90">so'm</div>
+                  </div>
+                ) : (
+                  <div className="text-center px-3 py-1">
+                    <div className="text-sm">Narx mavjud emas</div>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-
-          <div className="absolute top-4 right-4">
-            <div className="bg-[#00BCE4] text-white px-4 py-2 rounded-xl font-bold">
-              {price > 0 ? (
-                <div className="text-center">
-                  <div className="text-lg">{price.toLocaleString()}</div>
-                  <div className="text-xs opacity-90">so'm</div>
-                </div>
-              ) : (
-                <div className="text-center px-3 py-1">
-                  <div className="text-sm">Narx mavjud emas</div>
+          </div>
+          <div className="p-5">
+            <div className="mb-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-1">{name}</h3>
+              <div className="flex flex-wrap gap-2">
+                {specialtiesArray.slice(0, 2).map((spec, index) => (
+                  <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-medium">
+                    <BriefcaseMedical className="w-4 h-4" />
+                    {spec}
+                  </div>
+                ))}
+                {specialtiesArray.length > 2 && <div className="flex items-center text-[#00BCE4] font-medium">...</div>}
+              </div>
+              {(region || city) && (
+                <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
+                  <Globe className="w-3 h-3" />
+                  <span>{region}{city ? `, ${city}` : ''}</span>
                 </div>
               )}
+            </div>
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm">{experienceYears} yil tajriba</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => id && onView(id)}
+                disabled={!id}
+                className={`flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <Eye className="w-4 h-4" />
+                Profilni ko'rish
+              </button>
+              <button
+                onClick={() => onEdit(entity)}
+                className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors"
+                title="Tahrirlash"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => id && onDelete(id)}
+                disabled={!id}
+                className={`px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title="O'chirish"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
-
-        <div className="p-5">
-          <div className="mb-4">
-            <h3 className="text-xl font-bold text-gray-800 mb-1">{doctorName}</h3>
-            <div className="flex flex-wrap gap-2">
-              {specialtiesArray.slice(0, 2).map((spec, index) => (
-                <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-medium">
-                  <BriefcaseMedical className="w-4 h-4" />
-                  {spec}
-                </div>
-              ))}
-              {specialtiesArray.length > 2 && (
-                <div className="flex items-center text-[#00BCE4] font-medium">...</div>
-              )}
-            </div>
-
-            {/* Viloyat va tuman ko'rsatish */}
-            {(region || city) && (
-              <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
-                <Globe className="w-3 h-3" />
-                <span>{region}{city ? `, ${city}` : ''}</span>
+      );
+    } else {
+      // Technician Card
+      return (
+        <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 transition-all duration-300">
+          <div className="relative h-48 bg-gray-50">
+            {avatar ? (
+              <img
+                src={avatar}
+                alt={name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00BCE4&color=fff`; }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <User className="w-16 h-16 text-gray-300" />
               </div>
             )}
           </div>
-
-          <div className="space-y-3 mb-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-gray-600">
-                <Calendar className="w-4 h-4" />
-                <span className="text-sm">{experienceYears} yil tajriba</span>
+          <div className="p-5">
+            <div className="mb-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-1">{name}</h3>
+              {(region || city) && (
+                <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
+                  <Globe className="w-3 h-3" />
+                  <span>{region}{city ? `, ${city}` : ''}</span>
+                </div>
+              )}
+            </div>
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm">{experienceYears} yil tajriba</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => doctorId && onView(doctorId)}
-              disabled={!doctorId}
-              className={`flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-            >
-              <Eye className="w-4 h-4" />
-              Profilni ko'rish
-            </button>
-
-            <button
-              onClick={() => onEdit(doctor)}
-              className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors"
-              title="Tahrirlash"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => doctorId && onDelete(doctorId)}
-              disabled={!doctorId}
-              className={`px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors ${!doctorId ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              title="O'chirish"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => id && onView(id)}
+                disabled={!id}
+                className={`flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <Eye className="w-4 h-4" />
+                Profilni ko'rish
+              </button>
+              <button
+                onClick={() => onEdit(entity)}
+                className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors"
+                title="Tahrirlash"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => id && onDelete(id)}
+                disabled={!id}
+                className={`px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title="O'chirish"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
   };
 
   if (isLoading) {
@@ -1069,113 +975,61 @@ function MyInformation() {
   return (
     <div className="bg-white">
       <div className="">
-        {/* Debug info */}
-        {/* {debugInfo && (
-          <div className="mb-4 p-3 bg-white border border-blue-200 rounded-lg text-sm text-blue-700">
-            <strong>Debug Info:</strong> {debugInfo}
-          </div>
-        )} */}
-
-        {/* Sarlavha */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-                Shifokorlar Boshqaruvi
+                {userRole === 'technician' ? 'Texniklar Boshqaruvi' : 'Shifokorlar Boshqaruvi'}
               </h1>
               <p className="text-gray-500 mt-2">
-                {doctors.length} ta shifokor, {filteredDoctors.length} ta topildi
+                {entities.length} ta, {filteredEntities.length} ta topildi
               </p>
             </div>
-
             <button
-              onClick={handleAddNewDoctor}
+              onClick={handleAddNew}
               className="bg-[#00BCE4] cursor-pointer hover:bg-[#0096b8] text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/10 transition-all"
             >
               <Plus className="w-5 h-5" />
-              Yangi Shifokor Qo'shish
+              Yangi {userRole === 'technician' ? 'Texnik' : 'Shifokor'} Qo'shish
             </button>
           </div>
-
-          {/* Qidiruv va token holati */}
           <div className="grid md:grid-cols-1 gap-4">
             <div className="relative">
               <Search className="absolute left-4 top-6 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Shifokor ismi, mutaxassisligi, viloyati yoki klinika nomi bo'yicha qidirish..."
+                placeholder={userRole === 'technician' ? "Texnik ismi, viloyati yoki manzili bo'yicha qidirish..." : "Shifokor ismi, mutaxassisligi, viloyati yoki klinika nomi bo'yicha qidirish..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent outline-none transition"
               />
             </div>
-
-            {/* {token ? (
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <div className="flex items-center gap-3 text-green-700">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-bold">Token olindi ✓</h3>
-                    <p className="text-sm text-green-600 mt-1">
-                      {doctors.length} ta shifokor yuklandi
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <div className="flex items-center gap-3 text-red-700">
-                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-bold">Token olinmadi ✗</h3>
-                    <p className="text-sm text-red-600 mt-1">
-                      localStorage.setItem('accessToken', 'SIZNING_TOKENINGIZ')
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )} */}
           </div>
         </div>
-
         {submitMessage.text && (
-          <div className={`mb-6 p-4 rounded-lg ${submitMessage.type === 'success'
-            ? 'bg-green-50 border border-green-200 text-green-700'
-            : 'bg-red-50 border border-red-200 text-red-700'
-            }`}>
+          <div className={`mb-6 p-4 rounded-lg ${submitMessage.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
             {submitMessage.text}
           </div>
         )}
-
-        {/* Shifokorlar ro'yxati */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Barcha Shifokorlar</h2>
-
-          {doctors.length === 0 ? (
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Barchasi</h2>
+          {entities.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
                 <User className="w-10 h-10 text-gray-300" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Shifokorlar topilmadi</h3>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Topilmadi</h3>
               <p className="text-gray-500 mb-4">
-                Hali shifokor qo'shilmagan yoki yuklashda xatolik yuz berdi
+                Hali qo'shilmagan yoki yuklashda xatolik yuz berdi
               </p>
               <button
-                onClick={fetchDoctors}
+                onClick={fetchEntities}
                 className="bg-[#00BCE4] cursor-pointer hover:bg-[#0096b8] text-white font-semibold py-2 px-6 rounded-xl transition-colors"
               >
                 Qayta Yuklash
               </button>
             </div>
-          ) : paginatedDoctors.length === 0 ? (
+          ) : paginatedEntities.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center">
                 <Search className="w-10 h-10 text-gray-300" />
@@ -1188,24 +1042,21 @@ function MyInformation() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                {paginatedDoctors.map((doctor, index) => (
-                  <DoctorCard
-                    key={doctor._id || doctor.id || index}
-                    doctor={doctor}
-                    onView={handleViewDoctor}
-                    onEdit={handleEditDoctor}
-                    onDelete={handleDeleteDoctor}
+                {paginatedEntities.map((entity, index) => (
+                  <EntityCard
+                    key={entity._id || entity.id || index}
+                    entity={entity}
+                    onView={handleViewEntity}
+                    onEdit={handleEditEntity}
+                    onDelete={handleDeleteEntity}
                   />
                 ))}
               </div>
-
-              {/* Sahifalash */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between mt-8">
                   <div className="text-sm text-gray-600">
                     Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
                   </div>
-
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -1214,37 +1065,22 @@ function MyInformation() {
                     >
                       <ChevronLeft size={20} />
                     </button>
-
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
-                      if (totalPages <= 5) {
-                        pageNum = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
-                      } else {
-                        pageNum = currentPage - 2 + i;
-                      }
-
+                      if (totalPages <= 5) pageNum = i + 1;
+                      else if (currentPage <= 3) pageNum = i + 1;
+                      else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                      else pageNum = currentPage - 2 + i;
                       return (
                         <button
                           key={pageNum}
                           onClick={() => setCurrentPage(pageNum)}
-                          className={`w-10 h-10 rounded-lg cursor-pointer ${currentPage === pageNum
-                              ? 'bg-[#00BCE4] text-white'
-                              : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
-                            } transition-colors`}
+                          className={`w-10 h-10 rounded-lg cursor-pointer ${currentPage === pageNum ? 'bg-[#00BCE4] text-white' : 'border border-slate-300 text-slate-700 hover:bg-slate-50'} transition-colors`}
                         >
                           {pageNum}
                         </button>
                       );
                     })}
-
-                    {/* {totalPages > 5 && (
-                    <span className="px-2 text-gray-500">...</span>
-                  )} */}
-
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}
@@ -1258,23 +1094,19 @@ function MyInformation() {
             </>
           )}
         </div>
-
-        {/* Forma qismi */}
         {showForm && (
           <div ref={formRef} className="bg-white rounded-2xl border border-gray-200 mb-8 p-6">
-            {/* Form sarlavhasi */}
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800">
-                  {isEditing ? 'Shifokorni Tahrirlash' : 'Yangi Shifokor Qo\'shish'}
+                  {isEditing ? (userRole === 'technician' ? 'Texnikni Tahrirlash' : 'Shifokorni Tahrirlash') : (userRole === 'technician' ? 'Yangi Texnik Qo\'shish' : 'Yangi Shifokor Qo\'shish')}
                 </h2>
-                {isEditing && selectedDoctor && (
+                {isEditing && selectedEntity && (
                   <p className="text-gray-600 mt-1">
-                    ID: {selectedDoctor._id || selectedDoctor.id}
+                    ID: {selectedEntity._id || selectedEntity.id}
                   </p>
                 )}
               </div>
-
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsFormCollapsed(!isFormCollapsed)}
@@ -1283,7 +1115,6 @@ function MyInformation() {
                 >
                   {isFormCollapsed ? <ArrowUp className="w-5 h-5 transform rotate-180" /> : <ArrowUp className="w-5 h-5" />}
                 </button>
-
                 <button
                   onClick={handleCloseForm}
                   className="p-2 hover:bg-gray-50 rounded-lg transition"
@@ -1293,13 +1124,9 @@ function MyInformation() {
                 </button>
               </div>
             </div>
-
-            {/* Form mazmuni */}
             {!isFormCollapsed && (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Rasm yuklash */}
-                <div className="flex flex-col items-start
-                 mb-8">
+                <div className="flex flex-col items-start mb-8">
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     className="w-32 h-32 rounded-[10px] overflow-hidden bg-white cursor-pointer hover:opacity-90 transition border-2 border-[#00BCE4] relative"
@@ -1309,10 +1136,7 @@ function MyInformation() {
                         src={previewUrl}
                         alt="Preview"
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent('Doctor')}&background=00BCE4&color=fff`;
-                        }}
+                        onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userRole === 'technician' ? 'Technician' : 'Doctor')}&background=00BCE4&color=fff`; }}
                       />
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
@@ -1322,7 +1146,7 @@ function MyInformation() {
                     )}
                   </div>
                   <p className="mt-3 text-sm text-gray-500">
-                    {selectedFile ? selectedFile.name : (isEditing && selectedDoctor?.avatar) ? 'Joriy rasm' : 'Shifokor rasmini tanlang'}
+                    {selectedFile ? selectedFile.name : (isEditing && selectedEntity?.avatar) ? 'Joriy rasm' : 'Rasmni tanlang'}
                   </p>
                   <input
                     type="file"
@@ -1332,63 +1156,70 @@ function MyInformation() {
                     onChange={handleFileChange}
                   />
                 </div>
-
-                {/* Asosiy ma'lumotlar */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">
                     Asosiy Ma'lumotlar
                   </h3>
-
-                  {/* Ism */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                       <UserCircle className="w-4 h-4" /> To'liq Ismi *
                     </label>
                     <input
-                      {...register('fullName', {
-                        required: 'Ism majburiy',
-                        minLength: { value: 3, message: 'Kamida 3 ta belgi' }
-                      })}
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                      {...register('fullName', { required: 'Ism majburiy', minLength: { value: 3, message: 'Kamida 3 ta belgi' } })}
+                      className={`w-full px-4 py-3 rounded-xl border ${errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                       placeholder="Aliyev Ali Aliyevich"
                     />
-                    {errors.fullName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
-                    )}
+                    {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>}
                   </div>
-
-                  {/* Jins */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                      <Users className="w-4 h-4" /> Jins *
-                    </label>
-                    <div className="flex gap-8">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          value="male"
-                          {...register('gender', { required: 'Jinsni tanlang' })}
-                          className="w-5 h-5 text-[#00BCE4]"
-                        />
-                        <span>Erkak</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          value="female"
-                          {...register('gender', { required: 'Jinsni tanlang' })}
-                          className="w-5 h-5 text-[#00BCE4]"
-                        />
-                        <span>Ayol</span>
-                      </label>
-                    </div>
-                    {errors.gender && (
-                      <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>
-                    )}
-                  </div>
-
-                  {/* Viloyat va Tuman */}
+                  {userRole !== 'technician' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <Users className="w-4 h-4" /> Jins *
+                        </label>
+                        <div className="flex gap-8">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" value="male" {...register('gender', { required: 'Jinsni tanlang' })} className="w-5 h-5 text-[#00BCE4]" />
+                            <span>Erkak</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" value="female" {...register('gender', { required: 'Jinsni tanlang' })} className="w-5 h-5 text-[#00BCE4]" />
+                            <span>Ayol</span>
+                          </label>
+                        </div>
+                        {errors.gender && <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Mutaxassislik *
+                        </label>
+                        <div className="border border-gray-300 rounded-xl p-2 min-h-[46px] bg-white focus-within:ring-2 focus-within:ring-[#00BCE4]">
+                          <div className="flex flex-wrap gap-2 p-1">
+                            {selectedSpecialties.map((specialty, index) => (
+                              <div key={index} className="bg-[#00BCE4] text-white px-3 py-1 rounded-lg flex items-center gap-1">
+                                <span>{specialty}</span>
+                                <button type="button" onClick={() => setSelectedSpecialties(selectedSpecialties.filter((_, i) => i !== index))} className="text-white hover:text-gray-200">×</button>
+                              </div>
+                            ))}
+                            <select
+                              value=""
+                              onChange={(e) => {
+                                if (e.target.value && !selectedSpecialties.includes(e.target.value)) {
+                                  setSelectedSpecialties([...selectedSpecialties, e.target.value]);
+                                }
+                                e.target.value = "";
+                              }}
+                              className="flex-1 min-w-[100px] border-none outline-none bg-transparent"
+                            >
+                              <option value="">Qo'shish...</option>
+                              {specialties.map(spec => !selectedSpecialties.includes(spec) && <option key={spec} value={spec}>{spec}</option>)}
+                            </select>
+                          </div>
+                        </div>
+                        {selectedSpecialties.length === 0 && <p className="mt-1 text-sm text-red-600">Mutaxassislikni tanlang *</p>}
+                      </div>
+                    </>
+                  )}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
@@ -1396,25 +1227,15 @@ function MyInformation() {
                       </label>
                       <select
                         value={selectedRegion}
-                        onChange={(e) => {
-                          setSelectedRegion(e.target.value);
-                          setSelectedCity(''); // viloyat o'zgarganda tuman tozalanadi
-                        }}
-                        className={`w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        onChange={(e) => { setSelectedRegion(e.target.value); setSelectedCity(''); }}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
                         required
                       >
                         <option value="">Viloyatni tanlang</option>
-                        {regions.map(region => (
-                          <option key={region} value={region}>
-                            {region}
-                          </option>
-                        ))}
+                        {regions.map(region => <option key={region} value={region}>{region}</option>)}
                       </select>
-                      {!selectedRegion && (
-                        <p className="mt-1 text-sm text-red-600">Viloyatni tanlang</p>
-                      )}
+                      {!selectedRegion && <p className="mt-1 text-sm text-red-600">Viloyatni tanlang</p>}
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         <Globe className="w-4 h-4" /> Tuman/Shahar *
@@ -1423,118 +1244,45 @@ function MyInformation() {
                         value={selectedCity}
                         onChange={(e) => setSelectedCity(e.target.value)}
                         disabled={!selectedRegion}
-                        className={`w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition ${!selectedRegion ? 'opacity-60 cursor-not-allowed' : ''
-                          }`}
+                        className={`w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition ${!selectedRegion ? 'opacity-60 cursor-not-allowed' : ''}`}
                         required
                       >
                         <option value="">Tuman/Shaharni tanlang</option>
-                        {filteredCities.map(city => (
-                          <option key={city._id} value={city.value}> {/* ✅ BU YERDA O'ZGARDI: value={city.value} */}
-                            {city.label}
-                          </option>
-                        ))}
+                        {filteredCities.map(city => <option key={city._id} value={city.value}>{city.label}</option>)}
                       </select>
-                      {!selectedCity && selectedRegion && (
-                        <p className="mt-1 text-sm text-red-600">Tuman/Shaharni tanlang</p>
-                      )}
+                      {!selectedCity && selectedRegion && <p className="mt-1 text-sm text-red-600">Tuman/Shaharni tanlang</p>}
                     </div>
                   </div>
-
-                  {/* Telefon + Email */}
                   <div className="grid md:grid-cols-1 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
                         <Phone className="w-4 h-4" /> Telefon *
                       </label>
                       <input
-                        {...register('phone', {
-                          required: 'Telefon raqami majburiy',
-                          pattern: {
-                            value: /^\+998[0-9]{9}$/,
-                            message: '+998XXXXXXXXX formatida kiriting'
-                          }
-                        })}
-                        className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                          } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        {...register('phone', { required: 'Telefon raqami majburiy', pattern: { value: /^\+998[0-9]{9}$/, message: '+998XXXXXXXXX formatida kiriting' } })}
+                        className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                         placeholder="+998901234567"
                       />
-                      {errors.phone && (
-                        <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-                      )}
+                      {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
                     </div>
                   </div>
-
-                  {/* Mutaxassislik */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Mutaxassislik *
-                    </label>
-                    <div className="border border-gray-300 rounded-xl p-2 min-h-[46px] bg-white focus-within:ring-2 focus-within:ring-[#00BCE4]">
-                      <div className="flex flex-wrap gap-2 p-1">
-                        {selectedSpecialties.map((specialty, index) => (
-                          <div key={index} className="bg-[#00BCE4] text-white px-3 py-1 rounded-lg flex items-center gap-1">
-                            <span>{specialty}</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const updatedSpecialties = selectedSpecialties.filter((_, i) => i !== index);
-                                setSelectedSpecialties(updatedSpecialties);
-                              }}
-                              className="text-white hover:text-gray-200 focus:outline-none"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                        <select
-                          value=""
-                          onChange={(e) => {
-                            if (e.target.value && !selectedSpecialties.includes(e.target.value)) {
-                              setSelectedSpecialties([...selectedSpecialties, e.target.value]);
-                            }
-                            e.target.value = ""; // Reset selection
-                          }}
-                          className="flex-1 min-w-[100px] border-none outline-none bg-transparent"
-                        >
-                          <option value="">Qo'shish...</option>
-                          {specialties.map((spec) => (
-                            !selectedSpecialties.includes(spec) && (
-                              <option key={spec} value={spec}>
-                                {spec}
-                              </option>
-                            )
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    {selectedSpecialties.length === 0 && (
-                      <p className="mt-1 text-sm text-red-600">Mutaxassislikni tanlang *</p>
-                    )}
-                  </div>
-
-                  {/* Tavsif */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Tavsif</label>
                     <textarea
                       {...register('description')}
                       rows={3}
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition resize-none"
-                      placeholder="Shifokor haqida qisqacha ma'lumot..."
+                      placeholder="Qisqacha ma'lumot..."
                     />
                   </div>
                 </div>
-
-                {/* Joylashuvni belgilash */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Joylashuvni belgilash
                   </label>
-
                   <div className="flex gap-2">
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Kenglik (Latitude)
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Kenglik (Latitude)</label>
                       <input
                         type="text"
                         value={location.lat || ''}
@@ -1544,9 +1292,7 @@ function MyInformation() {
                       />
                     </div>
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Uzunlik (Longitude)
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Uzunlik (Longitude)</label>
                       <input
                         type="text"
                         value={location.lng || ''}
@@ -1556,8 +1302,6 @@ function MyInformation() {
                       />
                     </div>
                     <div className="flex items-end">
-
-                      {/* openMapSelector button  */}
                       <button
                         type="button"
                         onClick={openMapSelector}
@@ -1565,19 +1309,16 @@ function MyInformation() {
                         disabled={isMapLoading}
                       >
                         {isMapLoading ? (
-                          <span className="flex items-center gap-2">
-                            <svg className="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                            </svg>
-                          </span>
+                          <svg className="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                          </svg>
                         ) : (
                           <MapPin className="w-5 h-5" />
                         )}
                       </button>
                     </div>
                   </div>
-
                   {location.lat && location.lng && (
                     <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -1586,8 +1327,6 @@ function MyInformation() {
                     </div>
                   )}
                 </div>
-
-                {/* Tajriba */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Tajriba</h3>
                   <div className="grid md:grid-cols-1 gap-4">
@@ -1597,149 +1336,111 @@ function MyInformation() {
                       </label>
                       <input
                         type="number"
-                        {...register('experienceYears', {
-                          required: 'Tajriba majburiy',
-                          min: { value: 0, message: 'Musbat son kiriting' },
-                          max: { value: 50, message: '50 yildan kam bo\'lishi kerak' }
-                        })}
-                        className={`w-full px-4 py-3 rounded-xl border ${errors.experienceYears ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                          } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        {...register('experienceYears', { required: 'Tajriba majburiy', min: { value: 0, message: 'Musbat son kiriting' }, max: { value: 50, message: '50 yildan kam' } })}
+                        className={`w-full px-4 py-3 rounded-xl border ${errors.experienceYears ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
                       />
-                      {errors.experienceYears && (
-                        <p className="mt-1 text-sm text-red-600">{errors.experienceYears.message}</p>
-                      )}
+                      {errors.experienceYears && <p className="mt-1 text-sm text-red-600">{errors.experienceYears.message}</p>}
                     </div>
                   </div>
                 </div>
-
-                {/* Klinika */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Klinika Ma'lumotlari</h3>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                      <Building className="w-4 h-4" /> Klinika nomi *
-                    </label>
-                    <input
-                      {...register('clinicName', {
-                        required: 'Klinika nomi majburiy',
-                        minLength: { value: 2, message: 'Kamida 2 ta belgi' }
-                      })}
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.clinicName ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
-                      placeholder="Stomatologiya Premium"
-                    />
-                    {errors.clinicName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.clinicName.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" /> Manzil *
-                    </label>
-                    <input
-                      {...register('clinicAddress', {
-                        required: 'Manzil majburiy',
-                        minLength: { value: 5, message: 'Kamida 5 ta belgi' }
-                      })}
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.clinicAddress ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
-                      placeholder="Toshkent sh., Chilanzor tumani, 45-uy"
-                    />
-                    {errors.clinicAddress && (
-                      <p className="mt-1 text-sm text-red-600">{errors.clinicAddress.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Narx va ish vaqti */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Narx va Ish Vaqti</h3>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" /> Konsultatsiya narxi (so'm) *
-                    </label>
-                    <input
-                      type="number"
-                      {...register('price', {
-                        required: 'Narx majburiy',
-                        min: { value: 0, message: 'Musbat son kiriting' }
-                      })}
-                      className={`w-full px-4 py-3 rounded-xl border ${errors.price ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                        } focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
-                    />
-                    {errors.price && (
-                      <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
-                    )}
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
+                {userRole !== 'technician' && (
+                  <>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Klinika Ma'lumotlari</h3>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                          <Building className="w-4 h-4" /> Klinika nomi *
+                        </label>
+                        <input
+                          {...register('clinicName', { required: 'Klinika nomi majburiy', minLength: { value: 2, message: 'Kamida 2 ta belgi' } })}
+                          className={`w-full px-4 py-3 rounded-xl border ${errors.clinicName ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                          placeholder="Stomatologiya Premium"
+                        />
+                        {errors.clinicName && <p className="mt-1 text-sm text-red-600">{errors.clinicName.message}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                          <MapPin className="w-4 h-4" /> Manzil *
+                        </label>
+                        <input
+                          {...register('clinicAddress', { required: 'Manzil majburiy', minLength: { value: 5, message: 'Kamida 5 ta belgi' } })}
+                          className={`w-full px-4 py-3 rounded-xl border ${errors.clinicAddress ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                          placeholder="Toshkent sh., Chilanzor tumani, 45-uy"
+                        />
+                        {errors.clinicAddress && <p className="mt-1 text-sm text-red-600">{errors.clinicAddress.message}</p>}
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Narx va Ish Vaqti</h3>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                          <DollarSign className="w-4 h-4" /> Konsultatsiya narxi (so'm) *
+                        </label>
+                        <input
+                          type="number"
+                          {...register('price', { required: 'Narx majburiy', min: { value: 0, message: 'Musbat son kiriting' } })}
+                          className={`w-full px-4 py-3 rounded-xl border ${errors.price ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        />
+                        {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>}
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                            <Clock className="w-4 h-4" /> Ish boshlash
+                          </label>
+                          <input type="time" {...register('workTimeStart')} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                            <Clock className="w-4 h-4" /> Ish tugash
+                          </label>
+                          <input type="time" {...register('workTimeEnd')} className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Qo'shimcha Ma'lumotlar</h3>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <label className="flex items-center gap-3 p-3 bg-white rounded-xl border cursor-pointer hover:bg-gray-50 transition">
+                          <input type="checkbox" {...register('isAvailable24x7')} className="w-5 h-5 text-[#00BCE4]" />
+                          <div>
+                            <span className="font-medium">24/7 qabul</span>
+                            <p className="text-sm text-gray-500">Doimiy mavjud</p>
+                          </div>
+                        </label>
+                        <label className="flex items-center gap-3 p-3 bg-white rounded-xl border cursor-pointer hover:bg-gray-50 transition">
+                          <input type="checkbox" {...register('isActive')} defaultChecked className="w-5 h-5 text-[#00BCE4]" />
+                          <div>
+                            <span className="font-medium">Faol</span>
+                            <p className="text-sm text-gray-500">Hozirda ishlayapti</p>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </>
+                )}
+                {userRole === 'technician' && (
+                  <div className="space-y-4">
+                    <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Manzil</h3>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                        <Clock className="w-4 h-4" /> Ish boshlash
+                        <MapPin className="w-4 h-4" /> Manzil *
                       </label>
                       <input
-                        type="time"
-                        {...register('workTimeStart')}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
+                        {...register('address', { required: 'Manzil majburiy', minLength: { value: 5, message: 'Kamida 5 ta belgi' } })}
+                        className={`w-full px-4 py-3 rounded-xl border ${errors.address ? 'border-red-500 bg-red-50' : 'border-gray-300'} focus:ring-2 focus:ring-[#00BCE4] outline-none transition`}
+                        placeholder="Toshkent sh., Chilanzor tumani, 45-uy"
                       />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                        <Clock className="w-4 h-4" /> Ish tugash
-                      </label>
-                      <input
-                        type="time"
-                        {...register('workTimeEnd')}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
-                      />
+                      {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>}
                     </div>
                   </div>
-                </div>
-
-                {/* Qo'shimcha */}
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg border-l-4 border-[#00BCE4] pl-3">Qo'shimcha Ma'lumotlar</h3>
-
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <label className="flex items-center gap-3 p-3 bg-white rounded-xl border cursor-pointer hover:bg-gray-50 transition">
-                      <input
-                        type="checkbox"
-                        {...register('isAvailable24x7')}
-                        className="w-5 h-5 text-[#00BCE4]"
-                      />
-                      <div>
-                        <span className="font-medium">24/7 qabul</span>
-                        <p className="text-sm text-gray-500">Doimiy mavjud</p>
-                      </div>
-                    </label>
-
-                    <label className="flex items-center gap-3 p-3 bg-white rounded-xl border cursor-pointer hover:bg-gray-50 transition">
-                      <input
-                        type="checkbox"
-                        {...register('isActive')}
-                        defaultChecked
-                        className="w-5 h-5 text-[#00BCE4]"
-                      />
-                      <div>
-                        <span className="font-medium">Faol</span>
-                        <p className="text-sm text-gray-500">Hozirda ishlayapti</p>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Submit tugmasi */}
+                )}
                 <div className="pt-6 border-t border-gray-200">
                   <button
                     type="submit"
                     disabled={isSubmitting || !selectedRegion || !selectedCity}
                     className={`w-full py-3.5 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all shadow-lg
-                      ${isSubmitting || !selectedRegion || !selectedCity
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-[#00BCE4] to-[#0099CC] hover:from-[#00A8D4] hover:to-[#0088B3] hover:shadow-xl'}`}
+                      ${isSubmitting || !selectedRegion || !selectedCity ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-[#00BCE4] to-[#0099CC] hover:from-[#00A8D4] hover:to-[#0088B3] hover:shadow-xl'}`}
                   >
                     {isSubmitting ? (
                       <>
@@ -1749,54 +1450,36 @@ function MyInformation() {
                     ) : (
                       <>
                         <Save className="w-5 h-5" />
-                        {isEditing ? 'O\'zgarishlarni Saqlash' : 'Shifokorni Saqlash'}
+                        {isEditing ? 'O\'zgarishlarni Saqlash' : 'Saqlash'}
                       </>
                     )}
                   </button>
-
-                  {(!selectedRegion || !selectedCity) && (
-                    <p className="text-center text-sm text-red-600 mt-2">
-                      Iltimos, viloyat va tuman/shaharni tanlang!
-                    </p>
-                  )}
-
-                  <p className="text-center text-sm text-gray-500 mt-4">
-                    * bilan belgilangan maydonlar majburiy
-                  </p>
+                  {(!selectedRegion || !selectedCity) && <p className="text-center text-sm text-red-600 mt-2">Viloyat va tuman/shaharni tanlang!</p>}
+                  <p className="text-center text-sm text-gray-500 mt-4">* bilan belgilangan maydonlar majburiy</p>
                 </div>
               </form>
             )}
           </div>
         )}
-
-        {/* Shifokorni ko'rsh modal oynasi */}
-        {isViewModalOpen && viewDoctor && (
+        {isViewModalOpen && viewEntity && (
           <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
               <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800">Shifokor Profili</h2>
-                <button
-                  onClick={() => setIsViewModalOpen(false)}
-                  className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-400"
-                >
+                <h2 className="text-2xl font-bold text-gray-800">Profil</h2>
+                <button onClick={() => setIsViewModalOpen(false)} className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-400">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-
               <div className="p-6">
-                {/* Profil ma'lumotlari */}
                 <div className="flex flex-col md:flex-row gap-6 mb-8">
                   <div className="flex-shrink-0">
                     <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gray-50 border-4 border-white shadow-md">
-                      {viewDoctor.avatar || viewDoctor.profileImage || viewDoctor.image ? (
+                      {viewEntity.avatar || viewEntity.profileImage || viewEntity.image ? (
                         <img
-                          src={viewDoctor.avatar || viewDoctor.profileImage || viewDoctor.image}
-                          alt={viewDoctor.fullName || viewDoctor.name}
+                          src={viewEntity.avatar || viewEntity.profileImage || viewEntity.image}
+                          alt={viewEntity.fullName || viewEntity.name}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(viewDoctor.fullName || viewDoctor.name || 'Doctor')}&background=00BCE4&color=fff`;
-                          }}
+                          onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(viewEntity.fullName || viewEntity.name || 'Entity')}&background=00BCE4&color=fff`; }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -1805,153 +1488,149 @@ function MyInformation() {
                       )}
                     </div>
                   </div>
-
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                      {viewDoctor.fullName || viewDoctor.name || 'Noma\'lum Shifokor'}
+                      {viewEntity.fullName || viewEntity.name || 'Noma\'lum'}
                     </h3>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {(Array.isArray(viewDoctor.specialty) ? viewDoctor.specialty : (Array.isArray(viewDoctor.specialization) ? viewDoctor.specialization : String(viewDoctor.specialty || viewDoctor.specialization || 'Mutaxassislik kiritilmagan').split(', '))).map((spec, index) => (
-                        <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-semibold">
-                          <BriefcaseMedical className="w-5 h-5" />
-                          {spec}
-                        </div>
-                      ))}
-                    </div>
-
+                    {userRole !== 'technician' && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {(Array.isArray(viewEntity.specialty) ? viewEntity.specialty : (Array.isArray(viewEntity.specialization) ? viewEntity.specialization : String(viewEntity.specialty || viewEntity.specialization || 'Mutaxassislik kiritilmagan').split(', '))).map((spec, index) => (
+                          <div key={index} className="flex items-center gap-2 text-[#00BCE4] font-semibold">
+                            <BriefcaseMedical className="w-5 h-5" />
+                            {spec}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-3">
-                      <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium">
-                        {viewDoctor.gender === 'male' ? 'Erkak' : 'Ayol'}
-                      </div>
+                      {userRole !== 'technician' && (
+                        <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium">
+                          {viewEntity.gender === 'male' ? 'Erkak' : 'Ayol'}
+                        </div>
+                      )}
                       <div className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-sm font-medium">
-                        {viewDoctor.experienceYears || viewDoctor.experience || 0} yil tajriba
+                        {viewEntity.experienceYears || viewEntity.experience || 0} yil tajriba
                       </div>
-                      {viewDoctor.region && (
+                      {viewEntity.region && (
                         <div className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium border border-gray-100">
-                          {viewDoctor.region}
+                          {viewEntity.region}
                         </div>
                       )}
-                      {viewDoctor.city && (
+                      {viewEntity.city && (
                         <div className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium border border-gray-100">
-                          {viewDoctor.city}
+                          {viewEntity.city}
                         </div>
                       )}
-                      {viewDoctor.isAvailable24x7 && (
+                      {userRole !== 'technician' && viewEntity.isAvailable24x7 && (
                         <div className="bg-amber-50 text-amber-600 px-3 py-1 rounded-lg text-sm font-medium border border-amber-100">
                           24/7 Mavjud
                         </div>
                       )}
-                      <div className={`px-3 py-1 rounded-lg text-sm font-medium ${viewDoctor.isActive !== false
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'bg-rose-50 text-rose-600'
-                        }`}>
-                        {viewDoctor.isActive !== false ? 'Faol' : 'Faol emas'}
+                      {userRole !== 'technician' && (
+                        <div className={`px-3 py-1 rounded-lg text-sm font-medium ${viewEntity.isActive !== false ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                          {viewEntity.isActive !== false ? 'Faol' : 'Faol emas'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {userRole !== 'technician' && (
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
+                    <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl text-center">
+                      <div className="text-2xl font-bold text-gray-800 mb-1">
+                        {viewEntity.price ? `${viewEntity.price.toLocaleString()} so'm` : 'N/A'}
                       </div>
+                      <div className="text-sm text-gray-500 font-bold uppercase tracking-widest">Narx</div>
                     </div>
                   </div>
-                </div>
-
-                {/* Statistikalar */}
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
-                  <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl text-center">
-                    <div className="text-2xl font-bold text-gray-800 mb-1">
-                      {viewDoctor.price ? `${viewDoctor.price.toLocaleString()} so'm` : 'N/A'}
-                    </div>
-                    <div className="text-sm text-gray-500 font-bold uppercase tracking-widest">Narx</div>
-                  </div>
-                </div>
-
-                {/* Kontakt ma'lumotlari */}
+                )}
                 <div className="space-y-4 mb-8">
                   <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
                     Kontakt Ma'lumotlari
                   </h4>
-
                   <div className="space-y-3">
-                    {viewDoctor.phone && (
+                    {viewEntity.phone && (
                       <div className="flex items-center gap-3">
                         <Phone className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-700 font-bold">{viewDoctor.phone}</span>
+                        <span className="text-gray-700 font-bold">{viewEntity.phone}</span>
                       </div>
                     )}
                   </div>
                 </div>
-
-                {/* Klinika ma'lumotlari */}
                 <div className="space-y-4 mb-8">
                   <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
-                    Klinika Ma'lumotlari
+                    {userRole === 'technician' ? 'Manzil' : 'Klinika Ma\'lumotlari'}
                   </h4>
-
                   <div className="bg-white border border-gray-100 p-5 rounded-xl">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Building className="w-5 h-5 text-[#00BCE4]" />
-                      <span className="font-bold text-gray-800">
-                        {viewDoctor.clinic?.name || viewDoctor.hospitalName || 'Klinika nomi kiritilmagan'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                      <div>
-                        <p className="text-gray-600">
-                          {viewDoctor.clinic?.address || viewDoctor.address || 'Manzil kiritilmagan'}
-                        </p>
+                    {userRole !== 'technician' ? (
+                      <>
+                        <div className="flex items-center gap-3 mb-3">
+                          <Building className="w-5 h-5 text-[#00BCE4]" />
+                          <span className="font-bold text-gray-800">
+                            {viewEntity.clinic?.name || viewEntity.hospitalName || 'Klinika nomi kiritilmagan'}
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                          <div>
+                            <p className="text-gray-600">
+                              {viewEntity.clinic?.address || viewEntity.address || 'Manzil kiritilmagan'}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex items-start gap-3">
+                        <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                        <div>
+                          <p className="text-gray-600">
+                            {viewEntity.address || 'Manzil kiritilmagan'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {userRole !== 'technician' && (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
+                      Ish Vaqti
+                    </h4>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-emerald-500" />
+                        <span className="font-bold text-gray-700">
+                          {viewEntity.workTime?.start || viewEntity.workHours?.start || '09:00'}
+                        </span>
+                      </div>
+                      <div className="text-gray-300">—</div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 text-rose-500" />
+                        <span className="font-bold text-gray-700">
+                          {viewEntity.workTime?.end || viewEntity.workHours?.end || '18:00'}
+                        </span>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Ish vaqti */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-bold text-gray-800 border-l-4 border-[#00BCE4] pl-3 italic uppercase tracking-tighter">
-                    Ish Vaqti
-                  </h4>
-
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-emerald-500" />
-                      <span className="font-bold text-gray-700">
-                        {viewDoctor.workTime?.start || viewDoctor.workHours?.start || '09:00'}
-                      </span>
-                    </div>
-                    <div className="text-gray-300">—</div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-rose-500" />
-                      <span className="font-bold text-gray-700">
-                        {viewDoctor.workTime?.end || viewDoctor.workHours?.end || '18:00'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tavsif */}
-                {viewDoctor.description && (
+                )}
+                {viewEntity.description && (
                   <div className="mt-8 p-4 bg-gray-50 border border-gray-100 rounded-xl">
                     <h4 className="font-bold text-gray-800 mb-2 uppercase text-xs tracking-widest">Qo'shimcha Ma'lumot</h4>
-                    <p className="text-gray-600 italic">{viewDoctor.description}</p>
+                    <p className="text-gray-600 italic">{viewEntity.description}</p>
                   </div>
                 )}
               </div>
-
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6">
                 <div className="flex gap-3">
                   <button
-                    onClick={() => {
-                      setIsViewModalOpen(false);
-                      handleEditDoctor(viewDoctor);
-                    }}
+                    onClick={() => { setIsViewModalOpen(false); handleEditEntity(viewEntity); }}
                     className="flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
                   >
                     <Edit className="w-4 h-4" />
                     Tahrirlash
                   </button>
-
                   <button
-                    onClick={() => {
-                      setIsViewModalOpen(false);
-                      handleDeleteDoctor(viewDoctor._id || viewDoctor.id);
-                    }}
+                    onClick={() => { setIsViewModalOpen(false); handleDeleteEntity(viewEntity._id || viewEntity.id); }}
                     className="px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -1962,7 +1641,6 @@ function MyInformation() {
             </div>
           </div>
         )}
-
         <footer className="mt-8 text-center text-gray-500 text-sm">
           © {new Date().getFullYear()} DentaGo. Barcha huquqlar himoyalangan.
         </footer>

@@ -1,3 +1,4 @@
+import TechnicianManagement from './components/Texnikan/TexnikInformation';
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataProvider';
@@ -61,6 +62,7 @@ import NeedAdmin from './components/NeedAdmin';
 
 // Icons
 import { ShoppingCart } from 'lucide-react';
+import AllTexniks from './AllTexniks';
 
 const getCurrentPageTitle = (pathname) => {
   const routes = {
@@ -204,11 +206,13 @@ const ProtectedLayout = () => {
               <Route path="/kurs" element={<Kurs />} />
               <Route path="/ustalar" element={<Ustalar />} />
               <Route path="/texniklar" element={<Texniklar />} />
+              <Route path="/technicians" element={<TechnicianManagement />} />
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
               <Route path='/AllDoctorsEdit' element={<AllDoctorsEdit />} />
               <Route path='/Categories' element={<Categories />} />
               <Route path='/need-admin' element={<NeedAdmin />} />
+              <Route path='/alltechnicals' element={<AllTexniks />} />
 
               {/* settings general */}
               {/* <Route path="/settings/general" element={<GeneralSettingsContent />} /> */}

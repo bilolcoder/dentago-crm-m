@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
     Home, Store, FileText, Stethoscope, Send, Users, Settings, BookOpen,
     ChevronDown, ListOrdered, Archive, User, PlusCircle, X, Package,
-    MessageSquare
+    MessageSquare,
+    BriefcaseMedical
 } from 'lucide-react';
 import { IoIosStats } from "react-icons/io";
 import { HiOutlineInformationCircle } from "react-icons/hi";
@@ -74,9 +75,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: PlusCircle, label: "Mahsulot qo'shish",    route: "/addproduct",       type: "link" },
         { icon: Package,    label: "Admin Product",        route: "/admin-product",    type: "link" },
         { icon: Package,    label: "All Doctors Edit",     route: "/AllDoctorsEdit",   type: "link" },
-        
+
         // Yangi qo'shilgan — faqat admin ko'radi
         { icon: ListOrdered, label: "Ustalar buyurtmalari", route: "/UstlarBuyurtmasi", type: "link" },
+        // Texniklar bo'limi
+        { icon: BriefcaseMedical, label: "Texniklar", route: "/technicians", type: "link" },
+        { icon: BriefcaseMedical, label: "All Texniks", route: "/alltechnicals", type: "link" },
 
         // Quyidagilar hozircha kommentda (agar kerak bo'lsa ochasiz)
         /*
@@ -168,8 +172,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
-                item.route === "/my-information" ||
-                item.route === "/orders"
+                item.route === "/orders"||
+                item.route === "/technicians"
             );
         }
 
@@ -187,7 +191,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     };
 
     const visibleNavItems = getVisibleNavItems();
-    
+
     // "Sizga nima kerak?" tugmasi uchun
     const needButton = {
         icon: MessageSquare,
@@ -195,7 +199,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         type: "button",
         action: () => setShowNeedModal(true)
     };
-    
+
     // "Foydalanuvchi So'rovlari" tugmasi (faqat admin uchun)
     const needAdminButton = {
         icon: MessageSquare,
@@ -330,7 +334,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                                 <MessageSquare size={20} strokeWidth={2} />
                                 <span className="text-[11px] uppercase tracking-widest">{needButton.label}</span>
                             </div>
-                            
+
                             {/* Foydalanuvchi So'rovlari (faqat admin) */}
                             {user?.role === 'admin' && (
                                 <div
@@ -373,7 +377,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     </p>
                 </div>
             </aside>
-            
+
             {/* Need Modal */}
             {showNeedModal && <Need onClose={() => setShowNeedModal(false)} />}
         </>
