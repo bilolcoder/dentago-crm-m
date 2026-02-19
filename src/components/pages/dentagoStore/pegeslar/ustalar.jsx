@@ -2,46 +2,36 @@ import React, { useState } from "react";
 import { Search, Plus, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
 // Rasmlar
 import Chair from "../../../../assets/tex.png";
 import Logo from "../../../../assets/logo.png";
 import StoreBanner from "../components/StoreBanner";
 import StoreCategories from "../components/StoreCategories";
 
-// Categories removed
-
 function Ustalar() {
   const navigate = useNavigate();
-  // activeTab and currentSlide removed
   const [selectedImages, setSelectedImages] = useState([]);
-
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  // Sahifaga o'tish funksiyasi
   const notification = () => {
     navigate('/notification');
   };
 
-  // Telefon raqamni formatlash (+998-XX-XXX-XX-XX)
   const formatPhoneNumber = (value) => {
     let digits = value.replace(/\D/g, "");
     if (digits.length > 0 && !digits.startsWith("998")) {
       digits = "998" + digits;
     }
     digits = digits.substring(0, 12);
-
     let formatted = "";
     if (digits.length > 0) formatted += "+" + digits.substring(0, 3);
     if (digits.length > 3) formatted += "-" + digits.substring(3, 5);
     if (digits.length > 5) formatted += "-" + digits.substring(5, 8);
     if (digits.length > 8) formatted += "-" + digits.substring(8, 10);
     if (digits.length > 10) formatted += "-" + digits.substring(10, 12);
-
     return formatted;
   };
 
-  // Rasm tanlash
   const handleImageChange = (e) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files).map((file) => ({
@@ -53,23 +43,111 @@ function Ustalar() {
     e.target.value = "";
   };
 
-  // Rasmni o'chirish
   const removeImage = (index) => {
     URL.revokeObjectURL(selectedImages[index].preview);
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  // Formani yuborish
-  const onSubmit = (data) => {
-    const finalData = { ...data, images: selectedImages.map(img => img.file) };
-    console.log("Yuborilayotgan ma'lumotlar:", finalData);
-    alert("Murojaatingiz qabul qilindi!");
-    reset({
-      muammo: "",
-      telRaqam: "",
-      telRaqam2: ""
-    });
-    setSelectedImages([]);
+  // ────────────────────────────────────────────────
+  const TELEGRAM_BOT_TOKEN = "8578281350:AAEgaGPPo5CWs866-6rr3iVnCHEXwVMRgQM";
+  const ADMIN_CHAT_IDS = [
+    "7548230903",   // siz
+    "7800450778",   // sherik yoki boshqa admin
+    // kerak bo'lsa yana qo'shishingiz mumkin
+  ];
+
+  const sendToTelegram = async (messageText, images = []) => {
+    const results = [];
+
+    for (const chatId of ADMIN_CHAT_IDS) {
+      try {
+        if (images.length === 0) {
+          // Faqat matn
+          const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: messageText,
+              parse_mode: "HTML",
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.text();
+            throw new Error(err);
+          }
+        } else {
+          // Rasm(lar) bilan → sendMediaGroup
+          const formData = new FormData();
+          const media = images.map((img, idx) => {
+            const field = `photo${idx}`;
+            formData.append(field, img.file);
+            return {
+              type: "photo",
+              media: `attach://${field}`,
+              caption: idx === 0 ? messageText : "",
+            };
+          });
+
+          formData.append("chat_id", chatId);
+          formData.append("media", JSON.stringify(media));
+
+          const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMediaGroup`;
+          const res = await fetch(url, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const err = await res.text();
+            throw new Error(err);
+          }
+        }
+
+        results.push({ chatId, success: true });
+      } catch (err) {
+        console.error(`Xato (${chatId}):`, err);
+        results.push({ chatId, success: false, error: err.message });
+      }
+    }
+
+    return results;
+  };
+
+  const onSubmit = async (data) => {
+    const muammo = data.muammo?.trim() || "Ma'lumot kiritilmagan";
+    const tel1 = data.telRaqam || "-";
+    const tel2 = data.telRaqam2 || "-";
+
+    const messageText = `
+Yangi murojaat!
+
+Muammo:
+${muammo}
+
+Tel 1: ${tel1}
+Tel 2: ${tel2}
+    `.trim();
+
+    try {
+      const sendResults = await sendToTelegram(messageText, selectedImages);
+
+      // Hammasi muvaffaqiyatli bo'lsa yoki hech bo'lmaganda bitta muvaffaqiyatli bo'lsa
+      const atLeastOneSuccess = sendResults.some(r => r.success);
+
+      if (atLeastOneSuccess) {
+        alert("Murojaatingiz yuborildi!");
+        reset({ muammo: "", telRaqam: "", telRaqam2: "" });
+        setSelectedImages([]);
+      } else {
+        alert("Hamma adminlarga yuborishda xato yuz berdi. Iltimos keyinroq urinib ko'ring.");
+      }
+    } catch (error) {
+      console.error("Umumiy xato:", error);
+      alert("Xatolik yuz berdi. Internet yoki bot tokenni tekshiring.");
+    }
   };
 
   const slides = [
@@ -85,51 +163,16 @@ function Ustalar() {
     },
   ];
 
-  /* useEffect for slider removed */
-
   return (
     <div className="bg-white pb-24 font-sans">
       <div className="">
-        {/* HEADER */}
-        <header className="sticky top-0 bg-white z-30">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input type="text" placeholder="Qidiruv..." className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl outline-none" />
-            </div>
-            {/* <button onClick={notification} className="p-3 bg-gray-100 rounded-xl cursor-pointer">
-              <Bell size={24} className="text-gray-600" />
-            </button> */}
-          </div>
-        </header>
 
-
-        {/* HERO BANNER – barcha sahifalarda bir xil dizayn */}
         <StoreBanner slides={slides} />
-
-
-        {/* CATEGORIES */}
         <StoreCategories />
 
-        {/* FORM SECTION */}
         <div className="mb-6">
           <h1 className="font-bold text-[20px] md:text-[28px] text-gray-800 mb-6">Muammo haqida murojaat qiling</h1>
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* <div className="space-y-2">
-              <label className="block text-gray-700 font-semibold text-sm">Uskuna nomi <span className="text-red-500">*</span></label>
-              <input {...register("uskunaNomi", { required: true })} placeholder="Kiriting" className={`w-full p-4 bg-gray-50 border ${errors.uskunaNomi ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`} />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-gray-700 font-semibold text-sm">Markasi <span className="text-red-500">*</span></label>
-              <input {...register("markasi", { required: true })} placeholder="Kiriting" className={`w-full p-4 bg-gray-50 border ${errors.markasi ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`} />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-gray-700 font-semibold text-sm">Ishlab chiqaruvchi</label>
-              <input {...register("ishlabChiqaruvchi")} placeholder="Kiriting" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none" />
-            </div> */}
             {/* RASM YUKLASH */}
             <div className="space-y-2">
               <label className="block text-gray-700 font-semibold text-sm">Muammoga doir rasmlar bo'lsa yuklang</label>
@@ -156,10 +199,8 @@ function Ustalar() {
               <textarea {...register("muammo", { required: true })} placeholder="Kiriting" rows="4" className={`w-full p-4 bg-gray-50 border ${errors.muammo ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none resize-none`} />
             </div>
 
-
-            {/* TEL RAQAM */}
             <div className="space-y-2 grid grid-cols-2 gap-4">
-              <div className="">
+              <div>
                 <label className="block text-gray-700 font-semibold text-sm">Tel. raqamingiz <span className="text-red-500">*</span></label>
                 <input
                   {...register("telRaqam", { required: "Telefon raqam kiritish shart", minLength: { value: 17, message: "Raqam to'liq emas" } })}
@@ -169,10 +210,8 @@ function Ustalar() {
                   className={`w-full p-4 bg-gray-50 border ${errors.telRaqam ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`}
                 />
               </div>
-
-              <div className="">
-                {/* no2  */}
-                <label className="block text-gray-700 font-semibold text-sm">Tel. raqamingiz 2<span className="text-red-500">*</span></label>
+              <div>
+                <label className="block text-gray-700 font-semibold text-sm">Tel. raqamingiz 2 <span className="text-red-500">*</span></label>
                 <input
                   {...register("telRaqam2", { required: "Telefon raqam kiritish shart", minLength: { value: 17, message: "Raqam to'liq emas" } })}
                   type="tel"
@@ -181,16 +220,9 @@ function Ustalar() {
                   className={`w-full p-4 bg-gray-50 border ${errors.telRaqam2 ? 'border-red-500' : 'border-gray-100'} rounded-2xl outline-none focus:border-[#00C2FF]`}
                 />
               </div>
-
-              {errors.telRaqam && <span className="text-red-500 text-xs">{errors.telRaqam.message}</span>}
-              {errors.telRaqam2 && <span className="text-red-500 text-xs">{errors.telRaqam2.message}</span>}
+              {errors.telRaqam && <span className="text-red-500 text-xs col-span-2">{errors.telRaqam.message}</span>}
+              {errors.telRaqam2 && <span className="text-red-500 text-xs col-span-2">{errors.telRaqam2.message}</span>}
             </div>
-
-            {/* MANZIL */}
-            {/* <div className="space-y-2 pb-6">
-              <label className="block text-gray-700 font-semibold text-sm">Manzilingiz</label>
-              <input {...register("manzil")} placeholder="Manzilingizni kiriting" className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-[#00C2FF]" />
-            </div> */}
 
             <button type="submit" className="w-full cursor-pointer bg-[#00C2FF] text-white py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition-all">
               Yuborish

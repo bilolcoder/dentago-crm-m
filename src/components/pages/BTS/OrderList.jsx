@@ -53,7 +53,7 @@ function Aperator() {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("Token topilmadi!");
 
-      const historyUrl = isAdmin 
+      const historyUrl = isAdmin
         ? `${BASE_URL}/api/order/history?all=true&page=1&limit=500`
         : `${BASE_URL}/api/order/history?page=1&limit=500`;
 
@@ -406,12 +406,12 @@ function Aperator() {
       color = 'bg-amber-100 text-amber-800';
       text = 'Kutilmoqda';
       icons = <Package className="w-3 h-3 mr-1" />;
-    } 
+    }
     else if (lower === 'accepted') {
       color = 'bg-blue-100 text-blue-800';
       text = 'Qabul qilindi';
       icons = <Check className="w-3 h-3 mr-1" />;
-    } 
+    }
     else if (lower === 'completed') {
       color = 'bg-emerald-100 text-emerald-800';
       text = 'Bajarildi';
@@ -421,7 +421,7 @@ function Aperator() {
           <Check className="w-3.5 h-3.5" />
         </div>
       );
-    } 
+    }
     else if (lower === 'rejected') {
       color = 'bg-rose-100 text-rose-800';
       text = 'Bekor qilindi';
@@ -644,7 +644,7 @@ function Aperator() {
                     <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.productCompany}</td>
                     <td className="px-6 py-5 text-center">
                       <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
-                        {item.quantity}  
+                        {item.quantity}
                       </span>
                     </td>
                     <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
