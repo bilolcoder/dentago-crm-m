@@ -81,6 +81,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         // Texniklar bo'limi
         { icon: BriefcaseMedical, label: "Texniklar", route: "/technicians", type: "link" },
         { icon: BriefcaseMedical, label: "All Texniks", route: "/alltechnicals", type: "link" },
+        { icon: BriefcaseMedical, label: "Texnikga Buyurtma", route: "/technician-orders", type: "link" },
 
         // Quyidagilar hozircha kommentda (agar kerak bo'lsa ochasiz)
         /*
@@ -153,7 +154,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/my-information" ||
                 item.route === "/bemorlarim" ||
                 item.route === "/orders" ||
-                item.route === "/result"
+                item.route === "/result"||
+                item.route === "/technician-orders"
             );
         }
 
@@ -163,7 +165,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
                 item.route === "/orders" ||
-                item.route === "/addproduct"
+                item.route === "/addproduct"||
+                item.route === "/technician-orders"
             );
         }
 
@@ -173,7 +176,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
                 item.route === "/orders"||
-                item.route === "/technicians"
+                item.route === "/technicians"||
+                item.route === "/technician-orders"
             );
         }
 
@@ -182,7 +186,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
-                item.route === "/orders"
+                item.route === "/orders"||
+                item.route === "/technician-orders"
             );
         }
 

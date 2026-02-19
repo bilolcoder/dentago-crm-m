@@ -72,7 +72,7 @@ const TechnicianDetail = () => {
         if (token) {
           setReqLoading(true);
           try {
-            const reqRes = await axios.get(`https://app.dentago.uz/api/user/technician-requests`, {
+            const reqRes = await axios.get(`https://app.dentago.uz/api/user/technician-requests?limit=3`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             if (reqRes.data?.data) {

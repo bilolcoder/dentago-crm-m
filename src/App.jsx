@@ -60,6 +60,7 @@ import Registration from './components/registration';
 import AllDoctorsEdit from './components/AllDoctorsedit';
 import Categories from './components/pages/allcategories';
 import NeedAdmin from './components/NeedAdmin';
+import TechnicianOrders from './components/pages/BTS/TexnikgaBuyurtma';
 
 // Icons
 import { ShoppingCart } from 'lucide-react';
@@ -208,6 +209,7 @@ const ProtectedLayout = () => {
               <Route path="/ustalar" element={<Ustalar />} />
               <Route path="/texniklar" element={<Texniklar />} />
               <Route path="/technician/:id" element={<TechnicanId />} />
+              <Route path="/technician-orders" element={<TechnicianOrders />} />
               <Route path="/technicians" element={<TechnicianManagement />} />
               <Route path="/shifokorlar/:id" element={<DoctorDetail />} />
               <Route path="/malumot" element={<MalumotBerish />} />
