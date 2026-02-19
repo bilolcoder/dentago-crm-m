@@ -162,7 +162,7 @@ function TexnikgaBuyurtma() {
   };
 
   return (
-    <div className="py-6 px-4 max-w-7xl mx-auto">
+    <div className="py-6">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Texnikga Buyurtma</h1>
 
       {loading ? (
