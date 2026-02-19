@@ -128,7 +128,7 @@ const TechnicianDetail = () => {
       );
 
       if (res.status === 200 || res.status === 201) {
-        alert("Buyurtma muvaffaqiyatli yuborildi!");
+        // alert("Buyurtma muvaffaqiyatli yuborildi!");
         setIsOrderModalOpen(false);
         setFormData({ fullName: "", phone: "", email: "", service: "", comment: "" });
 
@@ -323,7 +323,7 @@ const TechnicianDetail = () => {
               <input required placeholder="F.I.SH" className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
               <div className="flex flex-col sm:flex-row gap-4">
                 <input required placeholder="Telefon" className="flex-1 p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                <input placeholder="Email" className="flex-1 p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                {/* <input placeholder="Email" className="flex-1 p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} /> */}
               </div>
               <input required placeholder="Xizmat turi (masalan: Protez)" className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} />
               <textarea placeholder="Izoh..." className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white h-24 resize-none transition-all" value={formData.comment} onChange={e => setFormData({...formData, comment: e.target.value})}></textarea>
