@@ -31,7 +31,19 @@ function Aperator() {
   const [currentPage, setCurrentPage] = useState(1);
   const [actionLoading, setActionLoading] = useState({});
   const [techActionLoading, setTechActionLoading] = useState({});
-  const [confirmModal, setConfirmModal] = useState({ open: false, requestId: null, status: null });
+
+  // Bekor qilish sababi uchun modal
+  const [rejectModal, setRejectModal] = useState({
+    open: false,
+    requestId: null,
+    description: ''
+  });
+
+  // Bajarildi tasdiqlash uchun modal
+  const [confirmCompleteModal, setConfirmCompleteModal] = useState({
+    open: false,
+    requestId: null
+  });
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -41,7 +53,7 @@ function Aperator() {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("Token topilmadi!");
 
-      const historyUrl = isAdmin
+      const historyUrl = isAdmin 
         ? `${BASE_URL}/api/order/history?all=true&page=1&limit=500`
         : `${BASE_URL}/api/order/history?page=1&limit=500`;
 
@@ -221,19 +233,73 @@ function Aperator() {
     }
   };
 
-  const openConfirmModal = (requestId, newStatus) => {
-    setConfirmModal({ open: true, requestId, status: newStatus });
+  const openRejectModal = (requestId) => {
+    setRejectModal({ open: true, requestId, description: '' });
   };
 
-  const closeConfirmModal = () => {
-    setConfirmModal({ open: false, requestId: null, status: null });
+  const closeRejectModal = () => {
+    setRejectModal({ open: false, requestId: null, description: '' });
   };
 
-  const confirmAndUpdateStatus = async () => {
-    const { requestId, status } = confirmModal;
-    if (!requestId || !status) return;
+  const submitReject = async () => {
+    const { requestId, description } = rejectModal;
+    if (!description.trim()) {
+      alert("Sababni kiriting!");
+      return;
+    }
 
-    closeConfirmModal();
+    setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error("Token topilmadi");
+
+      // /work endpoint'iga faqat description jo'natamiz
+      const workRes = await axios.post(
+        `${BASE_URL}/api/admin/technicians/requests/${requestId}/work`,
+        { description },
+        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+      );
+
+      if (!workRes.data?.success) {
+        throw new Error(workRes.data?.message || "Sabab saqlanmadi");
+      }
+
+      // Statusni "rejected" ga o'zgartiramiz
+      const statusRes = await axios.put(
+        `${BASE_URL}/api/admin/technicians/requests/${requestId}/status`,
+        { status: 'rejected' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (statusRes.data?.success) {
+        setTechnicianOrders(prev =>
+          prev.map(o => o.requestId === requestId ? { ...o, status: 'rejected' } : o)
+        );
+        setFilteredTechOrders(prev =>
+          prev.map(o => o.requestId === requestId ? { ...o, status: 'rejected' } : o)
+        );
+        closeRejectModal();
+        alert("Buyurtma bekor qilindi!");
+      }
+    } catch (err) {
+      console.error("Xato:", err);
+      alert("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+    } finally {
+      setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
+    }
+  };
+
+  const openConfirmCompleteModal = (requestId) => {
+    setConfirmCompleteModal({ open: true, requestId });
+  };
+
+  const closeConfirmCompleteModal = () => {
+    setConfirmCompleteModal({ open: false, requestId: null });
+  };
+
+  const submitConfirmComplete = async () => {
+    const { requestId } = confirmCompleteModal;
     setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
 
     try {
@@ -242,19 +308,19 @@ function Aperator() {
 
       const response = await axios.put(
         `${BASE_URL}/api/admin/technicians/requests/${requestId}/status`,
-        { status },
+        { status: 'completed' },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data?.success) {
         setTechnicianOrders(prev =>
-          prev.map(o => o.requestId === requestId ? { ...o, status } : o)
+          prev.map(o => o.requestId === requestId ? { ...o, status: 'completed' } : o)
         );
         setFilteredTechOrders(prev =>
-          prev.map(o => o.requestId === requestId ? { ...o, status } : o)
+          prev.map(o => o.requestId === requestId ? { ...o, status: 'completed' } : o)
         );
-
-
+        closeConfirmCompleteModal();
+        alert("Buyurtma bajarildi!");
       } else {
         throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
       }
@@ -267,7 +333,17 @@ function Aperator() {
   };
 
   const updateTechnicianOrderStatus = async (requestId, status) => {
-    if (!requestId) return;
+    if (status === 'rejected') {
+      openRejectModal(requestId);
+      return;
+    }
+
+    if (status === 'completed') {
+      openConfirmCompleteModal(requestId);
+      return;
+    }
+
+    // Boshqa statuslar uchun (masalan 'accepted')
     setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
 
     try {
@@ -287,8 +363,6 @@ function Aperator() {
         setFilteredTechOrders(prev =>
           prev.map(o => o.requestId === requestId ? { ...o, status } : o)
         );
-
-
       } else {
         throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
       }
@@ -332,12 +406,12 @@ function Aperator() {
       color = 'bg-amber-100 text-amber-800';
       text = 'Kutilmoqda';
       icons = <Package className="w-3 h-3 mr-1" />;
-    }
+    } 
     else if (lower === 'accepted') {
       color = 'bg-blue-100 text-blue-800';
       text = 'Qabul qilindi';
       icons = <Check className="w-3 h-3 mr-1" />;
-    }
+    } 
     else if (lower === 'completed') {
       color = 'bg-emerald-100 text-emerald-800';
       text = 'Bajarildi';
@@ -347,11 +421,16 @@ function Aperator() {
           <Check className="w-3.5 h-3.5" />
         </div>
       );
-    }
+    } 
     else if (lower === 'rejected') {
       color = 'bg-rose-100 text-rose-800';
       text = 'Bekor qilindi';
-      icons = <X className="w-3 h-3 mr-1" />;
+      icons = (
+        <div className="flex items-center">
+          <X className="w-3.5 h-3.5 mr-0.5" />
+          <X className="w-3.5 h-3.5" />
+        </div>
+      );
     }
 
     return (
@@ -431,7 +510,7 @@ function Aperator() {
       <div className="mb-8 flex flex-wrap gap-3 border-b border-slate-200 pb-3">
         <button
           onClick={() => setActiveTab('products')}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
+          className={`flex items-center cursor-pointer gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
         >
           <Package size={18} />
           Mahsulot buyurtmalari
@@ -439,7 +518,7 @@ function Aperator() {
 
         <button
           onClick={() => setActiveTab('technicians')}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
+          className={`flex cursor-pointer items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
         >
           Texnik buyurtmalari
         </button>
@@ -484,7 +563,6 @@ function Aperator() {
                   </>
                 ) : (
                   <>
-                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID / Mahsulot</th>
                     <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Texnik</th>
                     <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kompaniya</th>
                     <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
@@ -522,7 +600,7 @@ function Aperator() {
                       <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.tadbirkor}</td>
                       <td className="px-6 py-5 text-center">
                         <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
-                          {item.soni} ta
+                          {item.soni}
                         </span>
                       </td>
                       <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
@@ -538,12 +616,12 @@ function Aperator() {
                             <button
                               onClick={() => handleConfirmPayment(item.id)}
                               disabled={isLoading}
-                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${isLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
                             >
                               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
                             </button>
                           ) : (
-                            <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center">
+                            <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center cursor-default">
                               <X size={20} />
                             </div>
                           )}
@@ -559,12 +637,6 @@ function Aperator() {
                   <tr key={item.requestId} className="hover:bg-[#00BCE4]/[0.03]">
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-xs font-black text-[#00BCE4]">#{item.requestId?.slice(-8)}</span>
-                        <span className="text-sm font-bold text-slate-800">{item.productName}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col">
                         <span className="text-sm font-bold text-slate-800">{item.technicianName}</span>
                         {item.technicianPhone && <span className="text-xs text-slate-500">{item.technicianPhone}</span>}
                       </div>
@@ -572,7 +644,7 @@ function Aperator() {
                     <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.productCompany}</td>
                     <td className="px-6 py-5 text-center">
                       <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
-                        {item.quantity} ta
+                        {item.quantity}  
                       </span>
                     </td>
                     <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
@@ -591,7 +663,7 @@ function Aperator() {
                             <button
                               onClick={() => updateTechnicianOrderStatus(item.requestId, 'accepted')}
                               disabled={isTechLoading}
-                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
                             >
                               {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
                             </button>
@@ -599,7 +671,7 @@ function Aperator() {
                             <button
                               onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
                               disabled={isTechLoading}
-                              className={`w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
+                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
                             >
                               {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
                             </button>
@@ -607,17 +679,27 @@ function Aperator() {
                         )}
 
                         {item.status === 'accepted' && (
-                          <button
-                            onClick={() => openConfirmModal(item.requestId, 'completed')}
-                            disabled={isTechLoading}
-                            className={`w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'}`}
-                          >
-                            {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
-                          </button>
+                          <>
+                            <button
+                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'completed')}
+                              disabled={isTechLoading}
+                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                            >
+                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
+                            </button>
+
+                            <button
+                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
+                              disabled={isTechLoading}
+                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
+                            >
+                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
+                            </button>
+                          </>
                         )}
 
                         {(item.status === 'completed' || item.status === 'rejected') && (
-                          <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center">
+                          <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center cursor-default">
                             <X size={20} />
                           </div>
                         )}
@@ -649,7 +731,7 @@ function Aperator() {
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className={`w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
+              className={`cursor-pointer w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
             >
               <ChevronLeft size={18} />
             </button>
@@ -666,7 +748,7 @@ function Aperator() {
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`w-9 h-9 rounded-md border text-sm font-medium ${currentPage === pageNum ? 'bg-[#00BCE4] text-white border-[#00BCE4]' : 'border-slate-300 hover:bg-slate-100'}`}
+                  className={`cursor-pointer w-9 h-9 rounded-md border text-sm font-medium ${currentPage === pageNum ? 'bg-[#00BCE4] text-white border-[#00BCE4]' : 'border-slate-300 hover:bg-slate-100'}`}
                 >
                   {pageNum}
                 </button>
@@ -676,7 +758,7 @@ function Aperator() {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className={`w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
+              className={`cursor-pointer w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
             >
               <ChevronRight size={18} />
             </button>
@@ -684,25 +766,68 @@ function Aperator() {
         </div>
       )}
 
-      {confirmModal.open && (
+      {/* Bekor qilish uchun modal */}
+      {rejectModal.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Tasdiqlang</h3>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">Bekor qilish sababini kiriting</h3>
             <p className="text-slate-600 mb-6">
-              Buyurtmani <strong>"Bajarildi"</strong> holatiga o‘tkazmoqchimisiz? Bu amalni qaytarib bo‘lmaydi.
+              Buyurtmani <strong>"Bekor qilindi"</strong> holatiga o‘tkazmoqchimisiz? Sababni kiriting.
             </p>
-            <div className="flex justify-end gap-3">
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-700 mb-2">Sabab</label>
+              <textarea
+                className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-400"
+                rows={4}
+                placeholder="Masalan: Material yetishmadi, vaqt yetmadi..."
+                value={rejectModal.description}
+                onChange={(e) => setRejectModal(prev => ({ ...prev, description: e.target.value }))}
+              />
+            </div>
+
+            <div className="flex justify-end gap-4">
               <button
-                onClick={closeConfirmModal}
-                className="px-5 py-2.5 bg-gray-200 text-slate-700 rounded-lg hover:bg-gray-300 transition"
+                onClick={closeRejectModal}
+                className="px-6 py-2.5 bg-gray-200 text-slate-700 rounded-lg hover:bg-gray-300 transition cursor-pointer"
               >
                 Yo‘q
               </button>
               <button
-                onClick={confirmAndUpdateStatus}
-                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition flex items-center gap-2"
+                onClick={submitReject}
+                disabled={techActionLoading[rejectModal.requestId]}
+                className={`px-6 py-2.5 text-white rounded-lg transition flex items-center gap-2 min-w-[140px] justify-center bg-rose-600 hover:bg-rose-700 ${techActionLoading[rejectModal.requestId] ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
               >
-                <Check size={18} />
+                {techActionLoading[rejectModal.requestId] ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
+                Bekor qil
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bajarildi tasdiqlash uchun modal */}
+      {confirmCompleteModal.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h3 className="text-xl font-bold text-slate-800 mb-4">Buyurtmani bajarishni tasdiqlang</h3>
+            <p className="text-slate-600 mb-6">
+              Rostdan ham buyurtmani bajarib bo'ldingizmi? Buyurtmani <strong>"Bajarildi"</strong> holatiga o‘tkazmoqchimisiz?
+            </p>
+
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={closeConfirmCompleteModal}
+                className="px-6 py-2.5 bg-gray-200 text-slate-700 rounded-lg hover:bg-gray-300 transition cursor-pointer"
+              >
+                Yo‘q
+              </button>
+              <button
+                onClick={submitConfirmComplete}
+                disabled={techActionLoading[confirmCompleteModal.requestId]}
+                className={`px-6 py-2.5 text-white rounded-lg transition flex items-center gap-2 min-w-[140px] justify-center bg-emerald-600 hover:bg-emerald-700 ${techActionLoading[confirmCompleteModal.requestId] ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+              >
+                {techActionLoading[confirmCompleteModal.requestId] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
                 Ha, bajarildi
               </button>
             </div>
