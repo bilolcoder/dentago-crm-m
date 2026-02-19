@@ -155,10 +155,10 @@ const TechnicianDetail = () => {
   if (!tech) return <div className="text-center py-20 font-bold">Ma'lumot topilmadi.</div>;
 
   return (
-    <div className="min-h-screen pb-20 bg-white">
+    <div className="pb-20 bg-white">
       {/* NAVBAR */}
       <div className="sticky top-0 z-30 py-4 bg-white/80 backdrop-blur-md border-b border-gray-50 px-4">
-        <div className="max-w-6xl mx-auto flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <ChevronLeft size={24} />
           </button>
@@ -166,7 +166,7 @@ const TechnicianDetail = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 mt-6">
+      <div className="mt-6">
         {/* ASOSIY KARTA */}
         <div className="flex flex-col lg:flex-row rounded-[32px] overflow-hidden border border-gray-100 shadow-sm mb-12">
           <div className="w-full lg:w-2/5 relative bg-gray-50 aspect-[4/5] lg:aspect-auto">
