@@ -508,21 +508,29 @@ function Aperator() {
       </div>
 
       <div className="mb-8 flex flex-wrap gap-3 border-b border-slate-200 pb-3">
-        <button
-          onClick={() => setActiveTab('products')}
-          className={`flex items-center cursor-pointer gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
-        >
-          <Package size={18} />
-          Mahsulot buyurtmalari
-        </button>
+  {/* Mahsulot buyurtmalari → hammaga ko‘rinadi */}
+  <button
+    onClick={() => setActiveTab('products')}
+    className={`flex items-center cursor-pointer gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+      activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+    }`}
+  >
+    <Package size={18} />
+    Mahsulot buyurtmalari
+  </button>
 
-        <button
-          onClick={() => setActiveTab('technicians')}
-          className={`flex cursor-pointer items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
-        >
-          Texnik buyurtmalari
-        </button>
-      </div>
+  {/* Texnik buyurtmalari → faqat admin yoki technician ga */}
+  {["admin", "technician"].includes(user?.role) && (
+    <button
+      onClick={() => setActiveTab('technicians')}
+      className={`flex cursor-pointer items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+        activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+      }`}
+    >
+      Texnik buyurtmalari
+    </button>
+  )}
+</div>
 
       {activeTab === 'products' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">

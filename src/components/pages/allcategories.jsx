@@ -237,7 +237,7 @@ function AllCategories() {
           <div className="px-5 py-4  bg-white flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
             {/* Chap taraf */}
             <div className="text-center sm:text-left">
-              Jami <span className="font-semibold text-gray-800">{categories.length}</span> ta kategoriya, 
+              Jami <span className="font-semibold text-gray-800">{categories.length}</span> ta kategoriya,
               Sahifa <span className="font-semibold text-gray-800">{currentPage}</span> dan <span className="font-semibold text-gray-800">{totalPages}</span>
             </div>
 
@@ -281,17 +281,17 @@ function AllCategories() {
 
       {/* To'liq tavsif modal */}
       {selectedDescription && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 cursor-pointer"
           onClick={() => setSelectedDescription(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">To'liq tavsif</h3>
-              <button 
+              <button
                 onClick={() => setSelectedDescription(null)}
                 className="cursor-pointer"
               >
@@ -311,7 +311,7 @@ function AllCategories() {
               <h2 className="text-xl font-semibold">
                 {editingCategory ? "Kategoriyani tahrirlash" : "Yangi kategoriya"}
               </h2>
-              <button 
+              <button
                 onClick={() => setModalOpen(false)}
                 className="cursor-pointer"
               >
@@ -378,8 +378,8 @@ function AllCategories() {
       {/* Notification */}
       {notification.show && (
         <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-xl shadow-lg flex items-center gap-3 border ${
-          notification.type === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-800' 
+          notification.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800'
             : 'bg-red-50 border-red-200 text-red-800'
         }`}>
           {notification.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}

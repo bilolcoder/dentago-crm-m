@@ -200,7 +200,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     // "Sizga nima kerak?" tugmasi uchun
     const needButton = {
         icon: MessageSquare,
-        label: "Sizga nima kerak?",
+        label: "Nima kerak?", // t('what_do_you_need') deb tarjima qilishingiz mumkin
         type: "button",
         action: () => setShowNeedModal(true)
     };
