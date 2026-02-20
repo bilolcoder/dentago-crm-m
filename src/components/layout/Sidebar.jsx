@@ -165,8 +165,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
                 item.route === "/orders" ||
-                item.route === "/addproduct"||
-                item.route === "/technician-orders"
+                item.route === "/addproduct"
+                // item.route === "/technician-orders"
             );
         }
 
@@ -176,8 +176,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
                 item.route === "/orders"||
-                item.route === "/technicians"||
-                item.route === "/technician-orders"
+                item.route === "/technicians"
+                // item.route === "/technician-orders"
             );
         }
 
@@ -186,8 +186,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
-                item.route === "/orders"||
-                item.route === "/technician-orders"
+                item.route === "/orders"
+                // item.route === "/technician-orders"
             );
         }
 
