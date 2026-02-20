@@ -144,7 +144,7 @@ function Aperator() {
       }
     } catch (err) {
       console.error("Texnik buyurtmalari xatosi:", err);
-      alert("Texnik buyurtmalarini yuklashda xatolik: " + (err.response?.data?.message || err.message));
+      // alert("Texnik buyurtmalarini yuklashda xatolik: " + (err.response?.data?.message || err.message));
     }
   };
 

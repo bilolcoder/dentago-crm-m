@@ -161,7 +161,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         }
 
         // User
-        if (role === 'user') {
+        if (role === 'seller') {
             return navItems.filter(item =>
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
