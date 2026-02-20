@@ -23,7 +23,7 @@ const NeedAdmin = () => {
     try {
       // Avval localStorage'dan mavjud so'rovlarni olish
       const savedRequests = JSON.parse(localStorage.getItem('needRequests') || '[]');
-        
+
       // Statik so'rovlarni qo'shish (faqat birinchi marta)
       const staticRequests = [
         {
@@ -48,7 +48,7 @@ const NeedAdmin = () => {
           timestamp: '2026-02-13T09:15:00.000Z'
         }
       ];
-        
+
       // Agar localStorage bo'sh bo'lsa, statik so'rovlarni qo'shamiz
       if (savedRequests.length === 0) {
         localStorage.setItem('needRequests', JSON.stringify(staticRequests));
@@ -148,8 +148,10 @@ const NeedAdmin = () => {
               </div>
 
               <div className="mb-4">
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  {truncateText(request.message, 100)}
+                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                  {request.message?.length > 100
+                    ? request.message.slice(0, 70) + "..."
+                    : request.message || ""}
                 </p>
               </div>
 
@@ -218,7 +220,7 @@ const NeedAdmin = () => {
                   <MessageSquare className="w-5 h-5" /> Xabar
                 </h3>
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
-                  <p className="text-gray-800 whitespace-pre-wrap">{selectedRequest.message}</p>
+                  <p className="text-gray-800 whitespace-pre-wrap wrap-break-word">{selectedRequest.message}</p>
                 </div>
               </div>
             </div>

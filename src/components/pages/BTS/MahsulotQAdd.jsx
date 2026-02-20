@@ -5,7 +5,7 @@ import axios from 'axios';
 
 function ProductForm({ productToEdit, onClose }) {
   console.log('ProductForm rendered with:', { productToEdit, onClose });
-  
+
   const navigate = useNavigate();
 
   // Tokenni localStoragedan olish
@@ -447,7 +447,7 @@ function ProductForm({ productToEdit, onClose }) {
           </h1>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-xl">
           {(loading || uploadingImages) && (
             <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-md flex items-center gap-2">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
@@ -483,7 +483,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="Mahsulot nomini kiriting"
               />
             </div>
@@ -499,7 +499,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.sku}
                 onChange={handleChange}
                 required
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="Mahsulot artikuli"
               />
             </div>
@@ -517,7 +517,7 @@ function ProductForm({ productToEdit, onClose }) {
                 required
                 min="0"
                 step="0.01"
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="0.00"
               />
             </div>
@@ -533,7 +533,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.quantity}
                 onChange={handleChange}
                 min="0"
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="1"
               />
             </div>
@@ -543,7 +543,7 @@ function ProductForm({ productToEdit, onClose }) {
                 Расмлар
               </label>
               <div className="flex items-center gap-4">
-                <label className="bg-blue-600 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-700 transition">
+                <label className="bg-[#00B8DB] text-white px-4 py-2 rounded-md cursor-pointer hover:bg-[#0099B8] transition">
                   Fayl tanlash
                   <input
                     type="file"
@@ -598,7 +598,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.deliveryDays}
                 onChange={handleChange}
                 min="0"
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="0"
               />
             </div>
@@ -615,7 +615,7 @@ function ProductForm({ productToEdit, onClose }) {
                 onChange={handleChange}
                 min="0"
                 max="100"
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="0"
               />
             </div>
@@ -630,7 +630,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="mt-1 text-black block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 text-black block w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
               >
                 <option value="">Категорияни танланг</option>
                 {categories.map((cat) => (
@@ -651,7 +651,7 @@ function ProductForm({ productToEdit, onClose }) {
                 name="company"
                 value={formData.company}
                 onChange={handleChange}
-                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="Kompaniya nomi"
               />
             </div>
@@ -666,7 +666,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.code}
                 onChange={handleChange}
                 required
-                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block text-black w-full px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
               >
                 <option value="">Кодни танланг</option>
                 {codeOptions.map((item, index) => (
@@ -690,7 +690,7 @@ function ProductForm({ productToEdit, onClose }) {
                 min="0"
                 step="0.01"
                 placeholder="0"
-                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
               />
             </div>
 
@@ -705,7 +705,7 @@ function ProductForm({ productToEdit, onClose }) {
                 value={formData.package_code}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="Qadoqlash kodi"
               />
             </div>
@@ -720,7 +720,7 @@ function ProductForm({ productToEdit, onClose }) {
                 rows="4"
                 value={formData.description}
                 onChange={handleChange}
-                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border border-gray-300 rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
+                className="mt-1 block w-full text-black px-4 py-2 bg-gray-50 border outline-0 border-[#00B8DB] rounded-md focus:ring-[#00B8DB] focus:border-[#00B8DB] transition-colors duration-200"
                 placeholder="Mahsulot tavsifi..."
               ></textarea>
             </div>
@@ -729,7 +729,7 @@ function ProductForm({ productToEdit, onClose }) {
               <button
                 type="submit"
                 disabled={loading || uploadingImages}
-                className="inline-flex items-center px-6 py-3 cursor-pointer   text-sm font-medium rounded-md   text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-6 py-3 cursor-pointer   text-sm font-medium rounded-md   text-white bg-[#00B8DB] hover:bg-[#0099B8] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00B8DB] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading
                   ? 'Юкланмоқда...'

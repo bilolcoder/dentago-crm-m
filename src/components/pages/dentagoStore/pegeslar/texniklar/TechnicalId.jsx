@@ -21,16 +21,14 @@ const TechnicianDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 1. ASOSIY HOLATLAR (STATES)
   const [tech, setTech] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImg, setSelectedImg] = useState(null);
   const [requests, setRequests] = useState([]);
-  const [reviews, setReviews] = useState([]); // Fikrlar uchun
+  const [reviews, setReviews] = useState([]);
   const [reqLoading, setReqLoading] = useState(false);
   const [revLoading, setRevLoading] = useState(false);
 
-  // Buyurtma formasi holati
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,7 +39,13 @@ const TechnicianDetail = () => {
     comment: ""
   });
 
-  // 2. MA'LUMOTLARNI YUKLASH (FETCHING)
+  // Modal ochilganda telefon maydoniga +998- qo‘yish
+  useEffect(() => {
+    if (isOrderModalOpen && !formData.phone) {
+      setFormData((prev) => ({ ...prev, phone: "+998-" }));
+    }
+  }, [isOrderModalOpen]);
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token") || localStorage.getItem("accessToken");
@@ -49,13 +53,11 @@ const TechnicianDetail = () => {
       try {
         setLoading(true);
 
-        // A) Texnik tafsilotlari
         const techRes = await axios.get(`https://app.dentago.uz/api/public/technicians/${id}`);
         if (techRes.data?.success) {
           setTech(techRes.data.data.technician);
         }
 
-        // B) Fikrlarni yuklash (Public API)
         setRevLoading(true);
         try {
           const revRes = await axios.get(`https://app.dentago.uz/api/public/technicians/${id}/reviews`);
@@ -68,7 +70,6 @@ const TechnicianDetail = () => {
           setRevLoading(false);
         }
 
-        // C) So'rovlar ro'yxati (Token bo'lsa)
         if (token) {
           setReqLoading(true);
           try {
@@ -94,7 +95,23 @@ const TechnicianDetail = () => {
     if (id) fetchData();
   }, [id]);
 
-  // 3. BUYURTMA YUBORISH
+  const formatPhone = (value) => {
+    let digits = value.replace(/\D/g, "");
+    if (digits.length > 0 && !digits.startsWith("998")) {
+      digits = "998" + digits;
+    }
+    digits = digits.substring(0, 12);
+
+    let formatted = "";
+    if (digits.length > 0) formatted += "+" + digits.substring(0, 3);
+    if (digits.length > 3) formatted += "-" + digits.substring(3, 5);
+    if (digits.length > 5) formatted += "-" + digits.substring(5, 8);
+    if (digits.length > 8) formatted += "-" + digits.substring(8, 10);
+    if (digits.length > 10) formatted += "-" + digits.substring(10, 12);
+
+    return formatted;
+  };
+
   const handleOrderSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
@@ -128,13 +145,12 @@ const TechnicianDetail = () => {
       );
 
       if (res.status === 200 || res.status === 201) {
-        // alert("Buyurtma muvaffaqiyatli yuborildi!");
         setIsOrderModalOpen(false);
         setFormData({ fullName: "", phone: "", email: "", service: "", comment: "" });
 
-        // Ro'yxatni qayta yangilash
+        // Yangilash
         const updatedReqs = await axios.get(`https://app.dentago.uz/api/user/technician-requests`, {
-            headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         setRequests(updatedReqs.data?.data?.slice(0, 5) || []);
       }
@@ -238,7 +254,7 @@ const TechnicianDetail = () => {
           </div>
         )}
 
-        {/* FIKRLAR (YANGI QO'SHILDI) */}
+        {/* FIKRLAR */}
         <div className="mb-16">
           <h3 className="text-xl font-black mb-8 uppercase flex items-center gap-3 text-gray-800">
             <Star className="text-yellow-400 fill-yellow-400" /> Mijozlar fikri
@@ -311,35 +327,100 @@ const TechnicianDetail = () => {
         </div>
       </div>
 
-      {/* MODAL: BUYURTMA FORMASI */}
+      {/* BUYURTMA MODALI */}
       {isOrderModalOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center px-4" onClick={() => setIsOrderModalOpen(false)}>
-          <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-8 shadow-2xl animate-in slide-in-from-bottom duration-300" onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center px-4"
+          onClick={() => setIsOrderModalOpen(false)}
+        >
+          <div
+            className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-8 shadow-2xl animate-in slide-in-from-bottom duration-300"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-black uppercase text-gray-900">Buyurtma yuborish</h3>
-              <button onClick={() => setIsOrderModalOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"><X size={20}/></button>
+              <button
+                onClick={() => setIsOrderModalOpen(false)}
+                className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                <X size={20}/>
+              </button>
             </div>
-            <form onSubmit={handleOrderSubmit} className="space-y-4">
-              <input required placeholder="F.I.SH" className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} />
+
+            <form onSubmit={handleOrderSubmit} className="space-y-5">
+              <input
+                required
+                placeholder="F.I.SH"
+                className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all"
+                value={formData.fullName}
+                onChange={e => setFormData({...formData, fullName: e.target.value})}
+              />
+
               <div className="flex flex-col sm:flex-row gap-4">
-                <input required placeholder="Telefon" className="flex-1 p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                {/* <input placeholder="Email" className="flex-1 p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} /> */}
+                <div className="flex-1">
+                  <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                    Telefon raqami <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    required
+                    type="tel"
+                    placeholder="+998-90-123-45-67"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      const formatted = formatPhone(e.target.value);
+                      setFormData({ ...formData, phone: formatted });
+                    }}
+                    className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all"
+                  />
+                </div>
               </div>
-              <input required placeholder="Xizmat turi (masalan: Protez)" className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all" value={formData.service} onChange={e => setFormData({...formData, service: e.target.value})} />
-              <textarea placeholder="Izoh..." className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white h-24 resize-none transition-all" value={formData.comment} onChange={e => setFormData({...formData, comment: e.target.value})}></textarea>
-              <button disabled={orderLoading} className="w-full bg-[#00C1F3] text-white py-5 rounded-2xl font-black flex justify-center gap-3 hover:bg-[#00a8d9] transition-all active:scale-[0.98] disabled:opacity-50">
-                {orderLoading ? <Loader2 className="animate-spin" /> : <><Send size={20} /> YUBORISH</>}
+
+              <input
+                required
+                placeholder="Xizmat turi (masalan: Protez)"
+                className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white transition-all"
+                value={formData.service}
+                onChange={e => setFormData({...formData, service: e.target.value})}
+              />
+
+              <textarea
+                placeholder="Izoh..."
+                className="w-full p-4 bg-gray-50 rounded-2xl border border-transparent outline-none focus:border-[#00C1F3] focus:bg-white h-28 resize-none transition-all"
+                value={formData.comment}
+                onChange={e => setFormData({...formData, comment: e.target.value})}
+              ></textarea>
+
+              <button
+                disabled={orderLoading}
+                className={`w-full bg-[#00C1F3] text-white py-5 rounded-2xl font-black flex justify-center gap-3 hover:bg-[#00a8d9] transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed`}
+              >
+                {orderLoading ? (
+                  <Loader2 className="animate-spin" size={22} />
+                ) : (
+                  <>
+                    <Send size={20} /> YUBORISH
+                  </>
+                )}
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* MODAL: IMAGE ZOOM */}
+      {/* IMAGE ZOOM MODAL */}
       {selectedImg && (
-        <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out" onClick={() => setSelectedImg(null)}>
-          <button className="absolute top-6 right-6 text-white hover:rotate-90 transition-transform"><X size={32} /></button>
-          <img src={selectedImg} className="max-w-full max-h-[85vh] rounded-2xl animate-in zoom-in-95" alt="full" />
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setSelectedImg(null)}
+        >
+          <button className="absolute top-6 right-6 text-white hover:rotate-90 transition-transform">
+            <X size={32} />
+          </button>
+          <img
+            src={selectedImg}
+            className="max-w-full max-h-[85vh] rounded-2xl animate-in zoom-in-95"
+            alt="full"
+          />
         </div>
       )}
     </div>

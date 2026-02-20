@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Plus, X } from "lucide-react";
+import { Search, Plus, X, Loader2 } from "lucide-react"; // ← Loader2 ni qo'shing
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 // Rasmlar
@@ -11,6 +11,8 @@ import StoreCategories from "../components/StoreCategories";
 function Ustalar() {
   const navigate = useNavigate();
   const [selectedImages, setSelectedImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // ← yangi state
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   const notification = () => {
@@ -48,21 +50,15 @@ function Ustalar() {
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  // ────────────────────────────────────────────────
+  // Telegram yuborish funksiyasi (o'zgarmagan)
   const TELEGRAM_BOT_TOKEN = "8578281350:AAEgaGPPo5CWs866-6rr3iVnCHEXwVMRgQM";
-  const ADMIN_CHAT_IDS = [
-    "7548230903",   // siz
-    "7800450778",   // sherik yoki boshqa admin
-    // kerak bo'lsa yana qo'shishingiz mumkin
-  ];
+  const ADMIN_CHAT_IDS = ["7548230903", "7800450778"];
 
   const sendToTelegram = async (messageText, images = []) => {
     const results = [];
-
     for (const chatId of ADMIN_CHAT_IDS) {
       try {
         if (images.length === 0) {
-          // Faqat matn
           const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
           const res = await fetch(url, {
             method: "POST",
@@ -73,13 +69,8 @@ function Ustalar() {
               parse_mode: "HTML",
             }),
           });
-
-          if (!res.ok) {
-            const err = await res.text();
-            throw new Error(err);
-          }
+          if (!res.ok) throw new Error(await res.text());
         } else {
-          // Rasm(lar) bilan → sendMediaGroup
           const formData = new FormData();
           const media = images.map((img, idx) => {
             const field = `photo${idx}`;
@@ -90,33 +81,25 @@ function Ustalar() {
               caption: idx === 0 ? messageText : "",
             };
           });
-
           formData.append("chat_id", chatId);
           formData.append("media", JSON.stringify(media));
 
           const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMediaGroup`;
-          const res = await fetch(url, {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!res.ok) {
-            const err = await res.text();
-            throw new Error(err);
-          }
+          const res = await fetch(url, { method: "POST", body: formData });
+          if (!res.ok) throw new Error(await res.text());
         }
-
         results.push({ chatId, success: true });
       } catch (err) {
         console.error(`Xato (${chatId}):`, err);
         results.push({ chatId, success: false, error: err.message });
       }
     }
-
     return results;
   };
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true); // ← loading boshlanadi
+
     const muammo = data.muammo?.trim() || "Ma'lumot kiritilmagan";
     const tel1 = data.telRaqam || "-";
     const tel2 = data.telRaqam2 || "-";
@@ -133,8 +116,6 @@ Tel 2: ${tel2}
 
     try {
       const sendResults = await sendToTelegram(messageText, selectedImages);
-
-      // Hammasi muvaffaqiyatli bo'lsa yoki hech bo'lmaganda bitta muvaffaqiyatli bo'lsa
       const atLeastOneSuccess = sendResults.some(r => r.success);
 
       if (atLeastOneSuccess) {
@@ -147,6 +128,8 @@ Tel 2: ${tel2}
     } catch (error) {
       console.error("Umumiy xato:", error);
       alert("Xatolik yuz berdi. Internet yoki bot tokenni tekshiring.");
+    } finally {
+      setIsSubmitting(false); // ← loading tugaydi (muvaffaqiyatli yoki xato bo'lsa ham)
     }
   };
 
@@ -166,12 +149,14 @@ Tel 2: ${tel2}
   return (
     <div className="bg-white pb-24 font-sans">
       <div className="">
-
         <StoreBanner slides={slides} />
         <StoreCategories />
 
         <div className="mb-6">
-          <h1 className="font-bold text-[20px] md:text-[28px] text-gray-800 mb-6">Muammo haqida murojaat qiling</h1>
+          <h1 className="font-bold text-[20px] md:text-[28px] text-gray-800 mb-6">
+            Muammo haqida murojaat qiling
+          </h1>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* RASM YUKLASH */}
             <div className="space-y-2">
@@ -224,8 +209,23 @@ Tel 2: ${tel2}
               {errors.telRaqam2 && <span className="text-red-500 text-xs col-span-2">{errors.telRaqam2.message}</span>}
             </div>
 
-            <button type="submit" className="w-full cursor-pointer bg-[#00C2FF] text-white py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition-all">
-              Yuborish
+            <button
+              type="submit"
+              disabled={isSubmitting}                    // ← tugma faol bo'lmasligi
+              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg shadow-lg transition-all
+                ${isSubmitting
+                  ? 'bg-[#00C2FF]/70 cursor-not-allowed text-white/90'
+                  : 'bg-[#00C2FF] text-white active:scale-95 hover:bg-[#00B0E0] cursor-pointer'}
+              `}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Yuborilmoqda...
+                </>
+              ) : (
+                "Yuborish"
+              )}
             </button>
           </form>
         </div>
