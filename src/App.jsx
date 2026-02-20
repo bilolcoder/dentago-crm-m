@@ -65,7 +65,7 @@ import TechnicianOrders from './components/pages/BTS/TexnikgaBuyurtma';
 // Icons
 import { ShoppingCart } from 'lucide-react';
 import AllTexniks from './AllTexniks';
-import BuyurtmaSotuvchi from './components/BuyurtmaSotuvchi';
+import BuyurtmaSotuvchi from './components/seller/BuyurtmaSotuvchi';
 
 const getCurrentPageTitle = (pathname) => {
   const routes = {

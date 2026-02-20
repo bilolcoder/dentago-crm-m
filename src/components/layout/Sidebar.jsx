@@ -167,8 +167,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/dashboard" ||
                 item.route === "/orders" ||
                 item.route === "/addproduct"||
-                item.route === "/order-seller" ||
-                item.route === "/technician-orders"
+                item.route === "/order-seller"
             );
         }
 
