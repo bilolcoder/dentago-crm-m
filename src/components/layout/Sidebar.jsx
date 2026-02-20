@@ -82,6 +82,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         { icon: BriefcaseMedical, label: "Texniklar", route: "/technicians", type: "link" },
         { icon: BriefcaseMedical, label: "All Texniks", route: "/alltechnicals", type: "link" },
         { icon: BriefcaseMedical, label: "Texnikga Buyurtma", route: "/technician-orders", type: "link" },
+        { icon: BriefcaseMedical, label: "Buyurtma Sotuvchi", route: "/order-seller", type: "link" },
 
         // Quyidagilar hozircha kommentda (agar kerak bo'lsa ochasiz)
         /*
@@ -165,8 +166,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 item.route === "/DentagoStore" ||
                 item.route === "/dashboard" ||
                 item.route === "/orders" ||
-                item.route === "/addproduct"
-                // item.route === "/technician-orders"
+                item.route === "/addproduct"||
+                item.route === "/order-seller" ||
+                item.route === "/technician-orders"
             );
         }
 

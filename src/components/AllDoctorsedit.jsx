@@ -506,7 +506,7 @@ function AllDoctorsEdit() {
       );
 
       setShowEditModal(false);
-      alert('✅ Ma\'lumotlar muvaffaqiyatli yangilandi!');
+      // alert('✅ Ma\'lumotlar muvaffaqiyatli yangilandi!');
     } catch (err) {
       console.error('Yangilash xatosi:', err);
       alert('❌ Yangilashda xato: ' + (err.response?.data?.message || err.message));

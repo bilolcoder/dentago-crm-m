@@ -10,19 +10,19 @@ const Need = ({ onClose }) => {
       // localStorage dan foydalanuvchi ma'lumotlarini olish
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
       const userPhone = localStorage.getItem('userPhone') || '';
-      
+
       // Foydalanuvchi ma'lumotlarini tayyorlash
       const userInfo = {
         name: userData.name || userData.username || '',
         phone: userPhone,
         message: data.message
       };
-      
+
       console.log("Foydalanuvchi ma'lumotlari:");
       console.log("Ism Familiya:", userInfo.name);
       console.log("Telefon:", userInfo.phone);
       console.log("Xabar:", userInfo.message);
-            
+
       // So'rovni localStorage ga saqlash (NeedAdmin uchun)
       const savedRequests = JSON.parse(localStorage.getItem('needRequests') || '[]');
       const requestWithId = {
@@ -32,10 +32,10 @@ const Need = ({ onClose }) => {
       };
       const updatedRequests = [requestWithId, ...savedRequests];
       localStorage.setItem('needRequests', JSON.stringify(updatedRequests));
-            
-      alert('Xabaringiz yuborildi!');
+
+      // alert('Xabaringiz yuborildi!');
       reset();
-      
+
     } catch (error) {
       console.error('Xatolik:', error);
       alert('Xabar yuborishda xato yuz berdi');
@@ -72,7 +72,7 @@ const Need = ({ onClose }) => {
                 return userData.name || userData.username || 'Noma\'lum foydalanuvchi';
               })()}
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-gray-600" />
               <span className="text-sm font-medium text-gray-700">Telefon:</span>
@@ -88,7 +88,7 @@ const Need = ({ onClose }) => {
               Xabaringiz
             </label>
             <textarea
-              {...register('message', { 
+              {...register('message', {
                 required: 'Xabar kiriting',
                 minLength: { value: 10, message: 'Xabar kamida 10 belgidan iborat bo\'lishi kerak' }
               })}

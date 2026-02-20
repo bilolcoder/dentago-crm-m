@@ -65,6 +65,7 @@ import TechnicianOrders from './components/pages/BTS/TexnikgaBuyurtma';
 // Icons
 import { ShoppingCart } from 'lucide-react';
 import AllTexniks from './AllTexniks';
+import BuyurtmaSotuvchi from './components/BuyurtmaSotuvchi';
 
 const getCurrentPageTitle = (pathname) => {
   const routes = {
@@ -195,6 +196,7 @@ const ProtectedLayout = () => {
 
               {/* Boshqa sahifalar */}
               <Route path="/addproduct" element={<Addproduct />} />
+              <Route path="/order-seller" element={<BuyurtmaSotuvchi />} />
               <Route path="/result" element={<Results />} />
               <Route path="/profile" element={<ProfileContent />} />
               <Route path="/payments/app" element={<AppPaymentsContent />} />
