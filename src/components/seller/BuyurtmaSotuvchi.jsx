@@ -8,13 +8,15 @@ function BuyurtmaSotuvchi() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState(null);
 
   const token = localStorage.getItem('accessToken');
 
   if (!token) {
     return (
-      <div style={{ textAlign: 'center', padding: '80px 20px', color: '#d32f2f', fontSize: '1.4rem' }}>
-        <h2>Tizimga kirish kerak</h2>
+      <div className="text-center py-20 px-5 text-red-600 text-2xl">
+        <h2 className="text-3xl font-bold">Tizimga kirish kerak</h2>
         <p>Token topilmadi. Iltimos, login qiling.</p>
       </div>
     );
@@ -28,28 +30,48 @@ function BuyurtmaSotuvchi() {
     },
   });
 
+  const getDeliveryStatusUz = (status) => {
+    if (!status) return '—';
+    const map = {
+      processing: 'Qayta ishlanmoqda',
+      shipped: 'Yetkazib berilmoqda',
+      delivered: 'Yetkazib berildi',
+      cancelled: 'Bekor qilindi',
+    };
+    return map[status.toLowerCase()] || status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
+  const getPaymentStatusUz = (status) => {
+    if (!status) return '—';
+    const map = {
+      pending: 'To‘lov kutilmoqda',
+      paid: 'To‘landi',
+      failed: 'Muvaffaqiyatsiz',
+      refunded: 'Qaytarildi',
+      cancelled: 'Bekor qilindi',
+    };
+    return map[status.toLowerCase()] || status.charAt(0).toUpperCase() + status.slice(1);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Statistika
         const statsRes = await api.get('/order/seller/orders/stats');
         setStats(statsRes.data?.data || {});
 
-        // Buyurtmalar
         const ordersRes = await api.get('/order/seller/orders');
         const fetchedOrders = ordersRes.data?.data || [];
         setOrders(fetchedOrders);
 
-        // Flat items (har bir mahsulot uchun alohida qator)
         const itemsMap = new Map();
 
         fetchedOrders.forEach((order) => {
           order.items?.forEach((item) => {
             const productName = item.productSnapshot?.name || 'Nomaʼlum mahsulot';
-            const key = `${productName}-${order._id}`; // bir xil nom bo'lsa ham buyurtma bo'yicha farqlash
+            const key = `${productName}-${order._id}`;
             const quantity = item.quantity || 1;
             const price = item.productSnapshot?.price || 0;
             const itemSum = price * quantity;
@@ -72,7 +94,6 @@ function BuyurtmaSotuvchi() {
         });
 
         setFlatItems(Array.from(itemsMap.values()));
-
         setLoading(false);
       } catch (err) {
         console.error('API xatosi:', err.response || err);
@@ -90,9 +111,35 @@ function BuyurtmaSotuvchi() {
     try {
       const res = await api.get(`/order/seller/orders/${orderId}`);
       setSelectedOrder(res.data?.data || res.data);
+      setUpdateMessage(null);
     } catch (err) {
       console.error(err);
       setSelectedOrder({ error: 'Buyurtma maʼlumotlari yuklanmadi' });
+    }
+  };
+
+  const updateOrderStatus = async (orderId, body) => {
+    try {
+      setUpdateLoading(true);
+      setUpdateMessage(null);
+      await api.put(`/order/seller/orders/${orderId}/status`, body);
+      setUpdateMessage({ type: 'success', text: 'Status muvaffaqiyatli yangilandi!' });
+
+      await fetchOrderDetails(orderId);
+      const [ordersRes, statsRes] = await Promise.all([
+        api.get('/order/seller/orders'),
+        api.get('/order/seller/orders/stats'),
+      ]);
+      setOrders(ordersRes.data?.data || []);
+      setStats(statsRes.data?.data || {});
+    } catch (err) {
+      console.error('Status update xatosi:', err);
+      setUpdateMessage({
+        type: 'error',
+        text: 'Status yangilanmadi: ' + (err.response?.data?.message || 'Xato'),
+      });
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -102,91 +149,59 @@ function BuyurtmaSotuvchi() {
 
   const closeModal = () => setSelectedOrder(null);
 
-  if (loading) return <div style={{ textAlign: 'center', padding: '100px', color: '#00BCE4' }}>Yuklanmoqda...</div>;
-  if (error) return <div style={{ color: 'red', textAlign: 'center', padding: '60px' }}>{error}</div>;
+  if (loading) return <div className="text-center py-24 text-cyan-500 text-xl">Yuklanmoqda...</div>;
+  if (error) return <div className="text-red-600 text-center py-16 text-xl">{error}</div>;
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', background: '#f8fcff', minHeight: '100vh', padding: '20px' }}>
-      <h1 style={{ color: '#00BCE4', textAlign: 'center', marginBottom: '30px' }}>Buyurtma Sotuvchi</h1>
+    <div className="min-h-screen py-5">
+      <h1 className="text-4xl font-bold text-cyan-500 mb-10">Buyurtma Sotuvchi</h1>
 
-      {/* Yangilangan Statistika - chiroyliroq */}
       {stats && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '20px',
-            marginBottom: '40px',
-            padding: '24px',
-            background: 'linear-gradient(135deg, #00BCE4 0%, #0099c7 100%)',
-            color: 'white',
-            borderRadius: '16px',
-            boxShadow: '0 8px 24px rgba(0, 188, 228, 0.35)',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', opacity: 0.95 }}>Jami buyurtmalar</h3>
-            <p style={{ fontSize: '2.6rem', fontWeight: 'bold', margin: 0 }}>{stats.totalOrders || 0}</p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', opacity: 0.95 }}>Umumiy summa</h3>
-            <p style={{ fontSize: '2.6rem', fontWeight: 'bold', margin: 0 }}>
-              {stats.totalAmount?.toLocaleString('uz-UZ') || 0} so'm
-            </p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', opacity: 0.95 }}>To'lov kutilmoqda</h3>
-            <p style={{ fontSize: '2.6rem', fontWeight: 'bold', margin: 0 }}>{stats.pendingPayment || 0}</p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', opacity: 0.95 }}>To'langan</h3>
-            <p style={{ fontSize: '2.6rem', fontWeight: 'bold', margin: 0 }}>{stats.paid || 0}</p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', opacity: 0.95 }}>Yetkazib berilgan</h3>
-            <p style={{ fontSize: '2.6rem', fontWeight: 'bold', margin: 0 }}>{stats.delivered || 0}</p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 8px', fontSize: '1.1rem', opacity: 0.95 }}>Bekor qilingan</h3>
-            <p style={{ fontSize: '2.6rem', fontWeight: 'bold', margin: 0 }}>{stats.cancelled || 0}</p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-10 p-6 bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-2xl shadow-2xl">
+          {[
+            { title: 'Jami buyurtmalar', value: stats.totalOrders || 0 },
+            { title: 'Umumiy summa', value: `${(stats.totalAmount || 0).toLocaleString('uz-UZ')} so'm` },
+            { title: "To'lov kutilmoqda", value: stats.pendingPayment || 0 },
+            { title: "To'langan", value: stats.paid || 0 },
+            { title: 'Yetkazib berilgan', value: stats.delivered || 0 },
+            { title: 'Bekor qilingan', value: stats.cancelled || 0 },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <h3 className="text-sm opacity-90 mb-2">{stat.title}</h3>
+              <p className="text-4xl font-bold">{stat.value}</p>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* Jadval - avvalgidek */}
-      <div style={{ overflowX: 'auto', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: 'white' }}>
+      <div className="overflow-x-auto rounded-xl shadow-lg bg-white">
+        <table className="w-full border-collapse">
           <thead>
-            <tr style={{ background: '#00BCE4', color: 'white' }}>
-              <th style={{ padding: '14px', textAlign: 'left' }}>Mijoz Ism-Familiyasi</th>
-              <th style={{ padding: '14px', textAlign: 'left' }}>Mahsulot Nomi</th>
-              <th style={{ padding: '14px', textAlign: 'right' }}>Summa</th>
-              <th style={{ padding: '14px', textAlign: 'center' }}>Soni</th>
+            <tr className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white">
+              <th className="p-4 text-left rounded-tl-xl">Mijoz Ism-Familiyasi</th>
+              <th className="p-4 text-left">Mahsulot Nomi</th>
+              <th className="p-4 text-right">Summa</th>
+              <th className="p-4 text-center rounded-tr-xl">Soni</th>
             </tr>
           </thead>
           <tbody>
             {flatItems.length === 0 ? (
-              <tr><td colSpan={4} style={{ padding: '40px', textAlign: 'center', color: '#666' }}>Maʼlumot yoʼq</td></tr>
+              <tr>
+                <td colSpan={4} className="p-10 text-center text-gray-500">Maʼlumot yoʻq</td>
+              </tr>
             ) : (
               flatItems.map((item, idx) => (
                 <tr
                   key={idx}
                   onClick={() => handleRowClick(item)}
-                  style={{ cursor: 'pointer' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f0faff')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                  className="cursor-pointer transition-all duration-200 hover:bg-cyan-50"
                 >
-                  <td style={{ padding: '14px', borderBottom: '1px solid #eee' }}>{item.mijoz}</td>
-                  <td style={{ padding: '14px', borderBottom: '1px solid #eee' }}>{item.productName}</td>
-                  <td style={{ padding: '14px', borderBottom: '1px solid #eee', textAlign: 'right', fontWeight: 'bold' }}>
+                  <td className="p-4 border-b border-gray-100">{item.mijoz}</td>
+                  <td className="p-4 border-b border-gray-100">{item.productName}</td>
+                  <td className="p-4 border-b border-gray-100 text-right font-bold">
                     {item.itemSum.toLocaleString('uz-UZ')} so'm
                   </td>
-                  <td style={{ padding: '14px', borderBottom: '1px solid #eee', textAlign: 'center' }}>{item.quantity}</td>
+                  <td className="p-4 border-b border-gray-100 text-center">{item.quantity}</td>
                 </tr>
               ))
             )}
@@ -194,93 +209,121 @@ function BuyurtmaSotuvchi() {
         </table>
       </div>
 
-      {/* Modal - avvalgidek chiroyli */}
       {selectedOrder && !selectedOrder.error && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            padding: '20px',
-          }}
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-5 backdrop-blur-sm"
           onClick={closeModal}
         >
           <div
-            style={{
-              background: 'white',
-              borderRadius: '16px',
-              maxWidth: '800px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              padding: '32px',
-              position: 'relative',
-              boxShadow: '0 12px 32px rgba(0,188,228,0.4)',
-              border: '1px solid #00BCE4',
-            }}
+            className="bg-gradient-to-br from-white to-cyan-50 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-10 relative shadow-2xl border-2 border-cyan-500 transition-all duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '24px',
-                fontSize: '32px',
-                border: 'none',
-                background: 'none',
-                color: '#00BCE4',
-                cursor: 'pointer',
-              }}
+              className="absolute top-5 right-7 text-4xl text-cyan-500 hover:scale-125 transition-transform"
             >
               ×
             </button>
 
-            <h2 style={{ color: '#00BCE4', margin: '0 0 24px', fontSize: '1.8rem', textAlign: 'center' }}>
+            <h2 className="text-3xl font-bold text-cyan-600 mb-6 text-center drop-shadow-sm">
               Buyurtma {selectedOrder.orderNumber || selectedOrder._id}
             </h2>
 
-            <div style={{ lineHeight: 1.7, fontSize: '1rem', color: '#333' }}>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>Mijoz:</strong> {selectedOrder.user_id?.username || '—'} ({selectedOrder.user_id?.phone || '—'})</p>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>Summa:</strong> {selectedOrder.totalAmount?.toLocaleString('uz-UZ')} so'm</p>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>To'lov usuli:</strong> {selectedOrder.paymentMethod || '—'}</p>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>To'lov statusi:</strong> {selectedOrder.paymentStatus || '—'}</p>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>Yetkazib berish statusi:</strong> {selectedOrder.deliveryStatus || '—'}</p>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>Manzil:</strong> {selectedOrder.shippingAddress || '—'}</p>
-              <p style={{ margin: '12px 0' }}><strong style={{ color: '#00BCE4' }}>Izoh:</strong> {selectedOrder.notes || 'Yoʻq'}</p>
+            <div className="space-y-4 text-gray-800 text-lg">
+              <p><strong className="text-cyan-600">Mijoz:</strong> {selectedOrder.user_id?.username || '—'} ({selectedOrder.user_id?.phone || '—'})</p>
+              <p><strong className="text-cyan-600">Summa:</strong> {selectedOrder.totalAmount?.toLocaleString('uz-UZ')} so'm</p>
+              <p><strong className="text-cyan-600">To'lov usuli:</strong> {selectedOrder.paymentMethod || '—'}</p>
+              <p><strong className="text-cyan-600">To'lov statusi:</strong> {getPaymentStatusUz(selectedOrder.paymentStatus)}</p>
+              <p><strong className="text-cyan-600">Yetkazib berish statusi:</strong> {getDeliveryStatusUz(selectedOrder.deliveryStatus)}</p>
+              <p><strong className="text-cyan-600">Manzil:</strong> {selectedOrder.shippingAddress || '—'}</p>
+              <p><strong className="text-cyan-600">Izoh:</strong> {selectedOrder.notes || 'Yoʻq'}</p>
 
-              <hr style={{ margin: '24px 0', borderColor: '#e6f7fd' }} />
+              <hr className="my-8 border-cyan-100 border-2" />
 
-              <h3 style={{ color: '#00BCE4', marginBottom: '16px', fontSize: '1.4rem' }}>Mahsulotlar</h3>
+              <h3 className="text-2xl font-semibold text-cyan-600 mb-5">Buyurtma statusini o‘zgartirish</h3>
+
+              {updateMessage && (
+                <p className={`p-3 rounded-lg text-center font-medium ${updateMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {updateMessage.text}
+                </p>
+              )}
+
+              <div className="flex flex-wrap gap-4 mb-6">
+                <button
+                  onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'processing' })}
+                  disabled={updateLoading || ['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus)}
+                  className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                >
+                  Qayta ishlanmoqda
+                </button>
+
+                <button
+                  onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'shipped' })}
+                  disabled={updateLoading || ['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus)}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                >
+                  Yetkazib berilmoqda
+                </button>
+
+                <button
+                  onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'delivered' })}
+                  disabled={updateLoading || selectedOrder.deliveryStatus === 'delivered' || selectedOrder.deliveryStatus === 'cancelled'}
+                  className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                >
+                  Yetkazib berildi
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (window.confirm("Buyurtmani rostdan ham bekor qilmoqchimisiz? Bu amalni orqaga qaytarib bo'lmaydi.")) {
+                      updateOrderStatus(selectedOrder._id, { deliveryStatus: 'cancelled' });
+                    }
+                  }}
+                  disabled={updateLoading || selectedOrder.deliveryStatus === 'cancelled'}
+                  className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                >
+                  Bekor qilindi
+                </button>
+              </div>
+
+              {['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus) && (
+                <p className="text-center text-red-600 font-medium mt-2">
+                  Bu buyurtma allaqachon {selectedOrder.deliveryStatus === 'delivered' ? 'yetkazib berilgan' : 'bekor qilingan'}.
+                  Statusni o'zgartirib bo'lmaydi.
+                </p>
+              )}
+
+              <hr className="my-8 border-cyan-100 border-2" />
+
+              <h3 className="text-2xl font-semibold text-cyan-600 mb-5">Mahsulotlar</h3>
+
               {selectedOrder.items?.length > 0 ? (
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '16px' }}>
-                  <thead>
-                    <tr style={{ background: '#e6f7fd', color: '#00BCE4' }}>
-                      <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #00BCE4' }}>Nomi</th>
-                      <th style={{ padding: '12px', textAlign: 'right', borderBottom: '2px solid #00BCE4' }}>Narx</th>
-                      <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid #00BCE4' }}>Soni</th>
-                      <th style={{ padding: '12px', textAlign: 'right', borderBottom: '2px solid #00BCE4' }}>Jami</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedOrder.items.map((item, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #e6f7fd' }}>
-                        <td style={{ padding: '12px' }}>{item.productSnapshot?.name || '—'}</td>
-                        <td style={{ padding: '12px', textAlign: 'right' }}>{(item.productSnapshot?.price || 0).toLocaleString('uz-UZ')} so'm</td>
-                        <td style={{ padding: '12px', textAlign: 'center' }}>{item.quantity || 1}</td>
-                        <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>
-                          {((item.productSnapshot?.price || 0) * (item.quantity || 1)).toLocaleString('uz-UZ')} so'm
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-cyan-50 text-cyan-700">
+                        <th className="p-4 text-left border-b-2 border-cyan-200">Nomi</th>
+                        <th className="p-4 text-right border-b-2 border-cyan-200">Narx</th>
+                        <th className="p-4 text-center border-b-2 border-cyan-200">Soni</th>
+                        <th className="p-4 text-right border-b-2 border-cyan-200">Jami</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {selectedOrder.items.map((item, idx) => (
+                        <tr key={idx} className="border-b border-cyan-50 hover:bg-cyan-50/50">
+                          <td className="p-4">{item.productSnapshot?.name || '—'}</td>
+                          <td className="p-4 text-right">{(item.productSnapshot?.price || 0).toLocaleString('uz-UZ')} so'm</td>
+                          <td className="p-4 text-center">{item.quantity || 1}</td>
+                          <td className="p-4 text-right font-bold">
+                            {((item.productSnapshot?.price || 0) * (item.quantity || 1)).toLocaleString('uz-UZ')} so'm
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
-                <p style={{ color: '#666', textAlign: 'center' }}>Mahsulotlar ro'yxati yo'q</p>
+                <p className="text-center text-gray-500 py-6">Mahsulotlar ro'yxati yo'q</p>
               )}
             </div>
           </div>
@@ -288,7 +331,7 @@ function BuyurtmaSotuvchi() {
       )}
 
       {selectedOrder?.error && (
-        <div style={{ color: 'red', textAlign: 'center', padding: '40px' }}>{selectedOrder.error}</div>
+        <div className="text-red-600 text-center py-10 text-xl">{selectedOrder.error}</div>
       )}
     </div>
   );
