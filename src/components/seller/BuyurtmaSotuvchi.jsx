@@ -215,12 +215,12 @@ function BuyurtmaSotuvchi() {
           onClick={closeModal}
         >
           <div
-            className="bg-gradient-to-br from-white to-cyan-50 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-10 relative shadow-2xl border-2 border-cyan-500 transition-all duration-300"
+            className="bg-gradient-to-br  from-white to-cyan-50 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-10 relative shadow-2xl border-2 border-cyan-500 transition-all duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute top-5 right-7 text-4xl text-cyan-500 hover:scale-125 transition-transform"
+              className="absolute cursor-pointer top-5 right-7 text-4xl text-cyan-500 hover:scale-125 transition-transform"
             >
               ×
             </button>
@@ -252,15 +252,15 @@ function BuyurtmaSotuvchi() {
                 <button
                   onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'processing' })}
                   disabled={updateLoading || ['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus)}
-                  className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
-                >
+                  className="px-6 py-3 cursor-pointer Yetkazib berilmoqda bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                > 
                   Qayta ishlanmoqda
                 </button>
 
                 <button
                   onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'shipped' })}
                   disabled={updateLoading || ['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus)}
-                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                  className="px-6 py-3 cursor-pointer bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
                 >
                   Yetkazib berilmoqda
                 </button>
@@ -268,7 +268,7 @@ function BuyurtmaSotuvchi() {
                 <button
                   onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'delivered' })}
                   disabled={updateLoading || selectedOrder.deliveryStatus === 'delivered' || selectedOrder.deliveryStatus === 'cancelled'}
-                  className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                  className="px-6 py-3 cursor-pointer bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
                 >
                   Yetkazib berildi
                 </button>
@@ -280,7 +280,7 @@ function BuyurtmaSotuvchi() {
                     }
                   }}
                   disabled={updateLoading || selectedOrder.deliveryStatus === 'cancelled'}
-                  className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+                  className="px-6 py-3 bg-red-500 cursor-pointer text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
                 >
                   Bekor qilindi
                 </button>
