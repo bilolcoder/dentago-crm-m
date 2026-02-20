@@ -201,7 +201,7 @@ const ProtectedLayout = () => {
               <Route path="/payments/tariffs" element={<TariffsContent />} />
               <Route path="/my-information" element={<MyInformation />} />
               <Route path="/bemorlarim" element={<Bemorlarim />} />
-              <Route path="/UstlarBuyurtmasi" element={<UstlarBuyurtmasi />} />
+              {/* <Route path="/UstlarBuyurtmasi" element={<UstlarBuyurtmasi />} /> */}
 
               {/* Dentago Store qo'shimcha sahifalar */}
               <Route path="/elonlar" element={<Elonlar />} />

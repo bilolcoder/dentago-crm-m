@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataProvider';
+
 function AddMahsulot() {
   const [products, setProducts] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -97,7 +98,7 @@ function AddMahsulot() {
     { code: '02520002029000000', name: 'Endo irrigation needles' },
     { code: '02207002022000000', name: 'Irrigation solution (NaOCl, CHX)' },
 
-    // Yangi rasm – stomatologik xizmatlar va qurilmalar (oxirgi qo'shilgan)
+    // Yangi rasm – stomatologik xizmatlar va qurilmalar
     { code: '09018013001001001', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
     { code: '09018013001001002', name: 'Бошқа, стоматологик қурилмалар ва мосламалар' },
     { code: '09018013001001003', name: 'Стоматологический картридж-ротор APPLEDENTAL наконечник BLUE-CA' },
@@ -136,11 +137,20 @@ function AddMahsulot() {
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setSearchResults(products);
-      setCurrentPage(1); // Qidiruv tozalanganda 1-sahifaga qaytish
+      setCurrentPage(1); // faqat qidiruv tozalandanda 1-sahifaga
     } else {
       handleSearch();
     }
-  }, [searchTerm, products]);
+  }, [searchTerm]); // ← products ni bu yerdan olib tashladik!
+
+  // products o'zgarganda faqat searchResults ni yangilaymiz, lekin currentPage ni o'zgartirmaymiz
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setSearchResults(products);
+    } else {
+      handleSearch();
+    }
+  }, [products]);
 
   // Kategoriyalarni yuklash
   const fetchCategories = async () => {
@@ -180,6 +190,7 @@ function AddMahsulot() {
 
   // Sahifalash ma'lumotlari
   const totalPages = Math.ceil(searchResults.length / itemsPerPage);
+
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
     setTimeout(() => {
@@ -194,8 +205,6 @@ function AddMahsulot() {
       const response = await axios.get(`${BASE_URL}/api/product?limit=100000`, {
         headers: { Authorization: `Bearer ${TOKEN}` }
       });
-
-      console.log("API javobi:", response.data);
 
       let productsData = [];
       if (response.data && response.data.data) {
@@ -239,6 +248,7 @@ function AddMahsulot() {
   const clearSearch = () => {
     setSearchTerm("");
     setSearchResults(products);
+    setCurrentPage(1); // faqat "tozalash" bosilganda 1-sahifaga
   };
 
   // Input'ga bosilgan tugmalarni qayta ishlash
@@ -252,7 +262,6 @@ function AddMahsulot() {
   const handleEditClick = (product) => {
     setEditingProduct(product);
 
-    // Form ma'lumotlarini to'ldirish
     const editData = {
       name: product.name || '',
       sku: product.sku || '',
@@ -271,14 +280,10 @@ function AddMahsulot() {
 
     setEditForm(editData);
 
-    // Preview rasmlarni o'rnatish
     if (editData.imageUrl && editData.imageUrl.length > 0) {
       const previews = editData.imageUrl.map(img => {
-        if (img.startsWith('http')) {
-          return img;
-        } else {
-          return `${BASE_URL}/images/${img}`;
-        }
+        if (img.startsWith('http')) return img;
+        return `${BASE_URL}/images/${img}`;
       });
       setPreviewImages(previews);
     } else {
@@ -327,25 +332,20 @@ function AddMahsulot() {
 
   // Rasmni o'chirish
   const removeImage = (index) => {
-    // Mavjud rasmlar sonini hisoblash
     const existingImageCount = editForm.imageUrl ? editForm.imageUrl.length : 0;
     const isExistingImage = index < existingImageCount;
 
     if (isExistingImage) {
-      // Mavjud rasmni o'chirish
       const newImageUrls = [...editForm.imageUrl];
       newImageUrls.splice(index, 1);
       setEditForm(prev => ({ ...prev, imageUrl: newImageUrls }));
     } else {
-      // Yangi faylni o'chirish
       const fileIndex = index - existingImageCount;
       setSelectedFiles(prev => prev.filter((_, i) => i !== fileIndex));
     }
 
-    // Preview ro'yxatini yangilash
     setPreviewImages(prev => {
       const newPreviews = [...prev];
-      // O'chirilgan fayl uchun object URL'ni tozalash
       if (newPreviews[index] && !newPreviews[index].startsWith(BASE_URL)) {
         URL.revokeObjectURL(newPreviews[index]);
       }
@@ -389,7 +389,6 @@ function AddMahsulot() {
         }
       }
       return [...(editForm.imageUrl || []), ...uploadedFilenames];
-
     } catch (error) {
       console.error("Rasm yuklanmadi:", error);
       showNotification('Rasm yuklanmadi. Qayta urinib ko\'ring.', 'error');
@@ -443,14 +442,11 @@ function AddMahsulot() {
       return;
     }
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setSavingEdit(true);
 
     try {
-      // Rasmlarni yuklash
       let uploadedImageUrls = [];
       if (selectedFiles.length > 0) {
         uploadedImageUrls = await uploadImagesToServer();
@@ -459,7 +455,6 @@ function AddMahsulot() {
           return;
         }
       } else {
-        // Yangi rasm yuklanmagan, mavjud rasmlarni saqlash
         uploadedImageUrls = editForm.imageUrl || [];
       }
 
@@ -479,9 +474,6 @@ function AddMahsulot() {
         vat_percent: parseFloat(editForm.vat_percent) || 0,
       };
 
-      console.log("Yuborilayotgan ma'lumot:", dataToSend);
-
-      // API ga yuborish
       const config = {
         headers: {
           'Authorization': `Bearer ${TOKEN}`,
@@ -496,23 +488,17 @@ function AddMahsulot() {
         config
       );
 
-      console.log("Server javobi:", response.data);
-
-      // Mahsulotlar ro'yxatini yangilash
+      // Yangilangan ro'yxat
       const updatedProducts = products.map(p =>
-        p._id === editingProduct._id ? {
-          ...p,
-          ...dataToSend,
-          imageUrl: uploadedImageUrls
-        } : p
+        p._id === editingProduct._id ? { ...p, ...dataToSend, imageUrl: uploadedImageUrls } : p
       );
 
       setProducts(updatedProducts);
       setSearchResults(updatedProducts);
+      // Eslatma: currentPage ni o'zgartirmaymiz → sahifa joyida qoladi
 
       showNotification("Mahsulot muvaffaqiyatli yangilandi!");
 
-      // Modalni yopish va ma'lumotlarni tozalash
       setEditModalOpen(false);
       setEditingProduct(null);
       setSelectedFiles([]);
@@ -557,10 +543,10 @@ function AddMahsulot() {
         }
       );
 
-      // Ikki ro'yxatdan ham o'chirish
       const updatedProducts = products.filter(p => p._id !== productToDelete._id);
       setProducts(updatedProducts);
       setSearchResults(updatedProducts);
+      // currentPage ni o'zgartirmaymiz — agar oxirgi element o'chirilsa, keyingi sahifaga o'tkazish mumkin, lekin hozircha joyida qoladi
 
       showNotification("Mahsulot muvaffaqiyatli o'chirildi!");
     } catch (err) {
@@ -587,7 +573,6 @@ function AddMahsulot() {
 
   // Modalni yopish
   const closeEditModal = () => {
-    // Preview rasmlar uchun object URL'larni tozalash
     previewImages.forEach(img => {
       if (!img.startsWith(BASE_URL)) {
         URL.revokeObjectURL(img);
@@ -710,7 +695,6 @@ function AddMahsulot() {
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[200px]">Mahsulot</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Kategoriya</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Narxi</th>
-                    {/* <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">SKU</th> */}
                     <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Amallar</th>
                   </tr>
                 </thead>
@@ -720,7 +704,7 @@ function AddMahsulot() {
                       <tr key={product._id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden  flex-shrink-0">
+                            <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
                               {product.imageUrl?.[0] ? (
                                 <img
                                   src={`${BASE_URL}/images/${product.imageUrl[0]}`}
@@ -728,7 +712,7 @@ function AddMahsulot() {
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     e.target.onerror = null;
-                                    e.target.src = `${encodeURIComponent(product.name.substring(0, 10))}`;
+                                    e.target.src = "https://via.placeholder.com/64?text=" + encodeURIComponent(product.name.substring(0, 10));
                                   }}
                                 />
                               ) : (
@@ -768,11 +752,6 @@ function AddMahsulot() {
                             </div>
                           )}
                         </td>
-                        {/* <td className="px-6 py-4">
-                          <div className="font-medium text-gray-700">
-                            {product.sku || "—"}
-                          </div>
-                        </td> */}
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-center gap-2">
                             <button
@@ -795,7 +774,7 @@ function AddMahsulot() {
                     ))
                   ) : !searchTerm && !loading ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-12 text-center">
+                      <td colSpan="4" className="px-6 py-12 text-center">
                         <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-600 mb-2">Mahsulotlar topilmadi</h3>
                         <p className="text-gray-500 mb-4">Hozircha mahsulotlar mavjud emas</p>
@@ -875,7 +854,7 @@ function AddMahsulot() {
       {editModalOpen && editingProduct && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6   sticky top-0 bg-white z-10">
+            <div className="p-6 sticky top-0 bg-white z-10 border-b">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-gray-800">Mahsulotni tahrirlash</h3>
@@ -892,7 +871,6 @@ function AddMahsulot() {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Yuklash holati */}
               {(savingEdit || uploadingImages) && (
                 <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md flex items-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -1172,7 +1150,7 @@ function AddMahsulot() {
               </div>
             </div>
 
-            <div className="p-6 flex justify-end gap-3">
+            <div className="p-6 flex justify-end gap-3 border-t">
               <button
                 onClick={closeEditModal}
                 disabled={savingEdit || uploadingImages}
