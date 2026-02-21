@@ -471,21 +471,12 @@ function Aperator() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-          <div className="relative flex-1 min-w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input
-              type="text"
-              placeholder={activeTab === 'technicians' ? "Texnik, mahsulot, telefon..." : "Buyurtma ID, mahsulot, mijoz..."}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50"
-            />
-          </div>
+   
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 bg-white min-w-[180px]"
+            className="px-4 py-2.5 border cursor-pointer border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 bg-white min-w-[180px]"
           >
             <option value="all">Barcha statuslar</option>
             {activeTab === 'technicians' ? (

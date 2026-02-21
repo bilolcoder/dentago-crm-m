@@ -175,7 +175,7 @@ const TechnicianDetail = () => {
       {/* NAVBAR */}
       <div className="sticky top-0 z-30 py-4 bg-white/80 backdrop-blur-md border-b border-gray-50 px-4">
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={() => navigate(-1)}  className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors">
             <ChevronLeft size={24} />
           </button>
           <h1 className="text-lg font-bold text-gray-800">Mutaxassis Profili</h1>
@@ -230,7 +230,7 @@ const TechnicianDetail = () => {
               </a>
               <button
                 onClick={() => setIsOrderModalOpen(true)}
-                className="flex-1 bg-[#00C1F3] text-white py-5 rounded-2xl font-bold shadow-lg shadow-blue-100 active:scale-95 transition-all"
+                className="flex-1 cursor-pointer  bg-[#00C1F3] text-white py-5 rounded-2xl font-bold shadow-lg shadow-blue-100 active:scale-95 transition-all"
               >
                 BUYURTMA BERISH
               </button>

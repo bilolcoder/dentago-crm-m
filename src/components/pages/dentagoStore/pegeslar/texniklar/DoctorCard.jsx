@@ -45,7 +45,7 @@ function TechnicianCard({ id, img, name, exp, description }) {
 
         <Link to={`/technician/${id}`}>
           <button
-            className="w-full bg-[#00BCE4] text-white py-2.5 rounded-xl mt-4 text-[14px] font-semibold hover:bg-[#00a8d9] transition-all duration-300 shadow-sm active:scale-95"
+            className="w-full cursor-pointer bg-[#00BCE4] text-white py-2.5 rounded-xl mt-4 text-[14px] font-semibold hover:bg-[#00a8d9] transition-all duration-300 shadow-sm active:scale-95"
           >
             Profilni ko'rish
           </button>

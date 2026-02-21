@@ -112,7 +112,7 @@ function Cards() {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={handleGoBack}
-            className="p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-all hover:bg-gray-50 border border-gray-200 flex items-center gap-2 text-gray-700 font-medium"
+            className="p-3 cursor-pointer bg-white rounded-xl  hover:shadow-md transition-all hover:bg-gray-50 border border-gray-200 flex items-center gap-2 text-gray-700 font-medium"
           >
             <ArrowLeft size={20} />
             Orqaga
@@ -122,18 +122,18 @@ function Cards() {
             <h1 className="text-3xl font-black text-slate-800">
               Buyurtmalar <span className="text-[#00BCE4]">Ro'yxati</span>
             </h1>
-            <span className="bg-[#00BCE4] text-white px-6 py-3 rounded-full text-lg font-bold shadow-md">
-              {orders.length} ta
+            <span className="bg-[#00BCE4] text-white px-3 py-1 rounded-full text-lg font-bold shadow-md">
+              {orders.length}  ta
             </span>
           </div>
         </div>
 
         {/* Cardlar */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+        <div className="grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
           {orders.length > 0 ? orders.map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col group"
+              className="bg-white cursor-pointer rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col group"
             >
               {/* Rasm */}
               <div className="aspect-square relative overflow-hidden bg-gray-100">
@@ -154,7 +154,7 @@ function Cards() {
                   </div>
                 )}
 
-                <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-bold backdrop-blur-sm">
+                <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
                   {order.soni} ta
                 </div>
               </div>

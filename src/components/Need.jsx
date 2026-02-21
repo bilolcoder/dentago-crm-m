@@ -134,23 +134,23 @@ const Need = ({ onClose }) => {
             <button
               type="button"
               onClick={onClose || (() => window.history.back())}
-              className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition"
+              className="flex-1 cursor-pointer py-3 px-4 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition"
             >
               Bekor qilish
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-3 px-4 bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-3 px-4 cursor-pointer bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <div className="animate-spin  rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                   <span>Yuborilmoqda...</span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <Send className="w-4  h-4" />
                   <span>Yuborish</span>
                 </>
               )}
