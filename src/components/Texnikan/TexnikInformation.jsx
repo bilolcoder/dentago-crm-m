@@ -443,15 +443,15 @@ function TechnicianManagement() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Longitude</label>
+                                <div className="flex items-center gap-2">
                                 <input
                                     type="number"
                                     step="any"
                                     {...register('lng')}
                                     className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none"
                                     placeholder="69.2401"
-                                />
-                            </div>
-                            <button
+                                    />
+                                <button
                                         type="button"
                                         onClick={getCurrentLocation}
                                         disabled={isLocating}
@@ -464,6 +464,8 @@ function TechnicianManagement() {
                                             <MapPin className="w-5 h-5" />
                                         )}
                                     </button>
+                                        </div>
+                            </div>
                         </div>
 
                         <div>
