@@ -48,6 +48,7 @@ function TechnicianManagement() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
     const [token, setToken] = useState(null);
+    const [isLocating, setIsLocating] = useState(false);
 
     // Avatar states
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -103,6 +104,51 @@ function TechnicianManagement() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const getCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            alert("Sizning brauzeringizda joylashuv funksiyasi mavjud emas yoki qo'llab-quvvatlanmaydi.");
+            return;
+        }
+
+        setIsLocating(true);
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+
+                reset(
+                    (prev) => ({
+                        ...prev,
+                        lat: latitude.toFixed(6),
+                        lng: longitude.toFixed(6),
+                    }),
+                    { keepDefaultValues: true }
+                );
+
+                setIsLocating(false);
+                setSubmitMessage({ type: 'success', text: 'Joriy joylashuv muvaffaqiyatli olindi!' });
+            },
+            (error) => {
+                setIsLocating(false);
+                let msg = 'Joylashuv olishda xato yuz berdi.';
+                if (error.code === error.PERMISSION_DENIED) {
+                    msg = 'Joylashuvga ruxsat berilmagan. Iltimos, brauzer sozlamalarida ruxsat bering.';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    msg = 'Joylashuv maʼlumotlari mavjud emas.';
+                } else if (error.code === error.TIMEOUT) {
+                    msg = 'Joylashuv so‘rovi vaqtida xato (timeout).';
+                }
+                alert(msg);
+                setSubmitMessage({ type: 'error', text: msg });
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
+            }
+        );
     };
 
     const handleFileChange = (e) => {
@@ -384,12 +430,40 @@ function TechnicianManagement() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium mb-1">Latitude</label>
-                                <input type="number" step="any" {...register('lat')} className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none" placeholder="41.2995" />
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        {...register('lat')}
+                                        className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none"
+                                        placeholder="41.2995"
+                                    />
+
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Longitude</label>
-                                <input type="number" step="any" {...register('lng')} className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none" placeholder="69.2401" />
+                                <input
+                                    type="number"
+                                    step="any"
+                                    {...register('lng')}
+                                    className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none"
+                                    placeholder="69.2401"
+                                />
                             </div>
+                            <button
+                                        type="button"
+                                        onClick={getCurrentLocation}
+                                        disabled={isLocating}
+                                        className="p-3 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition disabled:opacity-50 flex items-center justify-center shadow-sm"
+                                        title="Joriy joylashuvni aniqlash"
+                                    >
+                                        {isLocating ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <MapPin className="w-5 h-5" />
+                                        )}
+                                    </button>
                         </div>
 
                         <div>
