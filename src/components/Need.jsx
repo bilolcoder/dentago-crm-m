@@ -7,38 +7,64 @@ const Need = ({ onClose }) => {
 
   const onSubmit = async (data) => {
     try {
-      // localStorage dan foydalanuvchi ma'lumotlarini olish
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
       const userPhone = localStorage.getItem('userPhone') || '';
 
-      // Foydalanuvchi ma'lumotlarini tayyorlash
-      const userInfo = {
-        name: userData.name || userData.username || '',
-        phone: userPhone,
-        message: data.message
-      };
+      const name = userData.name || userData.username || 'Nomaʼlum';
+      const phone = userPhone || 'Telefon kiritilmagan';
+      const message = data.message.trim();
 
-      console.log("Foydalanuvchi ma'lumotlari:");
-      console.log("Ism Familiya:", userInfo.name);
-      console.log("Telefon:", userInfo.phone);
-      console.log("Xabar:", userInfo.message);
+      if (!message) {
+        alert("Iltimos, xabar kiriting!");
+        return;
+      }
 
-      // So'rovni localStorage ga saqlash (NeedAdmin uchun)
+      const botToken = '8553471103:AAH47bf02_AgHS6Dg-_0cRc8-p7ozUJ7FvE';
+      const adminChatIds = ['7548230903', '7800450778']; // Yangi adminlarni qo'shsa bo'ladi
+
+      const text = `Yangi murojaat:\n\n👤 <b>Ism Familiya:</b> ${name}\n📱 <b>Telefon:</b> ${phone}\n\n💬 <b>Xabar:</b>\n${message}`;
+
+      // Har bir adminga alohida yuboramiz
+      for (const chatId of adminChatIds) {
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'HTML',
+          }),
+        });
+
+        const result = await response.json();
+        if (!result.ok) {
+          console.error(`Xato chat ${chatId} ga:`, result);
+          // Bu yerda qo'shimcha xatolikni ishlatish mumkin, lekin davom etamiz
+        }
+      }
+
+      // localStorage ga saqlash (agar kerak bo'lsa, oldingi kabi)
       const savedRequests = JSON.parse(localStorage.getItem('needRequests') || '[]');
       const requestWithId = {
         id: Date.now(),
-        ...userInfo,
+        name,
+        phone,
+        message,
         timestamp: new Date().toISOString()
       };
       const updatedRequests = [requestWithId, ...savedRequests];
       localStorage.setItem('needRequests', JSON.stringify(updatedRequests));
 
-      // alert('Xabaringiz yuborildi!');
+      // alert('Xabaringiz muvaffaqiyatli yuborildi!');
       reset();
 
     } catch (error) {
-      console.error('Xatolik:', error);
-      alert('Xabar yuborishda xato yuz berdi');
+      console.error('Telegram yuborish xatosi:', error);
+      alert('Xabar yuborishda xato yuz berdi. Iltimos keyinroq urinib ko‘ring.');
     }
   };
 

@@ -154,25 +154,69 @@ function BuyurtmaSotuvchi() {
 
   return (
     <div className="min-h-screen py-5">
-      <h1 className="text-4xl font-bold text-cyan-500 mb-10">Buyurtma Sotuvchi</h1>
-
+      <h1 className="text-4xl font-bold text-cyan-500 mb-4">Buyurtma Sotuvchi</h1>
+        <p>jami buyurtmalar: {stats?.totalOrders || 0}</p>
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-10 p-6 bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-2xl shadow-2xl">
-          {[
-            { title: 'Jami buyurtmalar', value: stats.totalOrders || 0 },
-            { title: 'Umumiy summa', value: `${(stats.totalAmount || 0).toLocaleString('uz-UZ')} so'm` },
-            { title: "To'lov kutilmoqda", value: stats.pendingPayment || 0 },
-            { title: "To'langan", value: stats.paid || 0 },
-            { title: 'Yetkazib berilgan', value: stats.delivered || 0 },
-            { title: 'Bekor qilingan', value: stats.cancelled || 0 },
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <h3 className="text-sm opacity-90 mb-2">{stat.title}</h3>
-              <p className="text-4xl font-bold">{stat.value}</p>
-            </div>
-          ))}
-        </div>
-      )}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10 py-6 rounded-2xl">
+    {[
+      {
+        title: 'Umumiy summa',
+        value: `${(stats.totalAmount || 0).toLocaleString('uz-UZ')}`,
+        color: '#00BCE4',           // asosiy matn rangi
+        bgColor: 'rgba(0, 188, 228, 0.08)', // yengil fon
+        shadowColor: 'shadow-[0_4px_15px_rgba(0,188,228,0.25)]'
+      },
+      {
+        title: "To'lov kutilmoqda",
+        value: stats.pendingPayment || 0,
+        color: '#f59e0b',           // yellow/orange-yellow
+        bgColor: 'rgba(245, 158, 11, 0.08)',
+        shadowColor: 'shadow-[0_4px_15px_rgba(245,158,11,0.25)]'
+      },
+      {
+        title: "To'langan",
+        value: stats.paid || 0,
+        color: '#15803d',           // dark green (emerald-700 ga yaqin)
+        bgColor: 'rgba(21, 128, 61, 0.08)',
+        shadowColor: 'shadow-[0_4px_15px_rgba(21,128,61,0.25)]'
+      },
+      {
+        title: 'Yetkazib berilgan',
+        value: stats.delivered || 0,
+        color: '#1e40af',           // dodger blue ga yaqin (ko'k-yashil)
+        bgColor: 'rgba(30, 64, 175, 0.08)',
+        shadowColor: 'shadow-[0_4px_15px_rgba(30,64,175,0.25)]'
+      },
+      {
+        title: 'Bekor qilingan',
+        value: stats.cancelled || 0,
+        color: '#dc2626',           // red-600
+        bgColor: 'rgba(220, 38, 38, 0.08)',
+        shadowColor: 'shadow-[0_4px_15px_rgba(220,38,38,0.25)]'
+      },
+    ].map((stat, i) => (
+      <div
+        key={i}
+        className={`text-center rounded-2xl p-4 shadow-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ${stat.shadowColor}`}
+        style={{ backgroundColor: stat.bgColor }}
+      >
+        <h3
+          className="text-sm font-medium mb-2 opacity-90"
+          style={{ color: stat.color }}
+        >
+          {stat.title}
+        </h3>
+        <p
+          className="text-4xl font-bold"
+          style={{ color: stat.color }}
+        >
+          {stat.value}
+        </p>
+      </div>
+    ))}
+  </div>
+)}
+
 
       <div className="overflow-x-auto rounded-xl shadow-lg bg-white">
         <table className="w-full border-collapse">
@@ -220,7 +264,7 @@ function BuyurtmaSotuvchi() {
           >
             <button
               onClick={closeModal}
-              className="absolute top-5 right-7 text-4xl text-cyan-500 hover:scale-125 transition-transform"
+              className="absolute top-3 cursor-pointer right-5 text-4xl text-cyan-500 hover:scale-120 hover:bg-gray-50 transition-all"
             >
               ×
             </button>
@@ -240,59 +284,69 @@ function BuyurtmaSotuvchi() {
 
               <hr className="my-8 border-cyan-100 border-2" />
 
-              <h3 className="text-2xl font-semibold text-cyan-600 mb-5">Buyurtma statusini o‘zgartirish</h3>
+              {/* Buyurtma statusini o‘zgartirish */}
+<h3 className="text-2xl font-semibold text-cyan-600 mb-5">Buyurtma statusini o‘zgartirish</h3>
 
-              {updateMessage && (
-                <p className={`p-3 rounded-lg text-center font-medium ${updateMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                  {updateMessage.text}
-                </p>
-              )}
+{updateMessage && (
+  <p className={`p-3 rounded-lg text-center font-medium ${updateMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+    {updateMessage.text}
+  </p>
+)}
 
-              <div className="flex flex-wrap gap-4 mb-6">
-                <button
-                  onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'processing' })}
-                  disabled={updateLoading || ['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus)}
-                  className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
-                >
-                  Qayta ishlanmoqda
-                </button>
+{!['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus) ? (
+  <div className="flex flex-wrap gap-4 mb-6">
+    <button
+      onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'processing' })}
+      disabled={updateLoading}
+      className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+    >
+      Qayta ishlanmoqda
+    </button>
 
-                <button
-                  onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'shipped' })}
-                  disabled={updateLoading || ['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus)}
-                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
-                >
-                  Yetkazib berilmoqda
-                </button>
+    <button
+      onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'shipped' })}
+      disabled={updateLoading}
+      className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+    >
+      Yetkazib berilmoqda
+    </button>
 
-                <button
-                  onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'delivered' })}
-                  disabled={updateLoading || selectedOrder.deliveryStatus === 'delivered' || selectedOrder.deliveryStatus === 'cancelled'}
-                  className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
-                >
-                  Yetkazib berildi
-                </button>
+    <button
+      onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'delivered' })}
+      disabled={updateLoading}
+      className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+    >
+      Yetkazib berildi
+    </button>
 
-                <button
-                  onClick={() => {
-                    if (window.confirm("Buyurtmani rostdan ham bekor qilmoqchimisiz? Bu amalni orqaga qaytarib bo'lmaydi.")) {
-                      updateOrderStatus(selectedOrder._id, { deliveryStatus: 'cancelled' });
-                    }
-                  }}
-                  disabled={updateLoading || selectedOrder.deliveryStatus === 'cancelled'}
-                  className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
-                >
-                  Bekor qilindi
-                </button>
-              </div>
+    <button
+      onClick={() => {
+        if (window.confirm("Buyurtmani rostdan ham bekor qilmoqchimisiz? Bu amalni orqaga qaytarib bo'lmaydi.")) {
+          updateOrderStatus(selectedOrder._id, { deliveryStatus: 'cancelled' });
+        }
+      }}
+      disabled={updateLoading}
+      className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+    >
+      Bekor qilindi
+    </button>
+  </div>
+) : (
+  <div className="bg-gray-100 p-5 rounded-xl text-center text-gray-700">
+    <p className="font-medium text-lg">
+      Bu buyurtma allaqachon <strong className="text-cyan-700">
+        {selectedOrder.deliveryStatus === 'delivered' ? 'yetkazib berilgan' : 'bekor qilingan'}
+      </strong>.
+    </p>
+    <p className="mt-2 text-sm">Statusni endi o'zgartirib bo'lmaydi.</p>
+  </div>
+)}
 
-              {['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus) && (
-                <p className="text-center text-red-600 font-medium mt-2">
-                  Bu buyurtma allaqachon {selectedOrder.deliveryStatus === 'delivered' ? 'yetkazib berilgan' : 'bekor qilingan'}.
-                  Statusni o'zgartirib bo'lmaydi.
-                </p>
-              )}
-
+{/* {['delivered', 'cancelled'].includes(selectedOrder.deliveryStatus) && updateMessage?.type !== 'success' && (
+  <p className="text-center text-red-600 font-medium mt-4">
+    Status faqat "Yetkazib berildi" yoki "Bekor qilindi" holatidan oldin o'zgartiriladi.
+  </p>
+)} */}
               <hr className="my-8 border-cyan-100 border-2" />
 
               <h3 className="text-2xl font-semibold text-cyan-600 mb-5">Mahsulotlar</h3>

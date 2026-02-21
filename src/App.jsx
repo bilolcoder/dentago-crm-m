@@ -217,7 +217,7 @@ const ProtectedLayout = () => {
               <Route path="/malumot" element={<MalumotBerish />} />
               <Route path='/AllDoctorsEdit' element={<AllDoctorsEdit />} />
               <Route path='/Categories' element={<Categories />} />
-              <Route path='/need-admin' element={<NeedAdmin />} />
+              {/* <Route path='/need-admin' element={<NeedAdmin />} /> */}
               <Route path='/alltechnicals' element={<AllTexniks />} />
 
               {/* settings general */}
