@@ -14,7 +14,6 @@ import Logo from "../../../assets/logo.png";
 import StoreBanner from "./components/StoreBanner";
 import StoreCategories from "./components/StoreCategories";
 
-// Custom ThLarge icon SVG - HAMMASI BIR XIL ICON
 const CategoryIcon = ({ className = "w-5 h-5", color = "#0891b2" }) => (
   <svg
     className={className}
@@ -33,7 +32,6 @@ const CategoryIcon = ({ className = "w-5 h-5", color = "#0891b2" }) => (
   </svg>
 );
 
-// Asosiy kategoriyalar (navigation uchun)
 const categories = [
   { id: 'barchasi', label: 'Barchasi', Icon: MdGridView, path: '/DentagoStore' },
   { id: 'elonlar', label: 'Elonlar', Icon: Megaphone, path: '/elonlar' },
@@ -41,7 +39,6 @@ const categories = [
   { id: 'ustalar', label: 'Ustalar', Icon: Users, path: '/ustalar' },
 ];
 
-// Dropdown uchun mahsulot kategoriyalari
 const productCategories = [
   {
     id: 'stomatologik-materiallar',
@@ -149,23 +146,21 @@ function Boshsaxifa() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cartLoading, setCartLoading] = useState({});
 
-  // Dropdown state'lari
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Yangi state'lar
   const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [subcategoryProducts, setSubcategoryProducts] = useState([]);
   const [subcategoryLoading, setSubcategoryLoading] = useState(false);
   const [currentView, setCurrentView] = useState('subcategories');
 
-  // Filter state'lari
   const [selectedFilterCategory, setSelectedFilterCategory] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -200,7 +195,6 @@ function Boshsaxifa() {
 
         let productsData = response.data?.data || response.data || [];
 
-        // API dan kelgan mahsulotlarni formatlash
         const formattedProducts = productsData.map(product => ({
           ...product,
           id: product._id || product.id,
@@ -208,11 +202,13 @@ function Boshsaxifa() {
           price: product.price ? `${Number(product.price).toLocaleString('uz-UZ')} so'm` : "Narx yo'q",
           img: product.imageUrl?.[0] ? `${BASE_URL}images/${product.imageUrl[0]}` : "",
           category: product.category || "Umumiy",
-          categoryName: product.categoryName || product.category || "Umumiy"
+          categoryName: product.categoryName || product.category || "Umumiy",
+          company: product.company || "Noma'lum kompaniya"
         }));
 
         setProducts(formattedProducts);
-        setFilteredProducts(formattedProducts); // Boshlang'ich filteredProducts
+        setFilteredProducts(formattedProducts);
+        updateFeaturedProducts(formattedProducts);
         console.log("Yuklangan mahsulotlar:", formattedProducts);
       } catch (err) {
         console.error("Mahsulot yuklash xatosi:", err);
@@ -223,10 +219,12 @@ function Boshsaxifa() {
           price: '15 000 000 so\'m',
           img: '',
           category: 'Stomatologiya uskunalari',
-          categoryName: 'Stomatologiya uskunalari'
+          categoryName: 'Stomatologiya uskunalari',
+          company: 'VDS_DENTAL'
         }];
         setProducts(demoProducts);
         setFilteredProducts(demoProducts);
+        updateFeaturedProducts(demoProducts);
       } finally {
         setLoading(false);
       }
@@ -235,38 +233,48 @@ function Boshsaxifa() {
     fetchProducts();
   }, []);
 
-  // Filter qilish funksiyasi
+  const updateFeaturedProducts = (prods) => {
+    const companyMap = new Map();
+    prods.forEach(product => {
+      if (product.company && !companyMap.has(product.company)) {
+        companyMap.set(product.company, product);
+      }
+    });
+    setFeaturedProducts(Array.from(companyMap.values()).slice(0, 20));
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [selectedFilterCategory, searchFilter, products]);
+
+  useEffect(() => {
+    updateFeaturedProducts(filteredProducts);
+  }, [filteredProducts]);
+
   const applyFilters = () => {
     let result = [...products];
 
-    // 1. Kategoriya bo'yicha filter
     if (selectedFilterCategory) {
       const selectedCat = productCategories.find(cat => cat.id === selectedFilterCategory);
       if (selectedCat) {
         result = result.filter(product => {
-          // Mahsulot kategoriyasini tekshirish
           const productCat = product.categoryName?.toLowerCase() || product.category?.toLowerCase() || '';
           const catLabel = selectedCat.label.toLowerCase();
-
-          // Kategoriya label'i va subkategoriyalarni tekshirish
           const matchesMainCategory = productCat.includes(catLabel);
           const matchesSubcategory = selectedCat.subcategories?.some(subcat =>
             productCat.includes(subcat.label.toLowerCase())
           );
-
           return matchesMainCategory || matchesSubcategory;
         });
       }
     }
 
-    // 2. Qidiruv bo'yicha filter
     if (searchFilter.trim() !== "") {
       const searchLower = searchFilter.toLowerCase().trim();
       result = result.filter(product => {
         const productName = product.name?.toLowerCase() || '';
         const productCategory = product.categoryName?.toLowerCase() || product.category?.toLowerCase() || '';
         const productDesc = product.description?.toLowerCase() || '';
-
         return (
           productName.includes(searchLower) ||
           productCategory.includes(searchLower) ||
@@ -278,18 +286,11 @@ function Boshsaxifa() {
     setFilteredProducts(result);
   };
 
-  // Filter o'zgarganida applyFilters ni chaqirish
-  useEffect(() => {
-    applyFilters();
-  }, [selectedFilterCategory, searchFilter, products]);
-
-  // Filterlarni tozalash
   const clearFilters = () => {
     setSelectedFilterCategory("");
     setSearchFilter("");
   };
 
-  // Dropdown tashqariga bosilganda yopish
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -301,7 +302,6 @@ function Boshsaxifa() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Modal tashqariga bosilganda yopish
   useEffect(() => {
     const handleClickOutsideModal = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -320,25 +320,21 @@ function Boshsaxifa() {
     return () => document.removeEventListener('mousedown', handleClickOutsideModal);
   }, [isModalOpen, isSubcategoryModalOpen]);
 
-  // Inputni bosganda dropdownni ochish
   const handleInputClick = () => {
     setIsDropdownOpen(true);
   };
 
-  // Inputga yozish - FAKAT QIDIRISH UCHUN
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
     setIsDropdownOpen(true);
   };
 
-  // Kategoriyani tanlash
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     openSubcategoryModal(category);
     setIsDropdownOpen(false);
   };
 
-  // Subcategory modalini ochish
   const openSubcategoryModal = async (category) => {
     setSelectedSubcategory(category);
     setIsSubcategoryModalOpen(true);
@@ -346,50 +342,36 @@ function Boshsaxifa() {
     setSubcategoryProducts([]);
   };
 
-  // Subcategory tanlash
   const handleSubcategorySelect = async (subcategory) => {
     console.log("Tanlangan subkategoriya:", subcategory);
     setSelectedSubcategory(prev => ({ ...prev, selectedSub: subcategory }));
     setCurrentView('products');
-
-    // Subkategoriya bo'yicha mahsulotlarni filterlash
     await fetchProductsBySubcategory(subcategory);
   };
 
-  // Orqaga qaytish (subkategoriyalar ko'rinishiga)
   const handleBackToSubcategories = () => {
     setCurrentView('subcategories');
     setSubcategoryProducts([]);
   };
 
-  // Subkategoriya bo'yicha mahsulotlarni filterlash
   const fetchProductsBySubcategory = async (subcategory) => {
     try {
       setSubcategoryLoading(true);
-
-      // Subkategoriya label'ini tekshirish
       const subcategoryLabel = subcategory.label.toLowerCase();
-
-      // Mahsulotlarni filterlash
       const filtered = products.filter(product => {
         const productCategory = (product.categoryName || product.category || '').toLowerCase();
         const productName = (product.name || '').toLowerCase();
         const productDescription = (product.description || '').toLowerCase();
-
-        // Keng qidiruv: kategoriya, nom yoki tavsifda borligini tekshirish
         return (
           productCategory.includes(subcategoryLabel) ||
           productName.includes(subcategoryLabel) ||
           productDescription.includes(subcategoryLabel) ||
-          // Asosiy kategoriyalar uchun tekshirish
           (subcategoryLabel.includes('material') && productCategory.includes('material')) ||
           (subcategoryLabel.includes('uskuna') && productCategory.includes('uskuna')) ||
           (subcategoryLabel.includes('asbob') && productCategory.includes('asbob'))
         );
       });
-
       setSubcategoryProducts(filtered);
-
       if (filtered.length === 0) {
         console.log(`"${subcategory.label}" bo'yicha mahsulot topilmadi`);
       }
@@ -401,14 +383,12 @@ function Boshsaxifa() {
     }
   };
 
-  // Kategoriyani tozalash
   const clearCategory = () => {
     setSelectedCategory(null);
     setSearchQuery("");
     setIsDropdownOpen(false);
   };
 
-  // Filterlangan kategoriyalar
   const filteredCategories = productCategories.filter(category =>
     category.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
     category.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -442,7 +422,6 @@ function Boshsaxifa() {
       });
 
       console.log("Savatga qo'shildi:", response.data);
-      // Savatni yangilash
       if (fetchCart) fetchCart();
     } catch (error) {
       console.error("Savat xatosi:", error);
@@ -454,12 +433,9 @@ function Boshsaxifa() {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  // const notification = () => navigate('/notification');
 
-  // Modal ochish funksiyasi
   const openModal = () => {
     setIsModalOpen(true);
-    // Modal ochilganda filtrlarni tozalash
     clearFilters();
     setTimeout(() => {
       if (modalRef.current) {
@@ -471,10 +447,8 @@ function Boshsaxifa() {
   return (
     <div className="min-h-screen bg-white relative">
       <div className="">
-        {/* HEADER */}
         <header className="sticky top-0 bg-white z-30">
           <div className="flex items-center gap-4">
-            {/* Input qismi - Dropdown bilan */}
             <div className="flex-1 relative" ref={dropdownRef}>
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 z-20" />
 
@@ -488,12 +462,11 @@ function Boshsaxifa() {
                 readOnly={false}
               />
 
-              {/* Input o'ng tarafidagi iconlar */}
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 {searchQuery && (
                   <button
                     onClick={clearCategory}
-                    className="p-1 X hover:bg-gray-200 rounded-full transition-colors"
+                    className="p-1 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
                   >
                     <X size={18} className="text-gray-500" />
                   </button>
@@ -504,11 +477,9 @@ function Boshsaxifa() {
                 />
               </div>
 
-              {/* DROPDOWN */}
               {isDropdownOpen && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-y-auto animate-fadeIn">
                   <div className="p-4">
-                    {/* Dropdown header */}
                     <div className="flex items-center justify-between mb-4 px-2">
                       <h3 className="text-lg font-bold text-gray-800">Kategoriyalar</h3>
                       <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
@@ -516,7 +487,6 @@ function Boshsaxifa() {
                       </span>
                     </div>
 
-                    {/* Kategoriyalar ro'yxati */}
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
                       {filteredCategories.length > 0 ? (
                         filteredCategories.map((category) => {
@@ -527,14 +497,11 @@ function Boshsaxifa() {
                               onClick={() => handleCategorySelect(category)}
                               className={`flex items-center gap-4 p-3 rounded-xl hover:bg-cyan-50 cursor-pointer transition-all group border ${selectedCategory?.id === category.id ? 'border-cyan-500 bg-cyan-50' : 'border-transparent hover:border-cyan-200'}`}
                             >
-                              {/* Icon qismi */}
                               <div className="w-12 h-12 rounded-lg bg-cyan-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
                                 <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
                                   <Icon color="#0891b2" />
                                 </div>
                               </div>
-
-                              {/* Ma'lumotlar qismi */}
                               <div className="flex-1 min-w-0">
                                 <h4 className="font-semibold text-gray-800 group-hover:text-cyan-700 truncate">
                                   {category.label}
@@ -546,10 +513,8 @@ function Boshsaxifa() {
                                   </span>
                                 </p>
                               </div>
-
-                              {/* O'ng tarafdagi icon */}
-                              <div className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity">
-                                <ChevronDown className="text-cyan-500 rotate-270 transform rotate-90" size={20} />
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ChevronDown className="text-cyan-500 rotate-90" size={20} />
                               </div>
                             </div>
                           );
@@ -565,25 +530,13 @@ function Boshsaxifa() {
                 </div>
               )}
             </div>
-
-            {/* <button onClick={notification} className="p-3 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors">
-              <Bell />
-            </button> */}
           </div>
         </header>
 
-        {/* Hero Banner */}
-
-        {/* Hero Banner */}
         <StoreBanner slides={slides} />
 
-        {/* Categories */}
-
-        {/* Categories */}
         <StoreCategories />
 
-
-        {/* Title */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-bold text-[22px] md:text-[25px]">Ommabop mahsulotlar</h1>
           <div onClick={openModal} className="px-6 py-2 font-medium text-[16px] bg-[#BDF3FF] rounded-[10px] cursor-pointer text-black hover:bg-[#a2e9f7] transition-colors">
@@ -591,7 +544,6 @@ function Boshsaxifa() {
           </div>
         </div>
 
-        {/* Loading / Error */}
         {loading && (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-cyan-500 border-t-transparent mx-auto"></div>
@@ -603,16 +555,15 @@ function Boshsaxifa() {
           <div className="text-center py-20">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <p className="text-lg text-red-600 mb-4">{error}</p>
-            <button onClick={() => window.location.reload()} className="px-8 py-3 bg-cyan-500 text-white rounded-2xl font-bold hover:bg-cyan-600">
+            <button onClick={() => window.location.reload()} className="px-8 py-3 bg-cyan-500 text-white rounded-2xl font-bold hover:bg-cyan-600 cursor-pointer">
               Qayta yuklash
             </button>
           </div>
         )}
 
-        {/* Products */}
-        {!loading && !error && filteredProducts.length > 0 && (
+        {!loading && !error && featuredProducts.length > 0 && (
           <div className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 pb-10">
-            {filteredProducts.slice(0, 20).map((product) => (
+            {featuredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -620,12 +571,12 @@ function Boshsaxifa() {
                 onAddToCart={handleAddToCartAPI}
                 isLoading={cartLoading[product.id] || false}
                 isInCart={cartItems?.some(item => (item.product_id?._id || item.productSnapshot?._id || item.product_id) === product.id)}
+                onCompanyClick={(company) => navigate(`/companyproducts/${encodeURIComponent(company)}`)}
               />
             ))}
           </div>
         )}
 
-        {/* SUBCATEGORY MODAL XOLOS */}
         {isSubcategoryModalOpen && selectedSubcategory && (
           <div className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-start justify-center p-0 md:p-4 overflow-y-auto">
             <div
@@ -642,7 +593,7 @@ function Boshsaxifa() {
                         setIsSubcategoryModalOpen(false);
                       }
                     }}
-                    className="p-2 cursor-pointer hover:bg-gray-100 rounded-xl"
+                    className="p-2 hover:bg-gray-100 rounded-xl cursor-pointer"
                   >
                     <ArrowLeft size={28} />
                   </button>
@@ -664,7 +615,7 @@ function Boshsaxifa() {
                     setIsSubcategoryModalOpen(false);
                     setCurrentView('subcategories');
                   }}
-                  className="p-2 cursor-pointer hover:bg-gray-100 rounded-xl"
+                  className="p-2 hover:bg-gray-100 rounded-xl cursor-pointer"
                 >
                   <X size={24} />
                 </button>
@@ -672,7 +623,6 @@ function Boshsaxifa() {
 
               <div className="p-4 md:p-6">
                 {currentView === 'subcategories' ? (
-                  /* SUBKATEGORIYALAR */
                   <div>
                     <h3 className="text-lg font-bold text-gray-800 mb-4">Kataloglar</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -708,7 +658,6 @@ function Boshsaxifa() {
                     </div>
                   </div>
                 ) : (
-                  /* SUBKATEGORIYA MAHSULOTLARI */
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-lg font-bold text-gray-800">
@@ -737,6 +686,7 @@ function Boshsaxifa() {
                             onAddToCart={handleAddToCartAPI}
                             isLoading={cartLoading[product.id] || false}
                             isInCart={cartItems?.some(item => (item.product_id?._id || item.productSnapshot?._id || item.product_id) === product.id)}
+                            onCompanyClick={(company) => navigate(`/companyproducts/${encodeURIComponent(company)}`)}
                           />
                         ))}
                       </div>
@@ -749,7 +699,7 @@ function Boshsaxifa() {
                         <p className="text-gray-500 mb-6">Hozircha bu kategoriyada mahsulotlar mavjud emas</p>
                         <button
                           onClick={handleBackToSubcategories}
-                          className="px-6 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors"
+                          className="px-6 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors cursor-pointer"
                         >
                           ← Orqaga qaytish
                         </button>
@@ -762,16 +712,15 @@ function Boshsaxifa() {
           </div>
         )}
 
-        {/* Modal xolos - Barcha mahsulotlar */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm flex items-start justify-center p-0 md:p-4 overflow-y-auto">
             <div
               ref={modalRef}
-              className="bg-white rounded-t-3xl  md:rounded-3xl w-full md:max-w-4xl mt-auto md:my-auto max-h-[90vh] md:max-h-[80vh] overflow-y-auto animate-slideUp"
+              className="bg-white rounded-t-3xl md:rounded-3xl w-full md:max-w-4xl mt-auto md:my-auto max-h-[90vh] md:max-h-[80vh] overflow-y-auto animate-slideUp"
             >
               <div className="sticky top-0 bg-white p-6 flex items-center justify-between border-b border-gray-100 z-10 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-xl">
+                  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-xl cursor-pointer">
                     <ArrowLeft size={28} />
                   </button>
                   <h2 className="text-2xl font-bold text-gray-800">Barcha Mahsulotlar </h2>
@@ -781,21 +730,19 @@ function Boshsaxifa() {
                     setIsModalOpen(false);
                     clearFilters();
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-xl cursor-pointer "
+                  className="p-2 hover:bg-gray-100 rounded-xl cursor-pointer"
                 >
                   <X size={24} />
                 </button>
               </div>
 
-              {/* Filter va saralash - Sticky */}
-              {/* Desktop version */}
               <div className="hidden sm:block sticky top-[73px] md:top-[81px] z-10 bg-white px-4 md:px-6 py-4 border-b border-gray-100 shadow-sm">
                 <div className="p-4 bg-gray-50 rounded-2xl">
                   <div className="flex flex-row gap-4">
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Kategoriya bo'yicha</label>
                       <select
-                        className="w-full p-3 cursor-pointer bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500"
+                        className="w-full p-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 cursor-pointer"
                         value={selectedFilterCategory}
                         onChange={(e) => setSelectedFilterCategory(e.target.value)}
                       >
@@ -809,18 +756,18 @@ function Boshsaxifa() {
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Qidirish</label>
                       <div className="relative">
-                        <Search className="absolute  left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input
                           type="text"
                           placeholder="Mahsulot nomi bo'yicha qidirish..."
-                          className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500"
+                          className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 cursor-pointer"
                           value={searchFilter}
                           onChange={(e) => setSearchFilter(e.target.value)}
                         />
                         {searchFilter && (
                           <button
                             onClick={() => setSearchFilter("")}
-                            className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                           >
                             <X size={18} />
                           </button>
@@ -831,14 +778,13 @@ function Boshsaxifa() {
                     <div className="flex items-end">
                       <button
                         onClick={clearFilters}
-                        className="px-4 py-3 cursor-pointer bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+                        className="px-4 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium cursor-pointer"
                       >
                         Filtrlarni tozalash
                       </button>
                     </div>
                   </div>
 
-                  {/* Natija ko'rsatkichlari */}
                   {selectedFilterCategory && (
                     <div className="mt-4 flex items-center gap-2">
                       <span className="text-sm text-gray-600">Tanlangan kategoriya:</span>
@@ -850,7 +796,6 @@ function Boshsaxifa() {
                 </div>
               </div>
 
-              {/* Mobile version - faqat search icon */}
               <div className="sm:hidden sticky top-[73px] z-10 bg-white px-4 py-3 border-b border-gray-100 shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">
@@ -861,20 +806,19 @@ function Boshsaxifa() {
                   </span>
                   <button
                     onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                    className={`p-2.5 rounded-xl transition-colors ${isMobileSearchOpen || selectedFilterCategory || searchFilter ? 'bg-cyan-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    className={`p-2.5 rounded-xl transition-colors cursor-pointer ${isMobileSearchOpen || selectedFilterCategory || searchFilter ? 'bg-cyan-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                   >
                     <Search size={20} />
                   </button>
                 </div>
 
-                {/* Mobile filter dropdown */}
                 {isMobileSearchOpen && (
                   <div className="mt-3 p-4 bg-gray-50 rounded-2xl">
                     <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">Kategoriya</label>
                         <select
-                          className="w-full p-2.5 cursor-pointer bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 text-sm"
+                          className="w-full p-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 text-sm cursor-pointer"
                           value={selectedFilterCategory}
                           onChange={(e) => setSelectedFilterCategory(e.target.value)}
                         >
@@ -892,14 +836,14 @@ function Boshsaxifa() {
                           <input
                             type="text"
                             placeholder="Mahsulot nomi..."
-                            className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 text-sm"
+                            className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:border-cyan-500 text-sm cursor-pointer"
                             value={searchFilter}
                             onChange={(e) => setSearchFilter(e.target.value)}
                           />
                           {searchFilter && (
                             <button
                               onClick={() => setSearchFilter("")}
-                              className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                             >
                               <X size={16} />
                             </button>
@@ -913,13 +857,13 @@ function Boshsaxifa() {
                             clearFilters();
                             setIsMobileSearchOpen(false);
                           }}
-                          className="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl text-sm font-medium"
+                          className="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl text-sm font-medium cursor-pointer"
                         >
                           Tozalash
                         </button>
                         <button
                           onClick={() => setIsMobileSearchOpen(false)}
-                          className="flex-1 py-2.5 bg-cyan-500 text-white rounded-xl text-sm font-medium"
+                          className="flex-1 py-2.5 bg-cyan-500 text-white rounded-xl text-sm font-medium cursor-pointer"
                         >
                           Qo'llash
                         </button>
@@ -930,11 +874,8 @@ function Boshsaxifa() {
               </div>
 
               <div className="p-4 md:p-6">
-
-                {/* Mahsulotlar */}
                 {filteredProducts.length > 0 ? (
                   <>
-                    {/* Natija soni */}
                     <div className="mb-4 text-gray-600">
                       {selectedFilterCategory || searchFilter ? (
                         <p>
@@ -946,8 +887,6 @@ function Boshsaxifa() {
                         <p>Jami <span className="font-semibold">{filteredProducts.length}</span> ta mahsulot</p>
                       )}
                     </div>
-
-                    {/* Mahsulotlar grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                       {filteredProducts.map((product) => (
                         <ProductCard
@@ -957,6 +896,7 @@ function Boshsaxifa() {
                           onAddToCart={handleAddToCartAPI}
                           isLoading={cartLoading[product.id] || false}
                           isInCart={cartItems?.some(item => (item.product_id?._id || item.productSnapshot?._id || item.product_id) === product.id)}
+                          onCompanyClick={(company) => navigate(`/companyproducts/${encodeURIComponent(company)}`)}
                         />
                       ))}
                     </div>
@@ -973,7 +913,7 @@ function Boshsaxifa() {
                     {(selectedFilterCategory || searchFilter) && (
                       <button
                         onClick={clearFilters}
-                        className="px-6 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors"
+                        className="px-6 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors cursor-pointer"
                       >
                         Filtrlarni tozalash
                       </button>
@@ -989,10 +929,17 @@ function Boshsaxifa() {
   );
 }
 
-function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
+function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart, onCompanyClick }) {
   const handleAddToCart = async (e) => {
     e.stopPropagation();
     await onAddToCart(product);
+  };
+
+  const handleCompanyClick = (e) => {
+    e.stopPropagation();
+    if (onCompanyClick && product.company) {
+      onCompanyClick(product.company);
+    }
   };
 
   return (
@@ -1000,10 +947,7 @@ function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
       onClick={() => navigate(`/mahsulot/${product.id}`)}
       className="cursor-pointer rounded-[20px] p-3 md:rounded-[30px] md:p-4 shadow-sm border border-gray-100 flex flex-col relative group transition-all hover:shadow-xl hover:-translate-y-1 h-full"
     >
-      {/* <button className="absolute right-3 top-3 z-1 p-1 rounded-full bg-white/80 hover:bg-red-100 text-gray-500 hover:text-red-500 transition-all">
-        <Heart size={20} />
-      </button> */}
-      <div className="bg-gradient-to-br  rounded-[15px] md:rounded-[20px] overflow-hidden mb-3 md:mb-4 flex items-center justify-center h-32 md:h-48">
+      <div className="bg-gradient-to-br rounded-[15px] md:rounded-[20px] overflow-hidden mb-5 md:mb-4 flex items-center justify-center h-32 md:h-48">
         <img
           src={product.img}
           alt={product.name}
@@ -1021,6 +965,14 @@ function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
           </span>
         </div>
       )}
+      {product.company && (
+        <div 
+          onClick={handleCompanyClick}
+          className="cursor-pointer text-[13px] font-medium bg-[#E0F7FA] text-[#475569] rounded-2xl text-center px-3 py-1.5 mb-3 hover:bg-[#B2EBF2] transition-colors"
+        >
+          {product.company}
+        </div>
+      )}
       <div className="mt-auto">
         <p className="text-black font-bold text-[16px] md:text-[20px] mb-3">
           {product.price}
@@ -1028,7 +980,7 @@ function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart }) {
         <button
           onClick={handleAddToCart}
           disabled={isLoading}
-          className={`w-full cursor-pointer py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base ${isLoading
+          className={`w-full py-2.5 md:py-3 rounded-[12px] md:rounded-[15px] flex items-center justify-center gap-2 font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base cursor-pointer ${isLoading
               ? 'bg-gray-400'
               : isInCart
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg'

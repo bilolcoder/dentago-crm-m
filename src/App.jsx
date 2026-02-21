@@ -60,6 +60,8 @@ import Registration from './components/registration';
 import AllDoctorsEdit from './components/AllDoctorsedit';
 import Categories from './components/pages/allcategories';
 import NeedAdmin from './components/NeedAdmin';
+import Companyproducts from './components/pages/dentagoStore/pegeslar/companyproducts';
+import CompanyProducts from './components/pages/dentagoStore/pegeslar/companyproducts';
 import TechnicianOrders from './components/pages/BTS/TexnikgaBuyurtma';
 
 // Icons
@@ -193,7 +195,8 @@ const ProtectedLayout = () => {
               <Route path="/DentagoStore" element={<DentagoStore />} />
               <Route path="/savat" element={<Savat />} />
               <Route path="/mahsulot/:id" element={<ProductDetail />} />
-
+              <Route path="companyproducts" element={<Companyproducts />} />
+              <Route path="/companyproducts/:company" element={<CompanyProducts />} />
               {/* Boshqa sahifalar */}
               <Route path="/addproduct" element={<Addproduct />} />
               <Route path="/order-seller" element={<BuyurtmaSotuvchi />} />
