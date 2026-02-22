@@ -110,7 +110,7 @@ function Aperator() {
       setFilteredOrders(flatOrders);
     } catch (err) {
       console.error("Mahsulot buyurtmalari xatosi:", err);
-      alert("Ma'lumotlarni yuklashda xatolik: " + err.message);
+      console.log("Ma'lumotlarni yuklashda xatolik: " + err.message);
     }
   };
 
@@ -144,7 +144,7 @@ function Aperator() {
       }
     } catch (err) {
       console.error("Texnik buyurtmalari xatosi:", err);
-      // alert("Texnik buyurtmalarini yuklashda xatolik: " + (err.response?.data?.message || err.message));
+      // console.log("Texnik buyurtmalarini yuklashda xatolik: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -225,9 +225,9 @@ function Aperator() {
           item.id === orderId ? { ...item, paymentStatus: "paid", status: "to'langan" } : item
         )
       );
-      alert("To'lov tasdiqlandi!");
+      console.log("To'lov tasdiqlandi!");
     } catch (err) {
-      alert("Xatolik: " + (err.response?.data?.message || err.message));
+      console.log("Xatolik: " + (err.response?.data?.message || err.message));
     } finally {
       setActionLoading(prev => ({ ...prev, [orderId]: false }));
     }
@@ -244,7 +244,7 @@ function Aperator() {
   const submitReject = async () => {
     const { requestId, description } = rejectModal;
     if (!description.trim()) {
-      alert("Sababni kiriting!");
+      console.log("Sababni kiriting!");
       return;
     }
 
@@ -280,11 +280,11 @@ function Aperator() {
           prev.map(o => o.requestId === requestId ? { ...o, status: 'rejected' } : o)
         );
         closeRejectModal();
-        alert("Buyurtma bekor qilindi!");
+        console.log("Buyurtma bekor qilindi!");
       }
     } catch (err) {
       console.error("Xato:", err);
-      alert("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+      console.log("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
     } finally {
       setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
     }
@@ -320,13 +320,13 @@ function Aperator() {
           prev.map(o => o.requestId === requestId ? { ...o, status: 'completed' } : o)
         );
         closeConfirmCompleteModal();
-        alert("Buyurtma bajarildi!");
+        console.log("Buyurtma bajarildi!");
       } else {
         throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
       }
     } catch (err) {
       console.error("Status yangilash xatosi:", err);
-      alert("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+      console.log("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
     } finally {
       setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
     }
@@ -368,7 +368,7 @@ function Aperator() {
       }
     } catch (err) {
       console.error("Status yangilash xatosi:", err);
-      alert("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+      console.log("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
     } finally {
       setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
     }
@@ -730,7 +730,7 @@ function Aperator() {
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className={`cursor-pointer w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
+              className={`p-2 cursor-pointer rounded-full ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
             >
               <ChevronLeft size={18} />
             </button>

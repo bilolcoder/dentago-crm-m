@@ -119,15 +119,15 @@ Tel 2: ${tel2}
       const atLeastOneSuccess = sendResults.some(r => r.success);
 
       if (atLeastOneSuccess) {
-        alert("Murojaatingiz yuborildi!");
+        console.log("Murojaatingiz yuborildi!");
         reset({ muammo: "", telRaqam: "", telRaqam2: "" });
         setSelectedImages([]);
       } else {
-        alert("Hamma adminlarga yuborishda xato yuz berdi. Iltimos keyinroq urinib ko'ring.");
+        console.log("Hamma adminlarga yuborishda xato yuz berdi. Iltimos keyinroq urinib ko'ring.");
       }
     } catch (error) {
       console.error("Umumiy xato:", error);
-      alert("Xatolik yuz berdi. Internet yoki bot tokenni tekshiring.");
+      console.log("Xatolik yuz berdi. Internet yoki bot tokenni tekshiring.");
     } finally {
       setIsSubmitting(false); // ← loading tugaydi (muvaffaqiyatli yoki xato bo'lsa ham)
     }

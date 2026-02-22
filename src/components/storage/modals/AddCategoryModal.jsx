@@ -27,7 +27,7 @@ const AddCategoryModal = ({ isOpen, onClose, category }) => {
         e.preventDefault();
 
         if (!name.trim()) {
-            alert("Kategoriya nomini kiriting!");
+            console.log("Kategoriya nomini kiriting!");
             return;
         }
 

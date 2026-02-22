@@ -65,7 +65,7 @@ const AnnouncementsContent = () => {
 
     const handleSave = () => {
         if (!formData.image || !formData.description) {
-            alert(t('fill_required'));
+            console.log(t('fill_required'));
             return;
         }
 
@@ -95,7 +95,7 @@ const AnnouncementsContent = () => {
             expiresAt: newExpiryDate,
             isActive: true
         }, 'UPDATE');
-        alert('E\'lon muddati 7 kunga uzaytirildi!');
+        console.log('E\'lon muddati 7 kunga uzaytirildi!');
     };
 
     const handleViewAnnouncement = (announcement) => {

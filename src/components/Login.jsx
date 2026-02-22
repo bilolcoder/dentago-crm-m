@@ -348,7 +348,7 @@ const Login = () => {
                                     <button
                                         type="submit"
                                         disabled={phoneNumber.replace(/\D/g, '').length < 12 || isLoading}
-                                        className="w-full py-3.5 bg-[#00C1F3] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full cursor-pointer py-3.5 bg-[#00C1F3] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {isLoading ? 'Yuborilmoqda...' : 'Tasdiqlash kodini olish'}
                                     </button>
@@ -367,7 +367,7 @@ const Login = () => {
                         ) : (
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between mb-2">
-                                    <button onClick={handleBackToPhone} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors p-2 -ml-2">
+                                    <button onClick={handleBackToPhone} className="flex cursor-pointer items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors p-2 -ml-2">
                                         <ArrowLeft className="w-5 h-5" />
                                         <span className="text-sm font-medium">Orqaga</span>
                                     </button>

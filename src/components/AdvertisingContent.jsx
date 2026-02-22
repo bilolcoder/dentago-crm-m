@@ -21,7 +21,7 @@ const AddAdvertisementModal = ({ isOpen, onClose }) => {
             setContent('');
             setStatus('active');
         } else {
-            alert(t('fill_required'));
+            console.log(t('fill_required'));
         }
     };
 

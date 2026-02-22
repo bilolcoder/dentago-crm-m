@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../../.././../components/pages/dentagoStore/CartContent';
-import { FaTrash, FaMinus, FaPlus, FaShoppingCart, FaSyncAlt } from 'react-icons/fa';
+import { FaTrash, FaMinus, FaPlus, FaShoppingCart, FaSyncAlt, FaTruck, FaStore, FaShieldAlt, FaChevronLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { IoMdArrowRoundBack } from 'react-icons/io';
+import { ChevronLeft } from 'lucide-react';
 import PurchaseModal from '../../../modals/PurchaseModal';
 
 const BASE_URL = "https://app.dentago.uz";
@@ -70,7 +70,7 @@ export const AddToCartButton = ({ productId, productName, productPrice, quantity
 
     setAdding(true);
     const result = await addToCartAPI(productId, productName, productPrice, quantity);
-    alert(result.message);
+    console.log(result.message);
 
     if (result.message.includes("sessiya") || result.message.includes("kiring")) {
       navigate('/login');
@@ -82,7 +82,7 @@ export const AddToCartButton = ({ productId, productName, productPrice, quantity
     <button
       onClick={handleAdd}
       disabled={adding}
-      className={`bg-[#00C2FF] text-white px-4 py-2 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-[#0099DD] transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`bg-[#00C2FF] text-white px-4 py-2 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-[#0099DD] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${className}`}
     >
       {adding ? (
         <>
@@ -115,7 +115,6 @@ const Savat = () => {
     fetchCartFromAPI();
   }, []);
 
-  // const navigate = useNavigate();
   const handleBackMinus = () => {
     navigate(-1);
   }
@@ -168,36 +167,30 @@ const Savat = () => {
       if (showLoading) setLoading(false);
     }
   };
+  
   const handleUpdateQuantity = async (itemId, change) => {
     if (!checkAuth(navigate)) return;
 
-    // 1. Savatdan mahsulotni topamiz
     const item = apiCartItems.find(i => i.id === itemId);
     if (!item) return;
 
-    // Agar miqdor 1 bo'lsa va foydalanuvchi ayirmoqchi bo'lsa, to'xtatamiz
     if (item.quantity <= 1 && change === -1) return;
 
     try {
       setUpdating(prev => ({ ...prev, [itemId]: true }));
 
-      // 2. Savatga qo'shish funksiyasini chaqiramiz (change: 1 yoki -1)
-      // Bu funksiya sizda yuqorida export qilingan addToCartAPI funksiyasidir
       const result = await addToCartAPI(
         item.product_id,
         item.nomi,
         item.narxi,
-        change // miqdorni +1 yoki -1 ko'rinishida yuboramiz
+        change
       );
 
       if (result.success) {
-
         await fetchCartFromAPI(false);
-
-        // Agar Context ishlatayotgan bo'lsangiz:
-        updateQuantity(itemId, item.quantity + change);
+        // updateQuantity(itemId, item.quantity + change);
       } else {
-        alert(result.message);
+        console.log(result.message);
       }
     } catch (err) {
       console.error("Yangilashda xato:", err);
@@ -205,6 +198,7 @@ const Savat = () => {
       setUpdating(prev => ({ ...prev, [itemId]: false }));
     }
   };
+  
   const handleRemoveFromCart = async (itemId) => {
     if (!checkAuth(navigate)) return;
 
@@ -220,9 +214,9 @@ const Savat = () => {
         timeout: 10000
       });
 
-      if (cartItems.find(i => i.id === itemId)) {
-        removeFromCart(itemId);
-      }
+      // if (cartItems.find(i => i.id === itemId)) {
+      //   removeFromCart(itemId);
+      // }
     } catch (error) {
       fetchCartFromAPI(false);
     } finally {
@@ -249,7 +243,7 @@ const Savat = () => {
         })
       ));
 
-      clearCart();
+      // clearCart();
     } catch (error) {
       fetchCartFromAPI(false);
     } finally {
@@ -258,62 +252,45 @@ const Savat = () => {
   };
 
   const jamiSumma = apiCartItems.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
-  // jamiTovarlar faqat bir marta yuqorida e'lon qilinadi
-
-  // Umumiy mahsulotlar sonini hisoblash
   const jamiTovarlar = apiCartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const yetkazibBerishNarxi = jamiSumma > 0 ? 0 : 0; // Bepul yetkazish
+  const chegirma = 0; // Agar chegirma bo'lsa qo'shish mumkin
 
   const handlePurchase = async (purchaseData) => {
     try {
-      // Here you would send the purchase data to your API
       console.log('Purchase data:', purchaseData);
-
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // To'lov usuli nomini o'zbekchaga tarjima qilish
-      const paymentMethodNames = {
-        'humo': 'Humo',
-        'uzcard': 'UzCard',
-        'visa': 'Visa',
-        'payme': 'Payme',
-        'click': 'Click',
-        'rahmat': 'Rahmat'
-      };
-
-      // Clear cart after successful purchase
       await handleClearCart();
-
     } catch (error) {
       console.error('Purchase error:', error);
-      alert('Xato yuz berdi. Iltimos, qayta urinib ko\'ring.');
+      console.log('Xato yuz berdi. Iltimos, qayta urinib ko\'ring.');
     }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-cyan-500 border-t-transparent mb-4"></div>
-        <h2 className="text-xl font-bold mb-2 text-gray-800">Savat yuklanmoqda...</h2>
-        <p className="text-gray-500 text-sm">Bu bir necha soniya vaqt olishi mumkin</p>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 text-center">
+        <div className="animate-spin rounded-full h-12 sm:h-16 w-12 sm:w-16 border-3 sm:border-4 border-[#00C2FF] border-t-transparent mb-3 sm:mb-4"></div>
+        <h2 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-800">Savat yuklanmoqda...</h2>
+        <p className="text-gray-500 text-xs sm:text-sm">Bu bir necha soniya vaqt olishi mumkin</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
-        <div className="text-red-500 text-4xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold mb-2 text-gray-800">Xato yuz berdi</h2>
-        <p className="text-gray-600 mb-6 max-w-md">{error}</p>
-        <div className="flex gap-4 flex-wrap justify-center">
-          <button onClick={() => fetchCartFromAPI()} className="bg-cyan-500 cursor-pointer text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-cyan-600">
-            <FaSyncAlt /> Qayta yuklash
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 text-center">
+        <div className="text-red-500 text-3xl sm:text-4xl mb-3 sm:mb-4">⚠️</div>
+        <h2 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-800">Xato yuz berdi</h2>
+        <p className="text-gray-600 mb-4 sm:mb-6 max-w-md text-sm sm:text-base">{error}</p>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 flex-wrap justify-center w-full sm:w-auto">
+          <button onClick={() => fetchCartFromAPI()} className="bg-[#00C2FF] cursor-pointer text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-[#0099DD] transition-colors text-sm sm:text-base w-full sm:w-auto">
+            <FaSyncAlt className="text-sm" /> Qayta yuklash
           </button>
-          <button onClick={() => navigate('/login')} className="bg-gray-200 cursor-pointer text-gray-800 px-6 py-3 rounded-full font-bold hover:bg-gray-300">
+          <button onClick={() => navigate('/login')} className="bg-gray-200 cursor-pointer text-gray-800 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold hover:bg-gray-300 transition-colors text-sm sm:text-base w-full sm:w-auto">
             Kirish
           </button>
-          <button onClick={() => navigate('/')} className="bg-green-500 cursor-pointer text-white px-6 py-3 rounded-full font-bold hover:bg-green-600">
+          <button onClick={() => navigate('/')} className="bg-green-500 cursor-pointer text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-bold hover:bg-green-600 transition-colors text-sm sm:text-base w-full sm:w-auto">
             Asosiy sahifaga
           </button>
         </div>
@@ -323,126 +300,226 @@ const Savat = () => {
 
   if (apiCartItems.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] p-6 text-center">
-        <div className="bg-gray-100 p-8 rounded-full mb-6 text-gray-300">
-          <FaShoppingCart size={80} />
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 text-center">
+        <div className="bg-gray-100 p-6 sm:p-8 rounded-full mb-4 sm:mb-6 text-gray-300">
+          <FaShoppingCart size={60} className="sm:w-20 sm:h-20" />
         </div>
-        <h2 className="text-xl font-bold mb-2 text-gray-800">Savatda hali hech narsa yo'q</h2>
-        <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-md">
+        <h2 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-800">Savatda hali hech narsa yo'q</h2>
+        <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-6 sm:mb-8 max-w-md">
           Mahsulotlarni ko'rib chiqing va savatingizni to'ldiring!
         </p>
-        <div className="flex gap-4 flex-wrap justify-center">
-          <button onClick={() => navigate('/DentagoStore')} className="bg-[#00C2FF] text-white px-8 py-3 rounded-full font-bold hover:bg-[#0099DD]">
+        <div className="flex gap-3 sm:gap-4 flex-wrap justify-center w-full sm:w-auto">
+          <button onClick={() => navigate('/DentagoStore')} className="bg-[#00C2FF] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold hover:bg-[#0099DD] transition-colors text-sm sm:text-base w-full sm:w-auto">
             Mahsulotlarga o'tish
           </button>
-
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-30 p-4">
-      <button onClick={handleBackMinus} className='p-3 text-gray-400 bg-gray-100 cursor-pointer rounded-2xl text-2xl'><IoMdArrowRoundBack /></button>
-      <div className="flex items-center justify-between mb-6 sticky top-0 z-10 py-2">
-        <h1 className="text-center text-xl font-bold text-gray-800">Korzinka</h1>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">{apiCartItems.length} ta mahsulot</span>
-          <button
-            onClick={handleClearCart}
-            disabled={clearing}
-            className="text-red-500 text-sm cursor-pointer hover:text-red-700 px-3 py-1 border  border-red-200 rounded-full hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
-          >
-            {clearing ? <>Tozalanmoqda...</> : <><FaTrash size={12} /> Tozalash</>}
-          </button>
-          <button onClick={() => fetchCartFromAPI(true)} className="text-gray-500 cursor-pointer hover:text-cyan-600 p-2 hover:bg-gray-100 rounded-full">
-            <FaSyncAlt />
-          </button>
+    <div className="min-h-screen bg-gray-50 pb-24 sm:pb-28 md:pb-32">
+      {/* Header - Responsive */}
+      <div className="bg-white sticky top-0 z-10 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button 
+                onClick={handleBackMinus} 
+                className='p-1.5 sm:p-2 cursor-pointer rounded-full hover:bg-gray-100 transition-colors'
+              >
+                <ChevronLeft size={20} className='sm:w-6 sm:h-6 text-gray-700' />
+              </button>
+              <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">Korzinka</h1>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-xs sm:text-sm text-gray-500">{jamiTovarlar} ta</span>
+              <button
+                onClick={handleClearCart}
+                disabled={clearing}
+                className="text-red-500 text-xs sm:text-sm cursor-pointer hover:text-red-700 px-2 sm:px-3 py-1 sm:py-1.5 border border-red-200 rounded-full hover:bg-red-50 flex items-center gap-1 sm:gap-1.5 disabled:opacity-50 transition-colors"
+              >
+                {clearing ? (
+                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-red-500 border-t-transparent"></div>
+                ) : (
+                  <>
+                    <FaTrash size={10} className="sm:w-3 sm:h-3" /> 
+                    <span className="hidden xs:inline">Tozalash</span>
+                  </>
+                )}
+              </button>
+              <button 
+                onClick={() => fetchCartFromAPI(true)} 
+                className="text-gray-500 cursor-pointer hover:text-[#00C2FF] p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <FaSyncAlt size={14} className="sm:w-4 sm:h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-2">
-        {apiCartItems.map(item => (
-          <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-start relative hover:shadow-md transition-shadow">
-            <button
-              onClick={() => handleRemoveFromCart(item.id)}
-              disabled={removing[item.id]}
-              className="absolute top-4 right-4 cursor-pointer text-gray-300 hover:text-red-500 p-2 disabled:opacity-50"
-            >
-              {removing[item.id] ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-500 border-t-transparent  "></div> : <FaTrash size={14} />}
-            </button>
-
-            <div
-              className="w-20 h-20 mr-4 bg-gray-50 rounded-lg overflow-hidden cursor-pointer shrink-0"
-              onClick={() => navigate(`/mahsulot/${item.product_id}`)}
-            >
-              <img src={item.image} alt={item.nomi} className="w-full h-full object-contain p-1" loading="lazy" />
-            </div>
-
+      {/* Main Content - Responsive */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        {/* Yetkazib berish ma'lumotlari - Responsive */}
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+            <FaTruck className="text-[#00C2FF] text-base sm:text-lg flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <h3
-                className="font-bold text-gray-800 text-sm mb-1 pr-6 leading-tight cursor-pointer hover:text-blue-600 truncate"
-                onClick={() => navigate(`/mahsulot/${item.product_id}`)}
+              <span className="font-medium text-gray-800">Yetkazib berish: </span>
+              <span className="text-gray-600">Ertaga, 24-fevral</span>
+            </div>
+            <span className="text-green-600 font-medium text-xs sm:text-sm flex-shrink-0">Bepul</span>
+          </div>
+        </div>
+
+        {/* Mahsulotlar ro'yxati - Responsive */}
+        <div className="space-y-2 sm:space-y-3">
+          {apiCartItems.map(item => (
+            <div key={item.id} className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 relative hover:shadow-md transition-all">
+              {/* O'chirish tugmasi */}
+              <button
+                onClick={() => handleRemoveFromCart(item.id)}
+                disabled={removing[item.id]}
+                className="absolute top-2 sm:top-3 right-2 sm:right-3 cursor-pointer text-gray-400 hover:text-red-500 p-1.5 disabled:opacity-50 z-10 rounded-full hover:bg-red-50 transition-colors"
               >
-                {item.nomi}
-              </h3>
-              {item.category && (
-                <p className="text-gray-500 text-[10px] mb-1 truncate">
-                  {item.category}{item.company && ` • ${item.company}`}
-                </p>
-              )}
+                {removing[item.id] ? (
+                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-red-500 border-t-transparent"></div>
+                ) : (
+                  <FaTrash size={12} className="sm:w-3.5 sm:h-3.5" />
+                )}
+              </button>
 
+              {/* Mahsulot qatori - Responsive */}
+              <div className="flex gap-2 sm:gap-3 md:gap-4">
+                {/* Rasm - Responsive */}
+                <div 
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden cursor-pointer shrink-0 border border-gray-100 hover:border-[#00C2FF] transition-colors"
+                  onClick={() => navigate(`/mahsulot/${item.product_id}`)}
+                >
+                  <img 
+                    src={item.image} 
+                    alt={item.nomi} 
+                    className="w-full h-full object-contain p-1 sm:p-1.5 md:p-2" 
+                    loading="lazy" 
+                  />
+                </div>
 
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="font-black text-lg text-gray-900">
-                  {(item.narxi * item.quantity).toLocaleString()} so'm
-                </span>
-
-                <div className="flex items-center bg-[#F2F3F5] rounded-full px-3 py-1.5 gap-4">
-                  <button
-                    onClick={() => handleUpdateQuantity(item.id, -1)}
-                    disabled={updating[item.id] || item.quantity <= 1}
-                    className="text-blue-500 cursor-pointer hover:bg-blue-50 rounded-full p-1 disabled:opacity-50"
+                {/* Mahsulot ma'lumotlari - Responsive */}
+                <div className="flex-1 min-w-0 pr-6 sm:pr-7 md:pr-8">
+                  <h3
+                    className="font-medium text-gray-800 text-xs sm:text-sm leading-tight cursor-pointer hover:text-[#00C2FF] line-clamp-2 mb-1"
+                    onClick={() => navigate(`/mahsulot/${item.product_id}`)}
                   >
-                    {updating[item.id] ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-blue-500 border-t-transparent"></div> : <FaMinus size={10} />}
-                  </button>
-                  <span className="font-bold text-sm min-w-6 text-center">{item.quantity}</span>
-                  <button
-                    onClick={() => handleUpdateQuantity(item.id, 1)}
-                    disabled={updating[item.id]}
-                    className="text-blue-500 cursor-pointer hover:bg-blue-50 rounded-full p-1 disabled:opacity-50"
-                  >
-                    {updating[item.id] ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-blue-500 border-t-transparent"></div> : <FaPlus size={10} />}
-                  </button>
+                    {item.nomi}
+                  </h3>
+                  
+                  {/* Kategoriya va kompaniya - Responsive */}
+                  {item.category && (
+                    <p className="text-gray-500 text-[10px] sm:text-xs mb-1.5 truncate">
+                      {item.category}{item.company && ` • ${item.company}`}
+                    </p>
+                  )}
+
+                  {/* Sotuvchi ma'lumoti - Responsive */}
+                  <div className="flex items-center gap-1 mb-1.5 sm:mb-2">
+                    <FaStore className="text-gray-400 text-[10px] sm:text-xs" />
+                    <span className="text-[10px] sm:text-xs text-gray-500">Sotuvchi: Dentago</span>
+                  </div>
+
+                  {/* Narx va miqdor - Responsive */}
+                  <div className="flex flex-col xs:flex-row xs:items-end xs:justify-between gap-1 xs:gap-2 mt-1 sm:mt-2">
+                    <div>
+                      <span className="font-bold text-sm sm:text-base md:text-lg text-gray-900">
+                        {(item.narxi * item.quantity).toLocaleString()} so'm
+                      </span>
+                      {item.quantity > 1 && (
+                        <p className="text-[10px] sm:text-xs text-gray-500">
+                          {item.narxi.toLocaleString()} so'm × {item.quantity}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Miqdor tanlagich - Responsive */}
+                    <div className="flex items-center bg-[#F2F3F5] rounded-lg px-1.5 sm:px-2 py-0.5 sm:py-1 gap-1.5 sm:gap-2 md:gap-3 self-start xs:self-auto">
+                      <button
+                        onClick={() => handleUpdateQuantity(item.id, -1)}
+                        disabled={updating[item.id] || item.quantity <= 1}
+                        className="text-[#00C2FF] cursor-pointer hover:bg-white rounded-md p-1 sm:p-1.5 disabled:opacity-50 transition-colors"
+                      >
+                        {updating[item.id] ? (
+                          <div className="animate-spin rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 border-2 border-[#00C2FF] border-t-transparent"></div>
+                        ) : (
+                          <FaMinus size={8} className="sm:w-2.5 sm:h-2.5" />
+                        )}
+                      </button>
+                      <span className="font-bold text-xs sm:text-sm min-w-5 sm:min-w-6 md:min-w-8 text-center">{item.quantity}</span>
+                      <button
+                        onClick={() => handleUpdateQuantity(item.id, 1)}
+                        disabled={updating[item.id]}
+                        className="text-[#00C2FF] cursor-pointer hover:bg-white rounded-md p-1 sm:p-1.5 disabled:opacity-50 transition-colors"
+                      >
+                        {updating[item.id] ? (
+                          <div className="animate-spin rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 border-2 border-[#00C2FF] border-t-transparent"></div>
+                        ) : (
+                          <FaPlus size={8} className="sm:w-2.5 sm:h-2.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="w-full flex justify-center">
-
-        <div className="fixed bottom-0 right-0 max-sm:left-0 sm:left-0 md:left-70 lg:left-70 bg-white p-4 sm:pt-3 sm:pb-4 z-40 border-t border-gray-200">
-          <div className="space-y-2 mb-3 text-sm">
-            <div className="flex justify-center items-center border-gray-300 mt-2">
-              <span className="font-medium text-2xl text-black">JAMI: </span>
-              <span className="font-bold text-2xl text-gray-600"> {jamiSumma.toLocaleString()} so'm</span>
-            </div>
-          </div>
-          <div className="flex justify-center items-center">
-
-            <button
-              onClick={() => setIsPurchaseModalOpen(true)}
-              className="py-2 px-16 cursor-pointer bg-[#00C2FF] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
-              disabled={clearing}
-            >
-              {clearing ? 'Kutilmoqda...' : `Sotib olish`}
-            </button>
-          </div>
-
+          ))}
         </div>
 
+
+        {/* To'lov ma'lumotlari - Responsive */}
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 mt-3 sm:mt-4 shadow-sm border border-gray-100">
+          <div className="space-y-2 sm:space-y-3">
+            <div className="flex justify-between text-xs sm:text-sm">
+              <span className="text-gray-600">Mahsulotlar ({jamiTovarlar} ta)</span>
+              <span className="font-medium text-gray-800">{jamiSumma.toLocaleString()} so'm</span>
+            </div>
+            <div className="flex justify-between text-xs sm:text-sm">
+              <span className="text-gray-600">Yetkazib berish</span>
+              <span className="text-green-600 font-medium">Bepul</span>
+            </div>
+            {chegirma > 0 && (
+              <div className="flex justify-between text-xs sm:text-sm">
+                <span className="text-gray-600">Chegirma</span>
+                <span className="text-red-500 font-medium">-{chegirma.toLocaleString()} so'm</span>
+              </div>
+            )}
+            <div className="border-t border-gray-200 pt-2 sm:pt-3 mt-1">
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-gray-800 text-sm sm:text-base">Jami:</span>
+                <span className="font-bold text-base sm:text-lg md:text-xl text-[#00C2FF]">{jamiSumma.toLocaleString()} so'm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Fixed Panel - Responsive */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4">
+            <div className="flex-1 sm:flex-none">
+              <div className="text-[10px] sm:text-xs text-gray-500 mb-0.5">Jami to'lov:</div>
+              <div className="font-bold text-sm sm:text-base md:text-lg lg:text-xl text-[#00C2FF] truncate max-w-[120px] sm:max-w-none">
+                {jamiSumma.toLocaleString()} so'm
+              </div>
+            </div>
+            <button
+              onClick={() => setIsPurchaseModalOpen(true)}
+              className="flex-1 sm:flex-1 md:max-w-sm py-2.5 sm:py-3 md:py-3.5 cursor-pointer bg-[#00C2FF] text-white rounded-lg sm:rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-md hover:bg-[#0099DD] active:scale-[0.98] transition-all disabled:opacity-50"
+              disabled={clearing}
+            >
+              {clearing ? 'Kutilmoqda...' : 'Sotib olish'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Purchase Modal */}

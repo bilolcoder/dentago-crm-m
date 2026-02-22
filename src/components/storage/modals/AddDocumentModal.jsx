@@ -48,7 +48,7 @@ const AddDocumentModal = ({ isOpen, onClose, document }) => {
         e.preventDefault();
 
         if (!name.trim() || !supplier.trim() || !date.trim() || !deliveryMethod.trim()) {
-            alert("Iltimos, barcha majburiy maydonlarni to'ldiring (*)");
+            console.log("Iltimos, barcha majburiy maydonlarni to'ldiring (*)");
             return;
         }
 

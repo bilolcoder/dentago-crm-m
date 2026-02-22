@@ -29,10 +29,10 @@ const SalaryCard = ({ title, staffList, isDoctor = false }) => {
 
         const confirmPayment = () => {
             if (!amount) {
-                alert("Iltimos, summani kiriting.");
+                console.log("Iltimos, summani kiriting.");
                 return;
             }
-            alert(`${selectedStaff.FIO}ga ${amount} so'm miqdorida maosh to'landi. (Simulyatsiya)`);
+            console.log(`${selectedStaff.FIO}ga ${amount} so'm miqdorida maosh to'landi. (Simulyatsiya)`);
             setModalOpen(false);
             setSelectedStaff(null);
         };

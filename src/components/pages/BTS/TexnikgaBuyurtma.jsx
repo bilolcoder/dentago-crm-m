@@ -103,12 +103,12 @@ function TexnikgaBuyurtma() {
   const handleOpenPrompt = async (req) => {
     const techId = getTechnicianId(req);
     if (!techId) {
-      alert('Texnik ID si topilmadi');
+      console.log('Texnik ID si topilmadi');
       return;
     }
 
     if (hasRatedThisTech(techId)) {
-      alert('Siz bu texnikni allaqachon baholagansiz!');
+      console.log('Siz bu texnikni allaqachon baholagansiz!');
       return;
     }
 
@@ -125,11 +125,11 @@ function TexnikgaBuyurtma() {
         setTechInfo(technician);
         setShowPromptModal(true);
       } else {
-        alert("Texnik ma'lumotlari topilmadi");
+        console.log("Texnik ma'lumotlari topilmadi");
       }
     } catch (err) {
       console.error('Texnik maʼlumotlarini olishda xato:', err);
-      alert('Texnik maʼlumotlarini yuklab bo‘lmadi');
+      console.log('Texnik maʼlumotlarini yuklab bo‘lmadi');
     }
   };
 
@@ -226,7 +226,7 @@ function TexnikgaBuyurtma() {
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-4 py-2 rounded-lg bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shadow flex items-center gap-1"
+          className="p-2 cursor-pointer rounded-full text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft size={18} />
         </button>

@@ -28,7 +28,7 @@ const ProductUsageContent = () => {
 
     const handleAddUsage = () => {
         if (!formData.doctorName || !formData.patientName || !formData.productName || !formData.quantity) {
-            alert(t('fill_required'));
+            console.log(t('fill_required'));
             return;
         }
 

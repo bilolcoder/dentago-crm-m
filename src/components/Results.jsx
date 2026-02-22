@@ -19,7 +19,7 @@ function Results() {
 
     const canAdd = MAX_IMAGES - selectedImages.length;
     if (files.length > canAdd) {
-      alert(t('max_images_alert') || `Maksimal ${MAX_IMAGES} ta rasm yuklash mumkin`);
+      console.log(t('max_images_alert') || `Maksimal ${MAX_IMAGES} ta rasm yuklash mumkin`);
       return;
     }
 
@@ -40,7 +40,7 @@ function Results() {
 
   const handleSave = async () => {
     if (selectedImages.length === 0) {
-      alert('Kamida bitta rasm tanlang');
+      console.log('Kamida bitta rasm tanlang');
       return;
     }
 

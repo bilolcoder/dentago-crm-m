@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ChevronLeft } from 'lucide-react';
 import axios from 'axios';
 
 function ProductForm({ productToEdit, onClose }) {
@@ -440,7 +440,7 @@ function ProductForm({ productToEdit, onClose }) {
             onClick={() => navigate(-1)}
             className="text-gray-500 cursor-pointer font-semibold hover:text-gray-900"
           >
-            <ArrowLeftIcon className="h-6 w-7" />
+            <ChevronLeft size={24} className="text-gray-500" />
           </div>
           <h1 className="text-3xl sm:text-4xl  text-gray-900">
             {productToEdit ? 'Товарни таҳрирлаш' : 'Янги товар қўшиш'}

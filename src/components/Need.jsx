@@ -15,14 +15,20 @@ const Need = ({ onClose }) => {
       const message = data.message.trim();
 
       if (!message) {
-        alert("Iltimos, xabar kiriting!");
+        console.log("Iltimos, xabar kiriting!");
         return;
       }
 
       const botToken = '8553471103:AAH47bf02_AgHS6Dg-_0cRc8-p7ozUJ7FvE';
       const adminChatIds = ['7548230903', '7800450778']; // Yangi adminlarni qo'shsa bo'ladi
 
-      const text = `Yangi murojaat:\n\n👤 <b>Ism Familiya:</b> ${name}\n📱 <b>Telefon:</b> ${phone}\n\n💬 <b>Xabar:</b>\n${message}`;
+      const text = `Yangi murojaat:
+
+👤 <b>Ism Familiya:</b> ${name}
+📱 <b>Telefon:</b> ${phone}
+
+💬 <b>Xabar:</b>
+${message}`;
 
       // Har bir adminga alohida yuboramiz
       for (const chatId of adminChatIds) {
@@ -64,7 +70,7 @@ const Need = ({ onClose }) => {
 
     } catch (error) {
       console.error('Telegram yuborish xatosi:', error);
-      alert('Xabar yuborishda xato yuz berdi. Iltimos keyinroq urinib ko‘ring.');
+      console.log('Xabar yuborishda xato yuz berdi. Iltimos keyinroq urinib ko‘ring.');
     }
   };
 

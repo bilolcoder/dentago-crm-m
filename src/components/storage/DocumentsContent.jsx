@@ -28,7 +28,7 @@ const DocumentsContent = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
                     <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">
-                        <Link to="/" className="hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
+                        <Link to="/" className="cursor-pointer hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
                         <ChevronRight size={10} />
                         <span className="text-[#00BCE4]">HUJJATLAR</span>
                     </nav>
@@ -80,65 +80,65 @@ const DocumentsContent = () => {
 
                 {/* Documents Table */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                    <table className="w-full min-w-[1100px]">
                         <thead>
-                            <tr className="bg-white">
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Hujjat Nomi</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Ta'minotchi</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sana</th>
-                                <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Amallar</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Hujjat Nomi</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Ta'minotchi</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Sana</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredDocuments.map((doc) => (
-                                <tr key={doc.id} className="hover:bg-gray-50/50 transition-all group">
-                                    <td className="px-8 py-5">
+                                <tr key={doc.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                    <td className="px-6 py-5">
                                         <div className="flex items-center gap-2 text-[#00BCE4]">
                                             <Hash size={14} strokeWidth={3} />
-                                            <span className="text-sm font-black tracking-tighter">
+                                            <span className="text-sm font-bold tracking-tighter">
                                                 {doc.id}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-6 py-5">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-gray-50 rounded-lg text-slate-400 group-hover:bg-[#00BCE4]/10 group-hover:text-[#00BCE4] transition-all">
                                                 <FileText size={16} />
                                             </div>
-                                            <span className="text-sm font-bold text-slate-700 group-hover:text-[#00BCE4] transition-colors">
+                                            <span className="text-sm font-bold text-slate-800 group-hover:text-[#00BCE4] transition-colors cursor-pointer">
                                                 {doc.name}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <span className="px-3 py-1 bg-gray-50 rounded-lg text-[10px] font-black text-slate-500 uppercase tracking-tight">
+                                    <td className="px-6 py-5">
+                                        <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
                                             {doc.supplier}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5 text-sm font-bold text-slate-500 tracking-tighter">
+                                    <td className="px-6 py-5 text-sm font-bold text-slate-700">
                                         {doc.date}
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex justify-end items-center gap-2">
+                                    <td className="px-6 py-5 text-center">
+                                        <div className="flex items-center justify-center gap-2">
                                             <button
-                                                className="w-10 h-10 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-xl transition-all active:scale-90"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
                                                 title="Yuklab olish"
                                             >
-                                                <Download className="w-4 h-4" />
+                                                <Download className="w-5 h-5" />
                                             </button>
                                             <button
                                                 onClick={() => handleOpenAddEditModal(doc)}
-                                                className="w-10 h-10 flex items-center justify-center bg-gray-50 text-slate-400 hover:bg-[#00BCE4] hover:text-white rounded-xl transition-all active:scale-90"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
                                                 title="Tahrirlash"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit className="w-5 h-5" />
                                             </button>
                                             <button
-                                                className="w-10 h-10 flex items-center justify-center bg-gray-50 text-slate-400 hover:bg-rose-500 hover:text-white rounded-xl transition-all active:scale-90"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600"
                                                 title="O'chirish"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-5 h-5" />
                                             </button>
                                         </div>
                                     </td>

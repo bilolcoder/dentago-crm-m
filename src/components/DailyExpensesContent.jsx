@@ -49,7 +49,7 @@ const DailyExpensesContent = () => {
 
     const handleSave = () => {
         if (!formData.name || !formData.price || !formData.category) {
-            alert("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+            console.log("Iltimos, barcha majburiy maydonlarni to'ldiring!");
             return;
         }
         if (editingExpense) {

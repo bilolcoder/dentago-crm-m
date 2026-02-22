@@ -30,7 +30,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         // Here check if new passwords match and handle API call
         if (formData.newPassword !== formData.confirmPassword) {
-            alert(t('password_mismatch'));
+            console.log(t('password_mismatch'));
             return;
         }
         // Success logic

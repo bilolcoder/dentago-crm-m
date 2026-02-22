@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Search,
-  ArrowLeft,
+  ChevronLeft,
   X,
   Check,
   ShoppingBag,
@@ -119,7 +119,7 @@ function CompanyProducts() {
 
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        alert("Iltimos avval tizimga kiring!");
+        console.log("Iltimos avval tizimga kiring!");
         navigate("/login");
         return;
       }
@@ -150,7 +150,7 @@ function CompanyProducts() {
 
     } catch (err) {
       console.error("Savat xatosi:", err);
-      alert("Xato yuz berdi: " + (err.response?.data?.message || err.message));
+      console.log("Xato yuz berdi: " + (err.response?.data?.message || err.message));
     } finally {
       setCartLoading((prev) => ({ ...prev, [product.id]: false }));
     }
@@ -167,7 +167,7 @@ function CompanyProducts() {
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
           >
-            <ArrowLeft size={28} className="text-gray-700" />
+            <ChevronLeft size={24} className="text-gray-700" />
           </button>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">
             {decodedCompany} mahsulotlari

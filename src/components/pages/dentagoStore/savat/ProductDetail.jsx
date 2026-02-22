@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Share2, Truck, ShoppingBag, Check } from "lucide-react";
+import { ChevronLeft, Heart, Share2, Truck, ShoppingBag, Check } from "lucide-react";
 import axios from "axios";
 
 const BASE_URL = "https://app.dentago.uz";
@@ -120,7 +120,7 @@ const ProductDetail = () => {
   
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      alert("Savatga qo'shish uchun tizimga kirish kerak!");
+      console.log("Savatga qo'shish uchun tizimga kirish kerak!");
       navigate("/login");
       return;
     }
@@ -153,7 +153,7 @@ const ProductDetail = () => {
       }
   
     } catch (err) {
-      alert("Savatga qo'shishda xato: " + (err.response?.data?.message || "Server bilan muammo"));
+      console.log("Savatga qo'shishda xato: " + (err.response?.data?.message || "Server bilan muammo"));
     } finally {
       setIsLoading(false);
     }
@@ -194,7 +194,7 @@ const ProductDetail = () => {
             onClick={() => navigate(-1)}
             className="p-2 -ml-2 rounded-full cursor-pointer hover:bg-gray-100 transition-colors"
           >
-            <ArrowLeft size={26} className="text-gray-700" />
+            <ChevronLeft size={24} className="text-gray-700" />
           </button>
 
           {/* <div className="flex items-center gap-3">

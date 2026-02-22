@@ -57,7 +57,7 @@ const LeadCategoriesContent = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
                     <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">
-                        <Link to="/" className="hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
+                        <Link to="/" className="cursor-pointer hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
                         <ChevronRight size={10} />
                         <span className="text-[#00BCE4]">LEAD KATEGORIYALARI</span>
                     </nav>
@@ -106,36 +106,36 @@ const LeadCategoriesContent = () => {
             </div>
 
             {/* Table Layout */}
-            <div className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className="w-full min-w-[1100px]">
                         <thead>
-                            <tr className="bg-white border-b border-slate-50">
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sira</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Bosqich Nomi</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Amallar</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Sira</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Bosqich Nomi</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Status</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredCategories.map((cat, index) => (
-                                <tr key={cat.id} className="hover:bg-[#00BCE4]/[0.02] transition-all group">
-                                    <td className="px-10 py-7">
+                                <tr key={cat.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                    <td className="px-6 py-5">
                                         <div className="w-8 h-8 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
                                             {index + 1}
                                         </div>
                                     </td>
-                                    <td className="px-10 py-7">
+                                    <td className="px-6 py-5">
                                         <div className="flex items-center gap-3">
                                             <div className="w-2 h-2 rounded-full bg-[#00BCE4] opacity-0 group-hover:opacity-100 transition-all scale-0 group-hover:scale-100" />
-                                            <span className="text-sm font-black text-slate-700 uppercase tracking-wide group-hover:translate-x-1 transition-transform inline-block italic">
+                                            <span className="text-sm font-bold text-slate-800 uppercase tracking-wide group-hover:translate-x-1 transition-transform inline-block italic cursor-pointer">
                                                 {cat.name}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-7">
+                                    <td className="px-6 py-5">
                                         <div className="flex justify-center">
-                                            <span className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                                            <span className={`px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black ${
                                                 cat.status
                                                 ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                                 : 'bg-rose-50 text-rose-600 border-rose-100'
@@ -144,16 +144,16 @@ const LeadCategoriesContent = () => {
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-7 text-right">
-                                        <div className="flex justify-end gap-3">
+                                    <td className="px-6 py-5 text-center">
+                                        <div className="flex items-center justify-center gap-2">
                                             <button
                                                 onClick={() => handleOpenModal(cat)}
-                                                className="w-11 h-11 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-[14px] transition-all active:scale-90 border border-transparent hover:border-blue-100"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
                                             >
-                                                <Edit size={18} strokeWidth={2.5} />
+                                                <Edit className="w-5 h-5" />
                                             </button>
-                                            <button className="w-11 h-11 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-[14px] transition-all active:scale-90 border border-transparent hover:border-rose-100">
-                                                <Trash2 size={18} strokeWidth={2.5} />
+                                            <button className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600">
+                                                <Trash2 className="w-5 h-5" />
                                             </button>
                                         </div>
                                     </td>

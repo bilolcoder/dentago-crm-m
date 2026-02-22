@@ -24,7 +24,7 @@ const AddEditCategoryModal = ({ isOpen, onClose, editingCategory }) => {
 
     const handleSave = () => {
         if (!categoryName) {
-            alert(t('fill_required'));
+            console.log(t('fill_required'));
             return;
         }
 

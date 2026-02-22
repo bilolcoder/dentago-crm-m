@@ -59,7 +59,7 @@ const AddProductModal = ({ isOpen, onClose, product }) => {
 
         // Majburiy maydonlarni tekshirish (Masalan, nom, narx, kategoriya)
         if (!formData.name.trim() || !formData.price || !formData.category) {
-            alert("Iltimos, Mahsulot nomi, Narxi va Kategoriyasini kiriting.");
+            console.log("Iltimos, Mahsulot nomi, Narxi va Kategoriyasini kiriting.");
             return;
         }
 
