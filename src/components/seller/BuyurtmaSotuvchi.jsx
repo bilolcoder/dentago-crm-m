@@ -62,7 +62,7 @@ function BuyurtmaSotuvchi() {
         const statsRes = await api.get('/order/seller/orders/stats');
         setStats(statsRes.data?.data || {});
 
-        const ordersRes = await api.get('/order/seller/orders');
+        const ordersRes = await api.get('/order/seller/orders?limit=100000000000000'); // Oxirgi 100 ta buyurtmani olish, kerak bo'lsa limitni oshirish mumkin
         const fetchedOrders = ordersRes.data?.data || [];
         setOrders(fetchedOrders);
 
