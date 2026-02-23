@@ -202,7 +202,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <button
                         onClick={() => setIsCollapsed(true)}
                         className="
-                            fixed left-[265px] top-6 z-[100]
+                            fixed left-[265px] top-6 z-[51]
                             bg-white border border-gray-200 rounded-full shadow-lg p-2.5
                             hover:bg-gray-100 transition-all duration-200
                         "

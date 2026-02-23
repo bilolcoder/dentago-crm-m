@@ -3,19 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaTrash, FaMinus, FaPlus, FaChevronLeft } from 'react-icons/fa';
 import { IoCartOutline } from 'react-icons/io5';
-import { MdStorefront } from 'react-icons/md';
+import { MdStorefront, MdDeleteSweep } from 'react-icons/md';
 import { RiSecurePaymentLine } from 'react-icons/ri';
-import { TbTruckDelivery } from 'react-icons/tb';
 import PurchaseModal from '../../../modals/PurchaseModal';
 
 const BASE_URL = "https://app.dentago.uz";
 
-// Token olish funksiyasi
-const getToken = () => {
-  return localStorage.getItem('accessToken');
-};
+// Token olish
+const getToken = () => localStorage.getItem('accessToken');
 
-// Auth tekshiruvi
+// Auth tekshirish
 const checkAuth = (navigate) => {
   const token = getToken();
   if (!token) {
@@ -25,7 +22,9 @@ const checkAuth = (navigate) => {
   return true;
 };
 
-// API orqali savatga mahsulot qo'shish
+// ────────────────────────────────────────────────
+// API: mahsulotni savatga qo'shish / miqdorni o'zgartirish
+// ────────────────────────────────────────────────
 export const addToCartAPI = async (productId, productName, productPrice, quantity = 1) => {
   try {
     const token = getToken();
@@ -46,7 +45,7 @@ export const addToCartAPI = async (productId, productName, productPrice, quantit
     });
 
     if (response.data.success) {
-      return { success: true, message: "Mahsulot savatga muvaffaqiyatli qo'shildi!", data: response.data };
+      return { success: true, message: "Mahsulot savatga qo'shildi", data: response.data };
     } else {
       return { success: false, message: response.data.message || "Noma'lum xato" };
     }
@@ -57,6 +56,42 @@ export const addToCartAPI = async (productId, productName, productPrice, quantit
     else if (error.code === 'ECONNABORTED') message = "Serverga ulanish vaqti o'tdi.";
     else if (error.request) message = "Internet aloqasini tekshiring.";
     else message = error.message;
+
+    return { success: false, message };
+  }
+};
+
+// ────────────────────────────────────────────────
+// API: butun savatni tozalash
+// ────────────────────────────────────────────────
+export const clearCartAPI = async () => {
+  try {
+    const token = getToken();
+    if (!token) throw new Error("Token topilmadi");
+
+    const response = await axios.post(
+      `${BASE_URL}/api/cart/clear`,
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      }
+    );
+
+    if (response.data.success) {
+      return { success: true, message: "Savat tozalandi" };
+    } else {
+      return { success: false, message: response.data.message || "Xato yuz berdi" };
+    }
+  } catch (error) {
+    console.error("clearCartAPI xatosi:", error);
+    let message = "Xato yuz berdi";
+    if (error.response?.status === 401) message = "Sessiya muddati tugagan. Iltimos, qayta kiring.";
+    else if (error.code === 'ECONNABORTED') message = "Server javob bermadi.";
+    else message = error.message || "Internet aloqasi muammosi";
 
     return { success: false, message };
   }
@@ -102,15 +137,16 @@ export const AddToCartButton = ({ productId, productName, productPrice, quantity
   );
 };
 
-// Asosiy Savat sahifasi komponenti
+// ────────────────────────────────────────────────
+// ASOSIY SAVAT KOMPONENTI
+// ────────────────────────────────────────────────
 const Savat = () => {
   const [apiCartItems, setApiCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState({});
   const [removing, setRemoving] = useState({});
-  const [selectedItems, setSelectedItems] = useState({});
-  const [selectAll, setSelectAll] = useState(true);
+  const [clearing, setClearing] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -118,7 +154,6 @@ const Savat = () => {
     fetchCartFromAPI();
   }, []);
 
-  // API dan savatni yuklash
   const fetchCartFromAPI = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true);
@@ -150,15 +185,6 @@ const Savat = () => {
         }));
 
         setApiCartItems(formattedItems);
-
-        // Default barcha itemlarni tanlash
-        const initialSelected = {};
-        formattedItems.forEach(item => {
-          initialSelected[item.id] = true;
-        });
-        setSelectedItems(initialSelected);
-        setSelectAll(true);
-
         setError(null);
       } else {
         setError("Savat ma'lumotlarini olishda xato");
@@ -177,31 +203,6 @@ const Savat = () => {
     }
   };
 
-  // Item tanlash
-  const handleSelectItem = (itemId) => {
-    setSelectedItems(prev => {
-      const newSelected = { ...prev, [itemId]: !prev[itemId] };
-
-      // Check if all items are selected
-      const allSelected = apiCartItems.every(item => newSelected[item.id]);
-      setSelectAll(allSelected);
-
-      return newSelected;
-    });
-  };
-
-  // Barchasini tanlash
-  const handleSelectAll = () => {
-    const newSelectAll = !selectAll;
-    const newSelected = {};
-    apiCartItems.forEach(item => {
-      newSelected[item.id] = newSelectAll;
-    });
-    setSelectedItems(newSelected);
-    setSelectAll(newSelectAll);
-  };
-
-  // Miqdorni yangilash
   const handleUpdateQuantity = async (itemId, change) => {
     if (!checkAuth(navigate)) return;
 
@@ -226,13 +227,12 @@ const Savat = () => {
         console.log(result.message);
       }
     } catch (err) {
-      console.error("Yangilashda xato:", err);
+      console.error("Miqdor yangilashda xato:", err);
     } finally {
       setUpdating(prev => ({ ...prev, [itemId]: false }));
     }
   };
 
-  // Savatdan o'chirish
   const handleRemoveFromCart = async (itemId) => {
     if (!checkAuth(navigate)) return;
 
@@ -247,74 +247,53 @@ const Savat = () => {
         headers: { 'Authorization': `Bearer ${token}` },
         timeout: 10000
       });
-
-      // Update selected items
-      setSelectedItems(prev => {
-        const newSelected = { ...prev };
-        delete newSelected[itemId];
-        return newSelected;
-      });
-
     } catch (error) {
-      fetchCartFromAPI(false);
+      console.error("O'chirishda xato:", error);
+      fetchCartFromAPI(false); // agar xato bo'lsa sinxronlashtirish
     } finally {
       setRemoving(prev => ({ ...prev, [itemId]: false }));
     }
   };
 
-  // Tanlangan itemlarni o'chirish
-  const handleRemoveSelected = async () => {
+  const handleClearCart = async () => {
     if (!checkAuth(navigate)) return;
 
-    const selectedIds = Object.entries(selectedItems)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([id]) => id);
-
-    if (selectedIds.length === 0) return;
+    if (!window.confirm("Savatdagi barcha mahsulotlarni o‘chirmoqchimisiz? Bu amal qaytarib bo‘lmaydi.")) {
+      return;
+    }
 
     try {
       setClearing(true);
+      const result = await clearCartAPI();
 
-      const token = getToken();
-      if (!token) return;
-
-      await Promise.all(selectedIds.map(id =>
-        axios.delete(`${BASE_URL}/api/cart/item/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-          timeout: 5000
-        })
-      ));
-
-      await fetchCartFromAPI(false);
-    } catch (error) {
-      fetchCartFromAPI(false);
+      if (result.success) {
+        setApiCartItems([]);
+        setError(null);
+      } else {
+        alert(result.message || "Savat tozalanmadi");
+      }
+    } catch (err) {
+      console.error("Savat tozalashda xato:", err);
+      alert("Xatolik yuz berdi");
     } finally {
       setClearing(false);
     }
   };
 
-  const [clearing, setClearing] = useState(false);
-
-  // Tanlangan itemlar soni va summasi
-  const selectedItemsList = apiCartItems.filter(item => selectedItems[item.id]);
-  const selectedCount = selectedItemsList.reduce((acc, item) => acc + item.quantity, 0);
-  const selectedTotal = selectedItemsList.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
-
-  // Sotib olish
   const handlePurchase = async (purchaseData) => {
     try {
-      console.log('Purchase data:', purchaseData);
+      console.log('Barcha mahsulotlar sotib olinmoqda:', apiCartItems);
+      console.log('Purchase ma\'lumotlari:', purchaseData);
+
+      // Bu yerda real checkout API so'rovi bo'lishi kerak
+      // Hozircha simulyatsiya
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Faqat tanlangan itemlarni o'chirish
-      const selectedIds = Object.entries(selectedItems)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([id]) => id);
-
+      // Muvaffaqiyatdan keyin savatni tozalash
       const token = getToken();
-      if (token && selectedIds.length > 0) {
-        await Promise.all(selectedIds.map(id =>
-          axios.delete(`${BASE_URL}/api/cart/item/${id}`, {
+      if (token && apiCartItems.length > 0) {
+        await Promise.all(apiCartItems.map(item =>
+          axios.delete(`${BASE_URL}/api/cart/item/${item.id}`, {
             headers: { 'Authorization': `Bearer ${token}` },
             timeout: 5000
           })
@@ -322,23 +301,26 @@ const Savat = () => {
       }
 
       await fetchCartFromAPI(false);
+      console.log(`${apiCartItems.length} ta mahsulot muvaffaqiyatli sotib olindi!`);
+
     } catch (error) {
-      console.error('Purchase error:', error);
+      console.error('Sotib olish xatosi:', error);
     }
   };
 
-  // Loading state
+  const totalCount = apiCartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const totalAmount = apiCartItems.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <div className="w-12 h-12 border-3 border-[#00BCE4] border-t-transparent rounded-full animate-spin mb-4"></div>
+        <div className="w-12 h-12 border-4 border-[#00BCE4] border-t-transparent rounded-full animate-spin mb-4"></div>
         <h2 className="text-lg font-medium text-gray-900 mb-1">Savat yuklanmoqda</h2>
         <p className="text-sm text-gray-500">Bir necha soniya vaqt olishi mumkin</p>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6">
@@ -365,12 +347,11 @@ const Savat = () => {
     );
   }
 
-  // Empty cart state - Uzum style
   if (apiCartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-          <div className="py-3">
+          <div className="py-3 px-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate(-1)}
@@ -383,9 +364,9 @@ const Savat = () => {
           </div>
         </div>
 
-        <div className="py-12">
+        <div className="py-12 px-4">
           <div className="flex flex-col items-center text-center">
-            <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <div className="w-32 h-32 rounded-full flex items-center justify-center mb-6 bg-gray-50">
               <IoCartOutline size={64} className="text-gray-300" />
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Savat bo'sh</h2>
@@ -394,7 +375,7 @@ const Savat = () => {
             </p>
             <button
               onClick={() => navigate('/DentagoStore')}
-              className="w-full max-w-xs py-4 bg-[#7000FF] text-white rounded-xl font-semibold hover:bg-[#5c00cc] transition-colors"
+              className="w-full max-w-xs py-4 bg-[#00BBE3] text-white rounded-xl font-semibold hover:bg-[#0099c2] transition-colors"
             >
               Mahsulotlar katalogi
             </button>
@@ -406,9 +387,9 @@ const Savat = () => {
 
   return (
     <div className="min-h-screen pb-28">
-      {/* Header - Uzum style */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="py-3">
+        <div className="py-3 px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -419,96 +400,58 @@ const Savat = () => {
               </button>
               <h1 className="text-lg font-semibold text-gray-900">Savat</h1>
             </div>
-            <span className="text-sm text-gray-500">{apiCartItems.length} ta mahsulot</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Delivery info - Uzum style */}
-      {/* <div className="py-3">
-        <div className="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm">
-          <div className="w-10 h-10 bg-[#7000FF] bg-opacity-10 rounded-full flex items-center justify-center">
-            <TbTruckDelivery size={20} className="text-[#7000FF]" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-900">Yetkazib berish bepul</p>
-            <p className="text-xs text-gray-500">Toshkent bo'ylab ertaga yetkaziladi</p>
-          </div>
-        </div>
-      </div> */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500">
+                {apiCartItems.length} ta mahsulot
+              </span>
 
-      {/* Select all - Uzum style */}
-      <div className="my-5">
-        <div className="bg-white rounded-xl p-3 flex items-center justify-between shadow-sm">
-          <button
-            onClick={handleSelectAll}
-            className="flex items-center gap-3"
-          >
-            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-              selectAll
-                ? 'bg-[#00BCE4] border-[#00BCE4]'
-                : 'border-gray-300 bg-white'
-            }`}>
-              {selectAll && (
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
+              <button
+                onClick={handleClearCart}
+                disabled={clearing || apiCartItems.length === 0}
+                className="flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-40 transition-colors"
+                title="Butun savatni tozalash"
+              >
+                {clearing ? (
+                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <MdDeleteSweep size={18} />
+                    <span className="hidden sm:inline">Tozalash</span>
+                  </>
+                )}
+              </button>
             </div>
-            <span className="text-sm font-medium text-gray-900">Barchasini tanlash</span>
-          </button>
-
-          {Object.values(selectedItems).filter(Boolean).length > 0 && (
-            <button
-              onClick={handleRemoveSelected}
-              className="text-sm text-red-500 font-medium px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              O'chirish
-            </button>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* Products list - Uzum style */}
-      <div className="space-y-3">
+      {/* Mahsulotlar */}
+      <div className="space-y-3 p-4">
         {apiCartItems.map(item => (
           <div
             key={item.id}
             className="bg-white rounded-xl p-4 shadow-sm relative"
           >
             <div className="flex gap-3">
-              {/* Checkbox */}
-              <button
-                onClick={() => handleSelectItem(item.id)}
-                className="mt-1 flex-shrink-0"
-              >
-                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                  selectedItems[item.id]
-                    ? 'bg-[#00BCE4] border-[#00BCE4]'
-                    : 'border-gray-300 bg-white'
-                }`}>
-                  {selectedItems[item.id] && (
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                </div>
-              </button>
-
-              {/* Product image */}
               <div
                 className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 cursor-pointer"
                 onClick={() => navigate(`/mahsulot/${item.product_id}`)}
               >
-                <img
-                  src={item.image}
-                  alt={item.nomi}
-                  className="w-full h-full object-contain p-2"
-                  loading="lazy"
-                />
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.nomi}
+                    className="w-full h-full object-contain p-2"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    Rasm yo‘q
+                  </div>
+                )}
               </div>
 
-              {/* Product info */}
               <div className="flex-1 min-w-0">
                 <h3
                   className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 cursor-pointer hover:text-[#7000FF]"
@@ -517,13 +460,11 @@ const Savat = () => {
                   {item.nomi}
                 </h3>
 
-                {/* Seller */}
                 <div className="flex items-center gap-1 mb-2">
                   <MdStorefront size={12} className="text-gray-400" />
                   <span className="text-xs text-gray-500">Dentago</span>
                 </div>
 
-                {/* Price and quantity */}
                 <div className="flex items-end justify-between">
                   <div>
                     <span className="font-bold text-base text-gray-900">
@@ -536,7 +477,6 @@ const Savat = () => {
                     )}
                   </div>
 
-                  {/* Quantity selector - Uzum style */}
                   <div className="flex items-center bg-gray-100 rounded-lg">
                     <button
                       onClick={() => handleUpdateQuantity(item.id, -1)}
@@ -565,7 +505,6 @@ const Savat = () => {
                 </div>
               </div>
 
-              {/* Delete button */}
               <button
                 onClick={() => handleRemoveFromCart(item.id)}
                 disabled={removing[item.id]}
@@ -582,30 +521,27 @@ const Savat = () => {
         ))}
       </div>
 
-      {/* Bottom fixed panel - Uzum style */}
-      <div className="fixed bottom-0 lg:left-70 sm:left-0 max-sm:left-0 md:left-70 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-10
-">
-        <div className="px-10 py-3">
+      {/* Pastki panel */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.08)] z-10 lg:left-72">
+        <div className="px-4 sm:px-6 py-3 max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            {/* Total */}
             <div className="flex-1">
               <p className="text-xs text-gray-500 mb-0.5">Jami to'lov</p>
               <p className="font-bold text-lg text-gray-900">
-                {selectedTotal.toLocaleString()} so'm
+                {totalAmount.toLocaleString()} so'm
               </p>
-              {selectedCount > 0 && (
+              {totalCount > 0 && (
                 <p className="text-xs text-gray-500">
-                  {selectedCount} ta mahsulot
+                  {totalCount} ta mahsulot
                 </p>
               )}
             </div>
 
-            {/* Checkout button */}
             <button
               onClick={() => setIsPurchaseModalOpen(true)}
-              disabled={selectedCount === 0}
+              disabled={totalCount === 0}
               className={`flex-1 py-4 rounded-xl font-semibold text-base transition-all ${
-                selectedCount > 0
+                totalCount > 0
                   ? 'bg-[#00BCE4] text-white hover:bg-[#00a3c2] active:scale-[0.98]'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
@@ -614,7 +550,6 @@ const Savat = () => {
             </button>
           </div>
 
-          {/* Secure payment info */}
           <div className="flex items-center justify-center gap-1 mt-2">
             <RiSecurePaymentLine size={14} className="text-gray-400" />
             <span className="text-xs text-gray-400">Xavfsiz to'lov</span>
@@ -622,13 +557,12 @@ const Savat = () => {
         </div>
       </div>
 
-      {/* Purchase Modal */}
       <PurchaseModal
         isOpen={isPurchaseModalOpen}
         onClose={() => setIsPurchaseModalOpen(false)}
-        totalAmount={selectedTotal}
-        items={selectedItemsList}
-        itemsCount={selectedCount}
+        totalAmount={totalAmount}
+        items={apiCartItems}
+        itemsCount={totalCount}
         onConfirm={handlePurchase}
       />
     </div>

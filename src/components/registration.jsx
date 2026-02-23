@@ -703,7 +703,12 @@ const Registration = () => {
                 localStorage.setItem('accessToken', data.tokens.accessToken);
                 localStorage.setItem('userLocation', JSON.stringify(userLocation));
                 localStorage.setItem('userRole', userType);
-                loginWithPhone(fullPhone);
+                // User object for context update
+                const userObj = {
+                    name: data.user?.username || data.user?.name || '',
+                    role: data.user?.role || userType
+                };
+                loginWithPhone(fullPhone, userObj);
                 setTimeout(() => navigate('/dashboard'), 800);
             } else {
                 setInputBorderState('error');

@@ -75,7 +75,7 @@ ${message}`;
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[1000] backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
         {/* Header */}
         <div className="bg-[#00C2FF] p-6 rounded-t-2xl">

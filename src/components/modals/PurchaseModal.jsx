@@ -289,7 +289,7 @@ const PurchaseModal = ({ isOpen, onClose, totalAmount, items, itemsCount, onConf
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl relative z-[51]">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-5 rounded-t-2xl z-[52]">
