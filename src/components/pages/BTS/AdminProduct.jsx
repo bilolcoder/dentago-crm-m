@@ -372,9 +372,9 @@ function AdminProduct() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(prev => prev.filter(p => p._id !== id));
-      alert("O'chirildi!");
+      console.log("O'chirildi!");
     } catch (err) {
-      alert(err.response?.data?.message || "O'chirishda xato");
+      console.log(err.response?.data?.message || "O'chirishda xato");
     } finally {
       setDeletingId(null);
     }
@@ -512,7 +512,7 @@ function AdminProduct() {
             <button
               onClick={prevPage}
               disabled={currentPage === 1}
-              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="p-2 cursor-pointer rounded-full text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft size={20} />
             </button>

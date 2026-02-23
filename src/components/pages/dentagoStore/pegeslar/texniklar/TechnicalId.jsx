@@ -117,7 +117,7 @@ const TechnicianDetail = () => {
     const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
 
     if (!token) {
-      alert("Tizimga kirmagansiz! Iltimos, avval login qiling.");
+      console.log("Tizimga kirmagansiz! Iltimos, avval login qiling.");
       return;
     }
 
@@ -156,7 +156,7 @@ const TechnicianDetail = () => {
       }
     } catch (error) {
       console.error("POST Xatosi:", error.response);
-      alert(error.response?.status === 401 ? "Avtorizatsiya xatosi!" : "Xatolik yuz berdi.");
+      console.log(error.response?.status === 401 ? "Avtorizatsiya xatosi!" : "Xatolik yuz berdi.");
     } finally {
       setOrderLoading(false);
     }
@@ -175,7 +175,7 @@ const TechnicianDetail = () => {
       {/* NAVBAR */}
       <div className="sticky top-0 z-30 py-4 bg-white/80 backdrop-blur-md border-b border-gray-50 px-4">
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate(-1)}  className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={() => navigate(-1)} className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors">
             <ChevronLeft size={24} />
           </button>
           <h1 className="text-lg font-bold text-gray-800">Mutaxassis Profili</h1>

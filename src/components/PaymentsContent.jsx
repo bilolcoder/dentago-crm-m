@@ -69,7 +69,7 @@ const PaymentsContent = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
                     <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">
-                        <Link to="/" className="hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
+                        <Link to="/" className="cursor-pointer hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
                         <ChevronRight size={10} />
                         <span className="text-[#00BCE4]">TO'LOVLAR</span>
                     </nav>
@@ -140,54 +140,46 @@ const PaymentsContent = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/40 overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full min-w-[1100px]">
                         <thead>
-                            <tr className="bg-white border-b border-slate-50">
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kvitansiya</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Bemor</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">To'lov Summasi</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Usul</th>
-                                <th className="px-10 py-7 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Sana</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kvitansiya</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Bemor</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">To'lov Summasi</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Usul</th>
+                                <th className="px-6 py-5 text-right text-xs font-black text-slate-500 uppercase">Sana</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredPayments.map((p, index) => (
-                                <tr key={p.id} className="hover:bg-slate-50/50 transition-all group cursor-default">
-                                    <td className="px-10 py-6">
+                                <tr key={p.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                    <td className="px-6 py-5">
                                         <span className="text-xs font-black text-slate-300 font-mono group-hover:text-[#00BCE4]">
                                             #{String(index + 1).padStart(4, '0')}
                                         </span>
                                     </td>
-                                    <td className="px-10 py-6">
+                                    <td className="px-6 py-5">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-11 h-11 bg-slate-100 rounded-[14px] flex items-center justify-center text-slate-400 group-hover:bg-[#00BCE4]/10 group-hover:text-[#00BCE4] transition-all">
+                                            <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-[#00BCE4]/10 group-hover:text-[#00BCE4] transition-all">
                                                 <User size={18} strokeWidth={2.5} />
                                             </div>
-                                            <span className="text-sm font-black text-slate-700 uppercase tracking-tight group-hover:translate-x-1 transition-transform inline-block">
+                                            <span className="text-sm font-bold text-slate-800 uppercase tracking-tight group-hover:translate-x-1 transition-transform inline-block cursor-pointer">
                                                 {p.name}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-6">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                            <span className="text-sm font-black text-slate-800 tracking-tight italic">{p.amount}</span>
-                                        </div>
+                                    <td className="px-6 py-5 text-center text-sm font-bold text-slate-800">
+                                        {p.amount}
                                     </td>
-                                    <td className="px-10 py-6">
-                                        <div className="flex justify-center">
-                                            <span className="px-5 py-2 bg-white border border-slate-100 shadow-sm rounded-xl text-[9px] font-black text-slate-500 uppercase tracking-widest group-hover:border-[#00BCE4]/30 transition-colors">
-                                                {p.type}
-                                            </span>
-                                        </div>
+                                    <td className="px-6 py-5 text-center">
+                                        <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
+                                            {p.type}
+                                        </span>
                                     </td>
-                                    <td className="px-10 py-6 text-right">
-                                        <div className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 bg-white border border-slate-100 px-4 py-2 rounded-xl group-hover:bg-slate-50 transition-colors">
-                                            <Calendar size={12} strokeWidth={3} className="text-[#00BCE4]" />
-                                            {p.date}
-                                        </div>
+                                    <td className="px-6 py-5 text-right text-sm font-bold text-slate-700">
+                                        {p.date}
                                     </td>
                                 </tr>
                             ))}

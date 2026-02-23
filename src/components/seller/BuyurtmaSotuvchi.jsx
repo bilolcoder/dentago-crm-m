@@ -218,39 +218,49 @@ function BuyurtmaSotuvchi() {
 )}
 
 
-      <div className="overflow-x-auto rounded-xl shadow-lg bg-white">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white">
-              <th className="p-4 text-left rounded-tl-xl">Mijoz Ism-Familiyasi</th>
-              <th className="p-4 text-left">Mahsulot Nomi</th>
-              <th className="p-4 text-right">Summa</th>
-              <th className="p-4 text-center rounded-tr-xl">Soni</th>
-            </tr>
-          </thead>
-          <tbody>
-            {flatItems.length === 0 ? (
+      <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[1100px]">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <td colSpan={4} className="p-10 text-center text-gray-500">Maʼlumot yoʻq</td>
+                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mijoz Ism-Familiyasi</th>
+                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mahsulot Nomi</th>
+                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
+                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Summa</th>
               </tr>
-            ) : (
-              flatItems.map((item, idx) => (
-                <tr
-                  key={idx}
-                  onClick={() => handleRowClick(item)}
-                  className="cursor-pointer transition-all duration-200 hover:bg-cyan-50"
-                >
-                  <td className="p-4 border-b border-gray-100">{item.mijoz}</td>
-                  <td className="p-4 border-b border-gray-100">{item.productName}</td>
-                  <td className="p-4 border-b border-gray-100 text-right font-bold">
-                    {item.itemSum.toLocaleString('uz-UZ')} so'm
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {flatItems.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-20 text-center text-slate-500">
+                    <p className="text-lg font-medium">Maʼlumot yoʻq</p>
                   </td>
-                  <td className="p-4 border-b border-gray-100 text-center">{item.quantity}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                flatItems.map((item, idx) => (
+                  <tr
+                    key={idx}
+                    onClick={() => handleRowClick(item)}
+                    className="hover:bg-[#00BCE4]/[0.03] cursor-pointer"
+                  >
+                    <td className="px-6 py-5">
+                      <div className="text-sm font-bold text-slate-800">{item.mijoz}</div>
+                    </td>
+                    <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.productName}</td>
+                    <td className="px-6 py-5 text-center">
+                      <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
+                        {item.quantity}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
+                      {item.itemSum.toLocaleString('uz-UZ')} so'm
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedOrder && !selectedOrder.error && (

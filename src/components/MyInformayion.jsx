@@ -419,7 +419,7 @@ function MyInformation() {
   const handleViewEntity = async (id) => {
     try {
       if (!id) {
-        alert('ID topilmadi');
+        console.log('ID topilmadi');
         setDebugInfo('ID topilmadi');
         return;
       }
@@ -437,7 +437,7 @@ function MyInformation() {
         setDebugInfo(`Ma'lumotlari yuklandi`);
       } else {
         setDebugInfo('Ma\'lumotlari topilmadi');
-        alert('Ma\'lumotlari topilmadi');
+        console.log('Ma\'lumotlari topilmadi');
       }
     } catch (error) {
       console.error('Ko\'rishda xato:', error);
@@ -447,14 +447,14 @@ function MyInformation() {
       else if (error.response?.status === 401) errorMsg = 'Kirish huquqi yo\'q (401)';
       else if (error.response?.status === 403) errorMsg = 'Ruxsat yo\'q (403)';
       else if (error.response?.status === 500) errorMsg = 'Server xatosi (500)';
-      alert(errorMsg);
+      console.log(errorMsg);
     }
   };
 
   const handleEditEntity = (entity) => {
     console.log('Edit:', entity);
     if (!entity || (!entity._id && !entity.id)) {
-      alert('Ma\'lumotlari noto\'g\'ri');
+      console.log('Ma\'lumotlari noto\'g\'ri');
       return;
     }
     setSelectedEntity(entity);
@@ -516,7 +516,7 @@ function MyInformation() {
 
   const handleDeleteEntity = async (id) => {
     if (!id) {
-      alert('ID topilmadi');
+      console.log('ID topilmadi');
       return;
     }
     if (!window.confirm('Haqiqatan ham o\'chirmoqchimisiz?')) return;
@@ -542,18 +542,18 @@ function MyInformation() {
         (position) => {
           const { latitude, longitude } = position.coords;
           setLocation({ lat: latitude.toString(), lng: longitude.toString() });
-          alert(`Joriy joylashuvingiz aniqlandi: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+          console.log(`Joriy joylashuvingiz aniqlandi: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
           setIsMapLoading(false);
         },
         (error) => {
           console.error('Geolokatsiya xatosi:', error);
-          alert('Joylashuvni aniqlashda xatolik yuz berdi. Iltimos, koordinatalarni qo\'lda kiriting.');
+          console.log('Joylashuvni aniqlashda xatolik yuz berdi. Iltimos, koordinatalarni qo\'lda kiriting.');
           setIsMapLoading(false);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     } else {
-      alert('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi.');
+      console.log('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi.');
       setIsMapLoading(false);
     }
   };
@@ -578,7 +578,7 @@ function MyInformation() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      alert('Faqat rasm fayllarini tanlashingiz mumkin!');
+      console.log('Faqat rasm fayllarini tanlashingiz mumkin!');
       return;
     }
     setSelectedFile(file);
@@ -1061,7 +1061,7 @@ function MyInformation() {
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
-                      className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                      className="p-2 cursor-pointer rounded-full text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronLeft size={20} />
                     </button>

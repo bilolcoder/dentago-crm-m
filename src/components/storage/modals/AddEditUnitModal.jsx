@@ -29,7 +29,7 @@ const AddEditUnitModal = ({ isOpen, onClose, unit }) => {
         e.preventDefault();
 
         if (!name.trim()) {
-            alert("Nomini kiriting!");
+            console.log("Nomini kiriting!");
             return;
         }
 

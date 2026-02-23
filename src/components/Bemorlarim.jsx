@@ -187,7 +187,7 @@ function Bemorlarim() {
         setIsCancelModalOpen(false);
         reset();
       } else {
-        alert("Navbatni bekor qilib bo'lmadi.");
+        console.log("Navbatni bekor qilib bo'lmadi.");
       }
     } catch (err) {
       console.error("Bekor qilish xatosi:", err);
@@ -199,7 +199,7 @@ function Bemorlarim() {
       } else {
         msg += `: ${err.message}`;
       }
-      alert(msg);
+      console.log(msg);
     } finally {
       setIsCancelling(false); // ✅ Loading tugashi shu albatta amalga oshadi
     }
@@ -241,7 +241,7 @@ function Bemorlarim() {
       } else {
         msg += `: ${err.message}`;
       }
-      alert(msg);
+      console.log(msg);
     }
   };
 
@@ -313,7 +313,7 @@ function Bemorlarim() {
       setIsConfirming(true);
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        alert("Token topilmadi. Iltimos qayta kirish qiling.");
+        console.log("Token topilmadi. Iltimos qayta kirish qiling.");
         return;
       }
 
@@ -345,7 +345,7 @@ function Bemorlarim() {
         setIsConfirmModalOpen(false);
         setConfirmId(null);
       } else {
-        alert("Statusni o'zgartirib bo'lmadi");
+        console.log("Statusni o'zgartirib bo'lmadi");
       }
     } catch (err) {
       console.error("Tasdiqlash xatosi:", err);
@@ -357,7 +357,7 @@ function Bemorlarim() {
       } else {
         msg = err.message;
       }
-      alert(msg);
+      console.log(msg);
     } finally {
       setIsConfirming(false);
     }
@@ -734,7 +734,7 @@ function Bemorlarim() {
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="p-2 cursor-pointer rounded-full text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft size={20} />
             </button>

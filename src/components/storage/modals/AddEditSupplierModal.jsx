@@ -44,7 +44,7 @@ const AddEditSupplierModal = ({ isOpen, onClose, supplier }) => {
 
         // Majburiy maydonlarni tekshirish (Ism, Telefon 1)
         if (!formData.firstName.trim() || !formData.phone1.trim()) {
-            alert("Iltimos, Ism va Kamida 1-telefon raqamini kiriting.");
+            console.log("Iltimos, Ism va Kamida 1-telefon raqamini kiriting.");
             return;
         }
 

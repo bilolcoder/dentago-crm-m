@@ -400,7 +400,7 @@ function Boshsaxifa() {
 
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        alert("Iltimos, avval tizimga kiring!");
+        console.log("Iltimos, avval tizimga kiring!");
         navigate('/login');
         return;
       }
@@ -425,7 +425,7 @@ function Boshsaxifa() {
       if (fetchCart) fetchCart();
     } catch (error) {
       console.error("Savat xatosi:", error);
-      alert("Xato: " + (error.response?.data?.message || "Server bilan muammo"));
+      console.log("Xato: " + (error.response?.data?.message || "Server bilan muammo"));
     } finally {
       setCartLoading(prev => ({ ...prev, [product.id]: false }));
     }

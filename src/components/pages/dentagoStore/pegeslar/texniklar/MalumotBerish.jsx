@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Camera, Image as ImageIcon, X } from 'lucide-react';
+import { ChevronLeft, Camera, Image as ImageIcon, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function MalumotBerish({ isEmbedded = false }) {
@@ -63,7 +63,7 @@ function MalumotBerish({ isEmbedded = false }) {
         <div className="flex items-center py-5 border-b border-gray-200 sticky top-0 bg-white z-50">
           <div className="w-full flex items-center">
             <button type="button" onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full">
-              <ArrowLeft className="w-6 h-6 text-gray-800" />
+              <ChevronLeft size={24} className="text-gray-800" />
             </button>
             <h1 className="flex-1 text-center text-xl md:text-2xl font-bold text-gray-800 mr-10">
               Buyurtma berish

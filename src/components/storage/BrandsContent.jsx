@@ -28,7 +28,7 @@ const BrandsContent = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
                     <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">
-                        <Link to="/" className="hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
+                        <Link to="/" className="cursor-pointer hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
                         <ChevronRight size={10} />
                         <span className="text-[#00BCE4]">BRENDLAR</span>
                     </nav>
@@ -75,33 +75,33 @@ const BrandsContent = () => {
 
                 {/* Table Section */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                    <table className="w-full min-w-[1100px]">
                         <thead>
-                            <tr className="bg-white">
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID Raqami</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Brend nomi</th>
-                                <th className="px-8 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Holati</th>
-                                <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Amallar</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID Raqami</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Brend nomi</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Holati</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredBrands.map((brand) => (
-                                <tr key={brand.id} className="hover:bg-gray-50/50 transition-all group">
-                                    <td className="px-8 py-5">
+                                <tr key={brand.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                    <td className="px-6 py-5">
                                         <div className="flex items-center gap-2 text-[#00BCE4]">
                                             <Hash size={14} strokeWidth={3} />
-                                            <span className="text-sm font-black tracking-tighter">
+                                            <span className="text-sm font-bold tracking-tighter">
                                                 {brand.id.toString().padStart(3, '0')}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <span className="text-sm font-bold text-slate-700 uppercase tracking-tight group-hover:text-[#00BCE4] transition-colors">
+                                    <td className="px-6 py-5">
+                                        <span className="text-sm font-bold text-slate-800 uppercase tracking-tight group-hover:text-[#00BCE4] transition-colors">
                                             {brand.name}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5 text-center">
-                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${
+                                    <td className="px-6 py-5 text-center">
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${
                                             brand.status
                                             ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                             : 'bg-rose-50 text-rose-500 border-rose-100'
@@ -110,20 +110,20 @@ const BrandsContent = () => {
                                             {brand.status ? "Aktiv" : "Nofaol"}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex justify-end items-center gap-3">
+                                    <td className="px-6 py-5 text-center">
+                                        <div className="flex items-center justify-center gap-2">
                                             <button
                                                 onClick={() => handleOpenAddEditModal(brand)}
-                                                className="w-10 h-10 flex items-center justify-center bg-gray-50 text-slate-400 hover:bg-[#00BCE4] hover:text-white rounded-xl transition-all"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
                                                 title="Tahrirlash"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit className="w-5 h-5" />
                                             </button>
                                             <button
-                                                className="w-10 h-10 flex items-center justify-center bg-gray-50 text-slate-400 hover:bg-rose-500 hover:text-white rounded-xl transition-all"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600"
                                                 title="O'chirish"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-5 h-5" />
                                             </button>
                                         </div>
                                     </td>

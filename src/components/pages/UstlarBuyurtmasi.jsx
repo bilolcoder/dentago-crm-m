@@ -88,12 +88,12 @@ const UstlarBuyurtmasi = () => {
   };
 
   const handleConfirm = (id) => {
-    alert(`Buyurtma #${id} tasdiqlandi`);
+    console.log(`Buyurtma #${id} tasdiqlandi`);
     // Bu yerda real holatda state yangilanadi yoki API chaqiriladi
   };
 
   const handleCancel = (id) => {
-    alert(`Buyurtma #${id} bekor qilindi`);
+    console.log(`Buyurtma #${id} bekor qilindi`);
     // Bu yerda real holatda state yangilanadi yoki API chaqiriladi
   };
 

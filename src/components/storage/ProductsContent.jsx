@@ -82,72 +82,70 @@ const ProductsContent = () => {
 
                 {/* Table Section */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                    <table className="w-full min-w-[1100px]">
                         <thead>
-                            <tr className="bg-white border-b border-gray-100">
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"># No</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Mahsulot Ma'lumoti</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Kategoriya</th>
-                                <th className="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Brend / O'lchov</th>
-                                <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Qoldiq</th>
-                                <th className="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Narxi</th>
-                                <th className="px-8 py-6 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Boshqaruv</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase"># No</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mahsulot Ma'lumoti</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kategoriya</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Brend / O'lchov</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Qoldiq</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Narxi</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Boshqaruv</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredProducts.map((prod, index) => (
-                                <tr key={prod.id} className="hover:bg-gray-50 transition-all group">
-                                    <td className="px-8 py-5">
+                                <tr key={prod.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                    <td className="px-6 py-5">
                                         <span className="text-xs font-black text-slate-300 group-hover:text-[#00BCE4] transition-colors tracking-tighter">
                                             {String(index + 1).padStart(2, '0')}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-6 py-5">
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-black text-slate-700 tracking-tight uppercase group-hover:text-[#00BCE4] transition-colors">
+                                            <span className="text-sm font-bold text-slate-800 uppercase group-hover:text-[#00BCE4] transition-colors">
                                                 {prod.name}
                                             </span>
-                                            <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">ID: {prod.id}</span>
+                                            <span className="text-xs text-slate-500">ID: {prod.id}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <span className="inline-flex items-center px-3 py-1 bg-gray-100 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-tight group-hover:bg-blue-50 group-hover:text-[#00BCE4] transition-all">
+                                    <td className="px-6 py-5">
+                                        <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
                                             {prod.category}
                                         </span>
                                     </td>
-                                    <td className="px-8 py-5">
+                                    <td className="px-6 py-5">
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">{prod.brand}</span>
-                                            <span className="text-[10px] font-medium text-slate-400 italic">{prod.unit}</span>
+                                            <span className="text-sm font-bold text-slate-600 uppercase tracking-tight">{prod.brand}</span>
+                                            <span className="text-xs text-slate-500 italic">{prod.unit}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
+                                    <td className="px-6 py-5 text-center">
+                                        <div className="flex items-center justify-center gap-2">
                                             {prod.quantity < 10 && <AlertTriangle size={12} className="text-rose-500 animate-pulse" />}
-                                            <span className={`text-sm font-black tracking-tighter ${prod.quantity < 10 ? 'text-rose-500' : 'text-slate-700'}`}>
+                                            <span className={`px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black ${prod.quantity < 10 ? 'text-rose-500' : 'text-slate-700'}`}>
                                                 {prod.quantity}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5 text-right">
-                                        <span className="text-sm font-black text-[#00BCE4] tracking-tighter bg-blue-50 px-3 py-1 rounded-lg border border-blue-100">
-                                            {prod.price.toLocaleString()} so'm
-                                        </span>
+                                    <td className="px-6 py-5 text-center text-sm font-bold text-slate-800">
+                                        {(prod.price || 0).toLocaleString()} so'm
                                     </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex justify-center items-center gap-2">
+                                    <td className="px-6 py-5 text-center">
+                                        <div className="flex items-center justify-center gap-2">
                                             <button
                                                 onClick={() => handleOpenAddEditModal(prod)}
-                                                className="w-9 h-9 flex items-center justify-center bg-white border border-gray-100 text-slate-400 hover:bg-[#00BCE4] hover:text-white rounded-xl transition-all shadow-sm active:scale-90"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
                                                 title="Tahrirlash"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit className="w-5 h-5" />
                                             </button>
                                             <button
-                                                className="w-9 h-9 flex items-center justify-center bg-white border border-gray-100 text-slate-400 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm active:scale-90"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600"
                                                 title="O'chirish"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-5 h-5" />
                                             </button>
                                         </div>
                                     </td>

@@ -65,15 +65,15 @@ const CalendarContent = () => {
                 </div>
 
                 <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200 w-full sm:w-auto">
-                    <button className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition">
-                        <ChevronLeft className="w-5 h-5" />
+                    <button className="p-2 cursor-pointer rounded-full text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 transition">
+                        <ChevronLeft size={20} />
                     </button>
                     <div className="flex items-center gap-2 px-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                         <CalendarIcon className='w-4 h-4 text-gray-400' />
                         <span>{selectedDate}</span>
                     </div>
-                    <button className="p-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
-                        <ChevronRight className="w-5 h-5" />
+                    <button className="p-2 cursor-pointer rounded-full bg-blue-600 text-white hover:bg-blue-700 transition">
+                        <ChevronRight size={20} />
                     </button>
                     <button className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition border-l border-gray-100 dark:border-gray-700 ml-1">
                         <RotateCw className="w-5 h-5" />

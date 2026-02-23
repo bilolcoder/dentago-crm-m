@@ -416,7 +416,7 @@ function AllDoctorsEdit() {
       setShowDeleteModal(false);
     } catch (err) {
       console.error('O‘chirish xatosi:', err);
-      alert('❌ O‘chirishda xato: ' + (err.response?.data?.message || err.message || 'Noma\'lum xato'));
+      console.log('❌ O‘chirishda xato: ' + (err.response?.data?.message || err.message || 'Noma\'lum xato'));
     } finally {
       setDeleting(false);
     }
@@ -425,7 +425,7 @@ function AllDoctorsEdit() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/')) {
-      alert('Faqat rasm fayllarini tanlang!');
+      console.log('Faqat rasm fayllarini tanlang!');
       return;
     }
     setSelectedFile(file);
@@ -509,7 +509,7 @@ function AllDoctorsEdit() {
       // alert('✅ Ma\'lumotlar muvaffaqiyatli yangilandi!');
     } catch (err) {
       console.error('Yangilash xatosi:', err);
-      alert('❌ Yangilashda xato: ' + (err.response?.data?.message || err.message));
+      console.log('❌ Yangilashda xato: ' + (err.response?.data?.message || err.message));
     } finally {
       setSaving(false);
     }

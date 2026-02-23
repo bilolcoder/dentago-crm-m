@@ -1,7 +1,7 @@
 // src/components/ProfileContent.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useData } from '../context/DataProvider';
-import { Edit2, ArrowLeft, Loader2, Upload, CheckCircle } from 'lucide-react';
+import { Edit2, ChevronLeft, Loader2, Upload, CheckCircle } from 'lucide-react';
 
 const ProfileContent = () => {
   const { t } = useData();
@@ -231,7 +231,7 @@ const ProfileContent = () => {
             onClick={() => window.history.back()}
             className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-[#00BCE4] transition-colors"
           >
-            <ArrowLeft className="w-6 h-6 " />
+            <ChevronLeft size={24} className="text-gray-600" />
             <span className="text-lg font-semibold">Orqaga</span>
           </button>
         </div>

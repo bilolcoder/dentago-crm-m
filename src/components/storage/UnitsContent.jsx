@@ -52,7 +52,7 @@ const UnitsContent = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
                 <div>
                     <nav className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-3 uppercase tracking-[0.2em]">
-                        <Link to="/" className="hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
+                        <Link to="/" className="cursor-pointer hover:text-[#00BCE4] transition-colors">BOSH SAHIFA</Link>
                         <ChevronRight size={10} />
                         <span className="text-[#00BCE4]">O'LCHOV BIRLIKLARI</span>
                     </nav>
@@ -99,37 +99,37 @@ const UnitsContent = () => {
             </div>
 
             {/* Table Section */}
-            <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className="w-full min-w-[1100px]">
                         <thead>
-                            <tr className="bg-white border-b border-gray-50">
-                                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Birlik Nomi</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
-                                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Amallar</th>
+                            <tr className="bg-slate-50 border-b border-slate-200">
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID</th>
+                                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Birlik Nomi</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Status</th>
+                                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-slate-100">
                             {filteredUnits.length > 0 ? (
                                 filteredUnits.map((unit, index) => (
-                                    <tr key={unit.id} className="hover:bg-gray-50/50 transition-all group">
-                                        <td className="px-10 py-6">
+                                    <tr key={unit.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                        <td className="px-6 py-5">
                                             <span className="text-xs font-black text-slate-300 font-mono group-hover:text-[#00BCE4] transition-colors">
                                                 {String(index + 1).padStart(2, '0')}
                                             </span>
                                         </td>
-                                        <td className="px-10 py-6">
+                                        <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-2 h-2 rounded-full bg-[#00BCE4] opacity-0 group-hover:opacity-100 transition-all scale-0 group-hover:scale-100" />
-                                                <span className="text-sm font-black text-slate-700 uppercase tracking-wider group-hover:translate-x-1 transition-transform inline-block">
+                                                <span className="text-sm font-bold text-slate-800 uppercase tracking-wider group-hover:translate-x-1 transition-transform inline-block cursor-pointer">
                                                     {unit.name}
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-6">
+                                        <td className="px-6 py-5">
                                             <div className="flex justify-center">
-                                                <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                                                <span className={`px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black ${
                                                     unit.status
                                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                                     : 'bg-rose-50 text-rose-600 border-rose-100'
@@ -138,16 +138,16 @@ const UnitsContent = () => {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-10 py-6 text-right">
-                                            <div className="flex justify-end gap-2">
+                                        <td className="px-6 py-5 text-center">
+                                            <div className="flex items-center justify-center gap-2">
                                                 <button
                                                     onClick={() => handleOpenModal(unit)}
-                                                    className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-gray-50 rounded-xl transition-all active:scale-90"
+                                                    className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
                                                 >
-                                                    <Edit size={16} strokeWidth={2.5} />
+                                                    <Edit className="w-5 h-5" />
                                                 </button>
-                                                <button className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all active:scale-90">
-                                                    <Trash2 size={16} strokeWidth={2.5} />
+                                                <button className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600">
+                                                    <Trash2 className="w-5 h-5" />
                                                 </button>
                                             </div>
                                         </td>

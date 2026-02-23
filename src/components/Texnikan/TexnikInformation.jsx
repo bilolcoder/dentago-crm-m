@@ -108,7 +108,7 @@ function TechnicianManagement() {
 
     const getCurrentLocation = () => {
         if (!navigator.geolocation) {
-            alert("Sizning brauzeringizda joylashuv funksiyasi mavjud emas yoki qo'llab-quvvatlanmaydi.");
+            console.log("Sizning brauzeringizda joylashuv funksiyasi mavjud emas yoki qo'llab-quvvatlanmaydi.");
             return;
         }
 
@@ -140,7 +140,7 @@ function TechnicianManagement() {
                 } else if (error.code === error.TIMEOUT) {
                     msg = 'Joylashuv so‘rovi vaqtida xato (timeout).';
                 }
-                alert(msg);
+                console.log(msg);
                 setSubmitMessage({ type: 'error', text: msg });
             },
             {
@@ -162,7 +162,7 @@ function TechnicianManagement() {
     const handleGalleryChange = (e) => {
         const files = Array.from(e.target.files || []);
         if (galleryPreviews.length + files.length > 4) {
-            alert("Maksimal 4 ta rasm yuklash mumkin!");
+            console.log("Maksimal 4 ta rasm yuklash mumkin!");
             return;
         }
 
