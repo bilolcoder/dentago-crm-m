@@ -135,7 +135,7 @@ export const translations = {
         // Profile
         my_profile: "Profil",
         app_payments: "Dastur to'lovlari",
-        tariffs: "Tariflar",
+        tariffs: "Tranzaksiyalar",
         edit_personal_info: "Shaxsiy ma'lumotlarni tahrirlash",
         change_password: "Parolni o'zgartirish",
         payment_type: "To'lov turi",

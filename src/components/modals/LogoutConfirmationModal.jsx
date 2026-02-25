@@ -21,11 +21,11 @@ const LogoutConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
     if (!isOpen) return null;
 
     return (
-        <div 
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        <div
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
             onClick={onClose} // Tashqi fon bosilganda yopiladi
         >
-            <div 
+            <div
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all duration-300 scale-100 animate-in fade-in zoom-in-95"
                 onClick={(e) => e.stopPropagation()} // Ichki qism bosilganda yopilmasin
             >
