@@ -265,7 +265,7 @@ function BuyurtmaSotuvchi() {
 
       {selectedOrder && !selectedOrder.error && (
         <div
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-5 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-[70] p-5 backdrop-blur-sm"
           onClick={closeModal}
         >
           <div

@@ -86,9 +86,9 @@ function Aperator() {
         let userName = "Noma'lum foydalanuvchi";
         let userPhone = "—";
 
-        if (order.userId && typeof order.userId === 'object') {
-          userName = order.userId.fullName || order.userId.name || order.userId.firstName || order.userId.phone || 'Noma\'lum';
-          userPhone = order.userId.phone || '—';
+        if (order.user_id && typeof order.user_id === 'object') {
+          userName = order.user_id.username || "Noma'lum foydalanuvchi";
+          userPhone = order.user_id.phone || '—';
         }
 
         return (order.items || []).map((item, index) => ({
@@ -471,7 +471,7 @@ function Aperator() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-   
+
 
           <select
             value={statusFilter}
