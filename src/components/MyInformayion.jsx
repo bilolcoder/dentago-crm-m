@@ -827,20 +827,16 @@ function MyInformation() {
                 <User className="w-16 h-16 text-gray-300" />
               </div>
             )}
+            {price && price > 0 && (
             <div className="absolute top-4 right-4">
-              <div className="bg-[#00BCE4] text-white px-4 py-2 rounded-xl font-bold">
-                {price > 0 ? (
-                  <div className="text-center">
-                    <div className="text-lg">{price.toLocaleString()}</div>
-                    <div className="text-xs opacity-90">so'm</div>
-                  </div>
-                ) : (
-                  <div className="text-center px-3 py-1">
-                    <div className="text-sm">Narx mavjud emas</div>
-                  </div>
-                )}
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-5 py-3 rounded-xl shadow-lg font-bold transform transition-transform hover:scale-105">
+                <div className="text-center">
+                  <div className="text-xl font-bold">{price.toLocaleString()}</div>
+                  <div className="text-xs opacity-90 mt-1">so'm</div>
+                </div>
               </div>
             </div>
+            )}
           </div>
           <div className="p-5">
             <div className="mb-4">
