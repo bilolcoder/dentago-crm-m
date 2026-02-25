@@ -152,7 +152,7 @@ const ProtectedLayout = () => {
             isSidebarOpen={isSidebarOpen}
             currentPage={currentPage}
           />
-          <div className="p-4 md:p-6 lg:p-8">
+          <div className="px-4 pt-4 md:px-6 md:pt-6 lg:p-8">
             <Routes>
               {/* Asosiy */}
               <Route path="/dashboard" element={<DashboardContent />} />
