@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Package, Loader2, Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package,  Edit3, Trash2, Plus, Search, Eye, X, CheckCircle, AlertCircle, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../../context/DataProvider';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 function AddMahsulot() {
   const [products, setProducts] = useState([]);
@@ -587,10 +588,8 @@ function AddMahsulot() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4] mb-4" />
-        <p className="text-gray-600 font-medium">Mahsulotlar yuklanmoqda...</p>
-        <p className="text-sm text-gray-400 mt-2">Iltimos kuting</p>
+      <div className="">
+        <LoadingSpinner text="Mahsulotlar yuklanmoqda" />
       </div>
     );
   }
@@ -687,15 +686,15 @@ function AddMahsulot() {
           )}
 
           {/* Jadval */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="unified-table-container">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="unified-table">
                 <thead>
-                  <tr className="bg-gray-50 ">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[200px]">Mahsulot</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Kategoriya</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Narxi</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Amallar</th>
+                  <tr>
+                    <th>Mahsulot</th>
+                    <th>Kategoriya</th>
+                    <th>Narxi</th>
+                    <th className="text-center">Amallar</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -873,12 +872,7 @@ function AddMahsulot() {
             <div className="p-6 space-y-6">
               {(savingEdit || uploadingImages) && (
                 <div className="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <p>
-                    {uploadingImages
-                      ? `Rasmlar yuklanmoqda... (${selectedFiles.length} ta)`
-                      : "Saqlanmoqda..."}
-                  </p>
+                  <LoadingSpinner text={uploadingImages ? "Rasmlar yuklanmoqda..." : "Saqlanmoqda..." } />
                 </div>
               )}
 
@@ -1165,8 +1159,7 @@ function AddMahsulot() {
               >
                 {(savingEdit || uploadingImages) ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    {uploadingImages ? "Rasmlar yuklanmoqda..." : "Saqlanmoqda..."}
+                    <LoadingSpinner text={uploadingImages ? "Rasmlar yuklanmoqda..." : "Saqlanmoqda..." } />
                   </>
                 ) : (
                   'Saqlash'

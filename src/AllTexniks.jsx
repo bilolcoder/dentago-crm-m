@@ -8,6 +8,7 @@ import {
   AlertCircle,
   Search
 } from 'lucide-react';
+import LoadingSpinner from './components/common/LoadingSpinner';
 
 const TechniciansList = () => {
   const [technicians, setTechnicians] = useState([]);
@@ -126,15 +127,14 @@ const TechniciansList = () => {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="animate-spin text-[#00BCE4] mb-4" size={40} />
-            <p className="text-gray-500">Yuklanmoqda...</p>
+          <div className="flex items-center justify-center pb-50">
+            <LoadingSpinner text="Texniklar yuklanmoqda" />
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="unified-table">
               <thead>
-                <tr className="bg-[#00BCE4] text-white">
+                <tr className="bg-gray-50 text-white">
                   <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Ism Familiya</th>
                   <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Telefon</th>
                   {/* <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Tajriba</th> */}
@@ -143,7 +143,7 @@ const TechniciansList = () => {
                   <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider text-center">Amallar</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {filteredTechnicians.length > 0 ? (
                   filteredTechnicians.map((tech) => (
                     <tr

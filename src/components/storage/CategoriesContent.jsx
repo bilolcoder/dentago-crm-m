@@ -44,7 +44,7 @@ const CategoriesContent = () => {
 
                 <button
                     onClick={() => handleOpenAddEditModal(null)}
-                    className="flex items-center gap-2 bg-[#00BCE4] text-white px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#00BCE4]/20 active:scale-95 font-black text-[10px] uppercase tracking-widest hover:brightness-110"
+                    className="flex items-center gap-2 bg-[#00BCE4] text-white px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#00BCE4]/20 active:scale-95 font-black text-[10px] uppercase tracking-widest hover:brightness-110 cursor-pointer"
                 >
                     <Plus className="w-5 h-5" strokeWidth={3} />
                     {t('add') || "Yangi Kategoriya"}
@@ -91,7 +91,7 @@ const CategoriesContent = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {filteredCategories.map((category) => (
-                                <tr key={category.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                <tr key={category.id} className="hover:bg-[#00BCE4]/[0.03] cursor-pointer">
                                     <td className="px-6 py-5">
                                         <div className="flex items-center gap-2 text-[#00BCE4]">
                                             <Hash size={14} strokeWidth={3} />
@@ -119,13 +119,13 @@ const CategoriesContent = () => {
                                         <div className="flex items-center justify-center gap-2">
                                             <button
                                                 onClick={() => handleOpenAddEditModal(category)}
-                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600 cursor-pointer"
                                                 title="Tahrirlash"
                                             >
                                                 <Edit className="w-5 h-5" />
                                             </button>
                                             <button
-                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer"
                                                 title="O'chirish"
                                             >
                                                 <Trash2 className="w-5 h-5" />

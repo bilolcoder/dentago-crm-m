@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Phone, Calendar, MessageSquare, X } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
 import { useData } from '../context/DataProvider';
 import { Navigate } from 'react-router-dom';
 
@@ -97,13 +98,7 @@ const NeedAdmin = () => {
   };
 
   if (loading) {
-    return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2FF]"></div>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner size="lg" color="primary" text="So'rovlar yuklanmoqda..." />;
   }
 
   return (

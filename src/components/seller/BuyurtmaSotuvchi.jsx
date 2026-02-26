@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 function BuyurtmaSotuvchi() {
   const [stats, setStats] = useState(null);
@@ -149,7 +150,7 @@ function BuyurtmaSotuvchi() {
 
   const closeModal = () => setSelectedOrder(null);
 
-  if (loading) return <div className="text-center py-24 text-cyan-500 text-xl">Yuklanmoqda...</div>;
+  if (loading) return <LoadingSpinner text="Buyurtmalar yuklanmoqda" />;
   if (error) return <div className="text-red-600 text-center py-16 text-xl">{error}</div>;
 
   return (
@@ -218,18 +219,18 @@ function BuyurtmaSotuvchi() {
 )}
 
 
-      <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+      <div className="unified-table-container">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px]">
-            <thead className="bg-slate-50 border-b border-slate-200">
+          <table className="unified-table">
+            <thead>
               <tr>
-                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mijoz Ism-Familiyasi</th>
-                <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mahsulot Nomi</th>
-                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
-                <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Summa</th>
+                <th>Mijoz Ism-Familiyasi</th>
+                <th>Mahsulot Nomi</th>
+                <th className="text-center">Soni</th>
+                <th className="text-center">Summa</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {flatItems.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-20 text-center text-slate-500">
@@ -410,7 +411,7 @@ function BuyurtmaSotuvchi() {
 
               {selectedOrder.items?.length > 0 ? (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="unified-table">
                     <thead>
                       <tr className="bg-cyan-50 text-cyan-700">
                         <th className="p-4 text-left border-b-2 border-cyan-200">Nomi</th>

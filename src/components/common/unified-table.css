@@ -1,0 +1,77 @@
+/* Unified Table Styles */
+.unified-table-container {
+  @apply bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm;
+}
+
+.unified-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.unified-table thead {
+  @apply bg-gray-50;
+}
+
+.unified-table th {
+  @apply px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider whitespace-nowrap;
+}
+
+.unified-table tbody {
+  @apply bg-white divide-y divide-gray-200;
+}
+
+.unified-table td {
+  @apply px-6 py-4 whitespace-nowrap;
+}
+
+ 
+
+/* Loading skeleton styles */
+.table-skeleton {
+  @apply bg-white rounded-2xl border border-gray-200 p-12 text-center;
+}
+
+.table-skeleton div {
+  @apply animate-pulse;
+}
+
+.table-skeleton .skeleton-line {
+  @apply h-4 bg-gray-200 rounded w-full mb-4;
+}
+
+.table-skeleton .skeleton-line:last-child {
+  @apply mb-0;
+}
+
+/* Empty state styles */
+.table-empty {
+  @apply bg-white rounded-2xl border border-gray-200 p-12 text-center;
+}
+
+.table-empty .empty-icon {
+  @apply text-6xl mb-4;
+}
+
+.table-empty .empty-title {
+  @apply text-xl font-semibold mb-2;
+}
+
+.table-empty .empty-description {
+  @apply text-gray-500;
+}
+
+/* Error state styles */
+.table-error {
+  @apply bg-white rounded-2xl border border-gray-200 p-12 text-center;
+}
+
+.table-error .error-icon {
+  @apply text-6xl mb-4;
+}
+
+.table-error .error-title {
+  @apply text-xl font-semibold mb-2 text-red-500;
+}
+
+.table-error .error-description {
+  @apply text-gray-600;
+}

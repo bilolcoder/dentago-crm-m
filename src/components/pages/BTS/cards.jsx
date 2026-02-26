@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Loader2, ArrowLeft } from 'lucide-react'; // ArrowLeft qo'shildi
+import { Package, Loader2, ArrowLeft } from 'lucide-react';
+import LoadingSpinner from '../../common/LoadingSpinner'; // ArrowLeft qo'shildi
 import { useNavigate } from 'react-router-dom'; // Orqaga o'tish uchun
 import axios from 'axios';
 
@@ -89,12 +90,7 @@ function Cards() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4]" />
-        <p className="ml-4 text-xl font-medium text-slate-600">Yuklanmoqda...</p>
-      </div>
-    );
+    return <LoadingSpinner size="lg" color="primary" fullscreen text="Buyurtmalar yuklanmoqda..." />;
   }
 
   if (error) {

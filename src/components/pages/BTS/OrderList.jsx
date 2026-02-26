@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Package, Loader2, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import LoadingSpinner from '../../common/LoadingSpinner';
 import axios from 'axios';
 import { useData } from '../../../context/DataProvider';
 
@@ -383,7 +384,7 @@ function Aperator() {
       color = 'bg-emerald-100 text-emerald-800';
       text = 'Yetkazib berildi';
     } else if (lower === 'to\'langan' || lower === 'paid') {
-      color = 'bg-blue-100 text-blue-800';
+      color = 'bg-green-400 text-white ';
       text = "To'langan";
     } else if (lower === 'kutilmoqda' || lower === 'pending') {
       color = 'bg-amber-100 text-amber-800';
@@ -442,14 +443,7 @@ function Aperator() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4] mx-auto mb-4" />
-          <p className="text-slate-600 font-bold">Yuklanmoqda...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner text="Buyurtmalar yuklanmoqda" />;
   }
 
   const currentData = activeTab === 'technicians' ? filteredTechOrders : filteredOrders;
@@ -534,8 +528,8 @@ function Aperator() {
             <p className="text-3xl font-bold text-amber-700 mt-1">{orderStats.pendingPayment.toLocaleString()}</p>
           </div>
           <div className="bg-white border border-blue-200 rounded-xl p-6 shadow-sm">
-            <p className="text-sm text-blue-700">To'langan</p>
-            <p className="text-3xl font-bold text-blue-700 mt-1">{orderStats.paid.toLocaleString()}</p>
+            <p className="text-sm text-green-500">To'langan</p>
+            <p className="text-3xl font-bold text-green-500 mt-1">{orderStats.paid.toLocaleString()}</p>
           </div>
           <div className="bg-white border border-emerald-200 rounded-xl p-6 shadow-sm">
             <p className="text-sm text-emerald-700">Yetkazib berilgan</p>
@@ -544,37 +538,37 @@ function Aperator() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+      <div className="unified-table-container">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px]">
-            <thead className="bg-slate-50 border-b border-slate-200">
+          <table className="unified-table">
+            <thead>
               <tr>
                 {activeTab === 'products' ? (
                   <>
-                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">ID / Mahsulot</th>
-                    {isAdmin && <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Mijoz</th>}
-                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kompaniya</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Narx</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Sana</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Status</th>
-                    {isAdmin && <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">To'lov</th>}
+                    <th>ID / Mahsulot</th>
+                    {isAdmin && <th>Mijoz</th>}
+                    <th>Kompaniya</th>
+                    <th className="text-center">Soni</th>
+                    <th className="text-center">Narx</th>
+                    <th className="text-center">Sana</th>
+                    <th className="text-center">Status</th>
+                    {isAdmin && <th className="text-center">To'lov</th>}
                   </>
                 ) : (
                   <>
-                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Texnik</th>
-                    <th className="px-6 py-5 text-left text-xs font-black text-slate-500 uppercase">Kompaniya</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Soni</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Narx</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Sana</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Status</th>
-                    <th className="px-6 py-5 text-center text-xs font-black text-slate-500 uppercase">Harakat</th>
+                    <th>Texnik</th>
+                    <th>Kompaniya</th>
+                    <th className="text-center">Soni</th>
+                    <th className="text-center">Narx</th>
+                    <th className="text-center">Sana</th>
+                    <th className="text-center">Status</th>
+                    <th className="text-center">Harakat</th>
                   </>
                 )}
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {paginatedData.length > 0 ? paginatedData.map((item) => {
                 if (activeTab === 'products') {
                   const canConfirm = item.paymentStatus === "pending" || item.paymentStatus === "waiting";
@@ -709,10 +703,13 @@ function Aperator() {
               }) : (
                 <tr>
                   <td colSpan={activeTab === 'products' ? (isAdmin ? 8 : 6) : 8} className="py-20 text-center text-slate-500">
-                    <Package className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                    <p className="text-lg font-medium">
-                      {activeTab === 'technicians' ? 'Texnik buyurtmalari topilmadi' : 'Mahsulot buyurtmalari topilmadi'}
-                    </p>
+                    <div className="table-empty">
+                      <div className="empty-icon">📋</div>
+                      <h3 className="empty-title">
+                        {activeTab === 'technicians' ? 'Texnik buyurtmalari topilmadi' : 'Mahsulot buyurtmalari topilmadi'}
+                      </h3>
+                      <p className="empty-description">Hozircha ma'lumotlar mavjud emas</p>
+                    </div>
                   </td>
                 </tr>
               )}

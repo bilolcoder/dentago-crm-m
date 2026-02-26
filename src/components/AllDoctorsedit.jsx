@@ -6,6 +6,7 @@ import {
   UserCircle, BriefcaseMedical, Calendar, Building, Clock, DollarSign,
   Save, Eye, Trash2, Plus, Globe
 } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
 const uzbekistanCities = [
   // =========================
   // QORAQALPOG'ISTON
@@ -525,14 +526,7 @@ function AllDoctorsEdit() {
     );
   });
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-        <p className="mt-4 text-gray-600">Ma'lumotlar yuklanmoqda...</p>
-      </div>
-    </div>
-  );
+  if (loading) return <LoadingSpinner text="Doktorlar yuklanmoqda" />;
 
   if (error) {
     return (
@@ -584,10 +578,10 @@ function AllDoctorsEdit() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="unified-table-container">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-max">
-              <thead className="bg-cyan-500" style={{ backgroundColor: '#00BCE4' }}>
+            <table className="unified-table">
+              <thead className="bg-gray-50"  >
                 <tr>
                   <th className="py-4 px-6 text-left text-white font-semibold">#</th>
                   <th className="py-4 px-6 text-left text-white font-semibold">Rasm</th>
@@ -598,7 +592,7 @@ function AllDoctorsEdit() {
                   <th className="py-4 px-6 text-left text-white font-semibold">Amallar</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {filteredDoctors.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-gray-600">
@@ -607,7 +601,7 @@ function AllDoctorsEdit() {
                   </tr>
                 ) : (
                   filteredDoctors.map((doctor, index) => (
-                    <tr key={doctor._id} className="hover:bg-cyan-50 transition-colors">
+                    <tr key={doctor._id} className="hover:bg-cyan-50 transition-colors cursor-pointer">
                       <td className="py-4 px-6 text-gray-700 font-medium">{index + 1}</td>
                       <td className="py-4 px-6">
                         {doctor.avatar ? (

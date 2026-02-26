@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useData } from '../context/DataProvider';
 import { Edit2, ChevronLeft, Loader2, Upload, CheckCircle } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
 
 const ProfileContent = () => {
   const { t } = useData();
@@ -204,11 +205,7 @@ const ProfileContent = () => {
   };
 
   if (loading) {
-    return (
-      <div className="p-8 flex justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#00BCE4]" />
-      </div>
-    );
+    return <LoadingSpinner size="lg" color="primary" text="Profil yuklanmoqda..." />;
   }
 
   if (error && !user) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import LoadingSpinner from '../../common/LoadingSpinner';
 
 const BASE_URL = 'https://app.dentago.uz';
 const ITEMS_PER_PAGE = 10; // Har bir sahifada nechta buyurtma ko'rsatiladi
@@ -286,14 +287,14 @@ function TexnikgaBuyurtma() {
         </div>
 
         {loading ? (
-          <div className="py-20 text-center text-gray-500 text-xl">Yuklanmoqda...</div>
+          <LoadingSpinner text="Buyurtmalar yuklanmoqda" />
         ) : error ? (
           <div className="py-20 text-center text-red-600 text-xl font-medium">{error}</div>
         ) : (
           <>
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+            <div className="unified-table-container">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[900px] text-sm">
+                <table className="unified-table">
                   <thead className="bg-[#00BCE4]/10">
                     <tr>
                       <th className="px-6 py-4 text-left font-semibold text-[#00BCE4] uppercase tracking-wider">
@@ -313,7 +314,7 @@ function TexnikgaBuyurtma() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody>
                     {getCurrentPageItems().length === 0 ? (
                       <tr>
                         <td colSpan={5} className="py-20 text-center text-gray-500 text-base">

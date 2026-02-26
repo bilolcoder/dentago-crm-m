@@ -119,7 +119,8 @@ const LeadCategoriesContent = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {filteredCategories.map((cat, index) => (
-                                <tr key={cat.id} className="hover:bg-[#00BCE4]/[0.03]">
+                                <tr key={cat.id} className="hover:bg-[#00BCE4]/[0.03] cursor-pointer"
+                                >
                                     <td className="px-6 py-5">
                                         <div className="w-8 h-8 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-xs font-black text-slate-400 group-hover:bg-[#00BCE4] group-hover:text-white transition-all">
                                             {index + 1}
@@ -148,11 +149,11 @@ const LeadCategoriesContent = () => {
                                         <div className="flex items-center justify-center gap-2">
                                             <button
                                                 onClick={() => handleOpenModal(cat)}
-                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600"
+                                                className="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-600 cursor-pointer"
                                             >
                                                 <Edit className="w-5 h-5" />
                                             </button>
-                                            <button className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600">
+                                            <button className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 cursor-pointer">
                                                 <Trash2 className="w-5 h-5" />
                                             </button>
                                         </div>

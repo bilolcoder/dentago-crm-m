@@ -16,6 +16,7 @@ import {
   MessageSquare,
   User
 } from "lucide-react";
+import LoadingSpinner from '../../../../common/LoadingSpinner';
 
 const TechnicianDetail = () => {
   const { id } = useParams();
@@ -162,11 +163,7 @@ const TechnicianDetail = () => {
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Loader2 className="animate-spin text-[#00C1F3]" size={40} />
-    </div>
-  );
+  if (loading) return <LoadingSpinner text="Texnik yuklanmoqda" />;
 
   if (!tech) return <div className="text-center py-20 font-bold">Ma'lumot topilmadi.</div>;
 

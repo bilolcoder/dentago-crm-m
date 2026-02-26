@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { TiTick } from "react-icons/ti";
 import { CiViewTable } from "react-icons/ci";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
+import UnifiedTable from './common/UnifiedTable';
 
 function Bemorlarim() {
   const [appointments, setAppointments] = useState([]);
@@ -369,32 +371,20 @@ function Bemorlarim() {
     setIsConfirming(false);
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center">
-      <div className="text-center py-20">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00BCE4] mb-4"></div>
-        <p className="text-gray-600">Yuklanmoqda...</p>
-      </div>
-    </div>
-  );
+  if (loading) return <LoadingSpinner text="Bemorlar yuklanmoqda" />;
 
   if (error) {
     return (
-      <div className="flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-lg text-center max-w-md w-full border border-gray-100">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-red-600 mb-6 font-medium">{error}</p>
-          <button
-            onClick={fetchAppointments}
-            className="bg-[#00BCE4] cursor-pointer hover:bg-[#00a8cc] text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
-          >
-            Qayta urinish
-          </button>
-        </div>
+      <div className="table-error">
+        <div className="error-icon">⚠️</div>
+        <h3 className="error-title">Xatolik yuz berdi</h3>
+        <p className="error-description">{error}</p>
+        <button
+          onClick={fetchAppointments}
+          className="bg-[#00BCE4] cursor-pointer hover:bg-[#00a8cc] text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg mt-6"
+        >
+          Qayta urinish
+        </button>
       </div>
     );
   }
@@ -502,14 +492,10 @@ function Bemorlarim() {
       </div>
 
       {appointments.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
-          <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-[#00BCE4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Navbatlar topilmadi</h3>
-          <p className="text-gray-600">Hozircha hech qanday navbat mavjud emas</p>
+        <div className="table-empty">
+          <div className="empty-icon">📋</div>
+          <h3 className="empty-title">Navbatlar topilmadi</h3>
+          <p className="empty-description">Hozircha hech qanday navbat mavjud emas</p>
         </div>
       ) : viewMode === 'card' ? (
         // CARD VIEW
@@ -611,11 +597,11 @@ function Bemorlarim() {
         </div>
       ) : (
         // TABLE VIEW
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+        <div className="unified-table-container">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="unified-table">
               <thead>
-                <tr className="bg-white border-b">
+                <tr>
                   <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Bemor
                   </th>
@@ -636,7 +622,7 @@ function Bemorlarim() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
+              <tbody>
                 {paginatedAppointments.map((appointment) => (
                   <tr key={appointment._id} className="hover:bg-gray-50 transition-colors duration-200">
                     <td className="px-6 py-4 whitespace-nowrap">

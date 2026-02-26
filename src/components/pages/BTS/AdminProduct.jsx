@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Package, Edit2, Trash2, Loader2, Plus, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import LoadingSpinner from '../../common/LoadingSpinner';
 import axios from 'axios';
 import { useData } from '../../../context/DataProvider';
 
@@ -381,11 +382,7 @@ function AdminProduct() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4]" />
-      </div>
-    );
+    return <LoadingSpinner text="Mahsulotlar yuklanmoqda" />;
   }
 
   // Agar admin bo'lmasa, hech narsa ko'rsatmaymiz (yoki ruxsat yo'qligini bildiramiz)
@@ -432,17 +429,17 @@ function AdminProduct() {
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg shadow-sm">
-        <table className="w-full min-w-[1000px]">
-          <thead className="bg-slate-50">
+      <div className="unified-table-container">
+        <table className="unified-table">
+          <thead>
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">Mahsulot</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">Kategoriya</th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase">Narx</th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase">Amallar</th>
+              <th>Mahsulot</th>
+              <th>Kategoriya</th>
+              <th className="text-center">Narx</th>
+              <th className="text-center">Amallar</th>
             </tr>
           </thead>
-          <tbody className="">
+          <tbody>
             {getCurrentProducts().map(product => (
               <tr key={product._id} className="hover:bg-slate-50/70">
                 <td className="px-6 py-4">

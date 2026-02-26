@@ -6,6 +6,7 @@ import { IoCartOutline } from 'react-icons/io5';
 import { MdStorefront } from 'react-icons/md';
 import { RiSecurePaymentLine } from 'react-icons/ri';
 import { X, ShoppingCart, User, MapPin, Navigation, Smartphone, Shield } from 'lucide-react';
+import LoadingSpinner from '../../../common/LoadingSpinner';
 import { useSocket } from "../../../../context/SocketContext";
 import PaymeSvg from '../../../../assets/payme.png';
 import ClickSvg from '../../../../assets/click.png';
@@ -423,13 +424,7 @@ const Savat = () => {
 
   // Loading
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-        <div className="w-12 h-12 border-3 border-[#00BCE4] border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h2 className="text-lg font-medium text-gray-900 mb-1">Savat yuklanmoqda</h2>
-        <p className="text-sm text-gray-500">Bir necha soniya vaqt olishi mumkin</p>
-      </div>
-    );
+    return <LoadingSpinner size="lg" color="primary" fullscreen text="Savat yuklanmoqda..." />;
   }
 
   // Error

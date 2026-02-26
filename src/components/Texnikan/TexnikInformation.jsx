@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
+import LoadingSpinner from '../common/LoadingSpinner';
+
 import {
     UserCircle, BriefcaseMedical, MapPin, Phone, Save,
     Loader2, Edit, Trash2, X, Plus, Image as ImageIcon,
@@ -271,11 +273,7 @@ function TechnicianManagement() {
         }
     };
 
-    if (isLoading) return (
-        <div className="flex justify-center items-center min-h-[400px]">
-            <Loader2 className="w-12 h-12 animate-spin text-cyan-500" />
-        </div>
-    );
+    if (isLoading) return <LoadingSpinner text="Texniklar yuklanmoqda" />;
 
     return (
         <div className="py-10">

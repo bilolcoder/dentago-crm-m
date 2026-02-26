@@ -829,12 +829,7 @@ function MyInformation() {
             )}
             {price && price > 0 && (
             <div className="absolute top-4 right-4">
-              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-5 py-3 rounded-xl shadow-lg font-bold transform transition-transform hover:scale-105">
-                <div className="text-center">
-                  <div className="text-xl font-bold">{price.toLocaleString()}</div>
-                  <div className="text-xs opacity-90 mt-1">so'm</div>
-                </div>
-              </div>
+           
             </div>
             )}
           </div>
@@ -869,14 +864,14 @@ function MyInformation() {
               <button
                 onClick={() => id && onView(id)}
                 disabled={!id}
-                className={`flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`flex-1 bg-[#00BCE4] cursor-pointer hover:bg-[#0096b8] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <Eye className="w-4 h-4" />
                 Profilni ko'rish
               </button>
               <button
                 onClick={() => onEdit(entity)}
-                className="px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors"
+                className="px-4 py-2.5 bg-gray-50 cursor-pointer hover:bg-gray-100 text-gray-700 rounded-xl transition-colors"
                 title="Tahrirlash"
               >
                 <Edit className="w-4 h-4" />
@@ -884,7 +879,7 @@ function MyInformation() {
               <button
                 onClick={() => id && onDelete(id)}
                 disabled={!id}
-                className={`px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-colors ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-4 py-2.5 bg-rose-50 cursor-pointer hover:bg-rose-100 text-rose-600 rounded-xl transition-colors ${!id ? 'opacity-50 cursor-not-allowed' : ''}`}
                 title="O'chirish"
               >
                 <Trash2 className="w-4 h-4" />
@@ -1530,11 +1525,11 @@ function MyInformation() {
                     </div>
                   </div>
                 </div>
-                {userRole !== 'technician' && (
+                {userRole !== 'technician' && viewEntity.price && viewEntity.price > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
                     <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl text-center">
                       <div className="text-2xl font-bold text-gray-800 mb-1">
-                        {viewEntity.price ? `${viewEntity.price.toLocaleString()} so'm` : 'N/A'}
+                        {`${viewEntity.price.toLocaleString()} so'm`}
                       </div>
                       <div className="text-sm text-gray-500 font-bold uppercase tracking-widest">Narx</div>
                     </div>

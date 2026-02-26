@@ -216,7 +216,7 @@ const ProductDetail = () => {
             <img
               src={product.img}
               alt={product.name}
-              className="max-h-full max-w-full object-contain mix-blend-multiply"
+              className="max-h-[300px] max-w-full object-contain mix-blend-multiply"
               onError={(e) => {
                 e.target.src = "/placeholder-product.jpg";
               }}
