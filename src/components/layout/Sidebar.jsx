@@ -204,7 +204,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         className="
                             fixed left-[265px] top-6 z-[51]
                             bg-white border border-gray-200 rounded-full shadow-lg p-2.5
-                            hover:bg-gray-100 transition-all duration-200
+                            hover:bg-gray-100 transition-all duration-200 cursor-pointer
                         "
                         aria-label="Collapse sidebar"
                     >
@@ -218,7 +218,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         className="
                             fixed left-[55px] top-6 z-[100]
                             bg-white border border-gray-200 rounded-full shadow-lg p-2.5
-                            hover:bg-gray-100 transition-all duration-200
+                            hover:bg-gray-100 transition-all duration-200 cursor-pointer
                         "
                         aria-label="Expand sidebar"
                     >

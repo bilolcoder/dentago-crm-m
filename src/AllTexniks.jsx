@@ -148,7 +148,7 @@ const TechniciansList = () => {
                   filteredTechnicians.map((tech) => (
                     <tr
                       key={tech._id}
-                      className={`transition-colors duration-300 bg-white hover:bg-cyan-50/30`}
+                      className={`transition-colors duration-300 bg-white hover:bg-cyan-50/30 `}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ const TechniciansList = () => {
                         {truncateText(tech.description)}
                       </td> */}
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${tech.isApproved === true ? 'bg-green-50 text-green-700' : tech.isApproved === false ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-500'
+                        <span className={`px-3 py-1 rounded-full  text-xs font-semibold ${tech.isApproved === true ? 'bg-green-50 text-green-700' : tech.isApproved === false ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-500'
                           }`}>
                           {tech.isApproved === true ? 'Tasdiqlangan' : tech.isApproved === false ? 'Bekor qilingan' : 'Kutilmoqda'}
                         </span>
@@ -191,7 +191,7 @@ const TechniciansList = () => {
                             <button
                               onClick={() => handleApprove(tech._id)}
                               disabled={actionLoading === tech._id}
-                              className={`p-2 rounded-lg transition shadow-sm border bg-white text-green-600 border-green-100 hover:bg-green-600 hover:text-white`}
+                              className={`p-2 rounded-lg cursor-pointer transition shadow-sm border bg-white text-green-600 border-green-100 hover:bg-green-600 hover:text-white`}
                               title="Tasdiqlash"
                             >
                               {actionLoading === tech._id ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
@@ -202,7 +202,7 @@ const TechniciansList = () => {
                             <button
                               onClick={() => handleReject(tech._id)}
                               disabled={actionLoading === tech._id}
-                              className={`p-2 rounded-lg transition shadow-sm border bg-white text-red-600 border-red-100 hover:bg-red-600 hover:text-white`}
+                              className={`p-2 rounded-lg cursor-pointer transition shadow-sm border bg-white text-red-600 border-red-100 hover:bg-red-600 hover:text-white`}
                               title="Rad etish"
                             >
                               {actionLoading === tech._id ? <Loader2 size={18} className="animate-spin" /> : <X size={18} />}

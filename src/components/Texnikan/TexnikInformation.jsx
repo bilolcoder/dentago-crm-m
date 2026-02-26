@@ -303,9 +303,9 @@ function TechnicianManagement() {
                                     <MapPin size={14} /> {technician.region}, {technician.city}
                                 </p>
                             </div>
-                            <div className="flex gap-2">
-                                <button onClick={() => { setShowForm(true); reset(technician); }} className="p-2 bg-gray-100 rounded-lg hover:bg-cyan-50 text-cyan-600 transition"><Edit size={20} /></button>
-                                <button onClick={handleDelete} className="p-2 bg-gray-100 rounded-lg hover:bg-red-50 text-red-600 transition"><Trash2 size={20} /></button>
+                            <div className="flex gap-2 ">
+                                <button onClick={() => { setShowForm(true); reset(technician); }} className="p-2 cursor-pointer bg-gray-100 rounded-lg hover:bg-cyan-50 text-cyan-600 transition"><Edit size={20} /></button>
+                                <button onClick={handleDelete} className="p-2 cursor-pointer bg-gray-100 rounded-lg hover:bg-red-50 text-red-600 transition"><Trash2 size={20} /></button>
                             </div>
                         </div>
 
@@ -480,7 +480,7 @@ function TechnicianManagement() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:bg-gray-400"
+                                className="flex-1 bg-gradient-to-r cursor-pointer from-cyan-500 to-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:bg-gray-400"
                             >
                                 {isSubmitting ? <Loader2 className="animate-spin" /> : <Save size={20} />}
                                 {technician ? 'O‘zgarishlarni saqlash' : 'Texnikni yaratish'}
@@ -489,7 +489,7 @@ function TechnicianManagement() {
                                 <button
                                     type="button"
                                     onClick={() => setShowForm(false)}
-                                    className="px-6 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition"
+                                    className="px-6 cursor-pointer py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition"
                                 >
                                     Bekor qilish
                                 </button>

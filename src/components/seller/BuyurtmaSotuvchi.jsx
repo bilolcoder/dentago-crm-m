@@ -198,7 +198,7 @@ function BuyurtmaSotuvchi() {
     ].map((stat, i) => (
       <div
         key={i}
-        className={`text-center rounded-2xl p-4 shadow-sm cursor-pointer transition-all duration-200 hover:scale-[1.01] ${stat.shadowColor}`}
+        className={`text-center rounded-2xl p-4 shadow-sm  transition-all duration-200 hover:scale-[1.01] ${stat.shadowColor}`}
         style={{ backgroundColor: stat.bgColor }}
       >
         <h3
@@ -311,7 +311,7 @@ function BuyurtmaSotuvchi() {
     <button
       onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'processing' })}
       disabled={updateLoading}
-      className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+      className="px-6 py-3 bg-cyan-500 cursor-pointer text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
     >
       Qayta ishlanmoqda
     </button>
@@ -319,7 +319,7 @@ function BuyurtmaSotuvchi() {
     <button
       onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'shipped' })}
       disabled={updateLoading}
-      className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+      className="px-6 py-3 bg-blue-500 cursor-pointer text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
     >
       Yetkazib berilmoqda
     </button>
@@ -327,7 +327,7 @@ function BuyurtmaSotuvchi() {
     <button
       onClick={() => updateOrderStatus(selectedOrder._id, { deliveryStatus: 'delivered' })}
       disabled={updateLoading}
-      className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+      className="px-6 py-3 bg-green-500 cursor-pointer  text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
     >
       Yetkazib berildi
     </button>
@@ -339,7 +339,7 @@ function BuyurtmaSotuvchi() {
         }
       }}
       disabled={updateLoading}
-      className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
+      className="px-6 py-3 bg-red-500 cursor-pointer text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition min-w-[160px]"
     >
       Bekor qilindi
     </button>

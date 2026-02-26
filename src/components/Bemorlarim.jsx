@@ -410,7 +410,7 @@ function Bemorlarim() {
             <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
               <button
                 onClick={() => setViewMode('card')}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'card'
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 cursor-pointer   rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'card'
                   ? 'bg-white text-[#00BCE4] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
                   }`}
@@ -423,7 +423,7 @@ function Bemorlarim() {
 
               <button
                 onClick={() => setViewMode('table')}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'table'
+                className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'table'
                   ? 'bg-white text-[#00BCE4] shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
                   }`}
@@ -436,7 +436,7 @@ function Bemorlarim() {
             {/* Yangilash tugmasi */}
             <button
               onClick={fetchAppointments}
-              className="bg-[#00BCE4] hover:bg-[#00a8cc] text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 text-sm md:text-base shadow-md active:scale-95"
+              className="bg-[#00BCE4] hover:bg-[#00a8cc] cursor-pointer text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 text-sm md:text-base shadow-md active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
@@ -450,7 +450,7 @@ function Bemorlarim() {
         <div className="flex mt-8 bg-gray-100 p-1 rounded-xl border border-gray-200 lg:w-[473px] md:w-[473px] sm:w-[398px] max-sm:w-[315px]">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
+            className={`flex items-center gap-2 cursor-pointer px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
               ? 'bg-white text-[#00BCE4] shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
               }`}
@@ -460,7 +460,7 @@ function Bemorlarim() {
 
           <button
             onClick={() => setStatusFilter('pending')}
-            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
+            className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
               ? 'bg-white text-yellow-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
               }`}
@@ -470,7 +470,7 @@ function Bemorlarim() {
 
           <button
             onClick={() => setStatusFilter('confirmed')}
-            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
+            className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
               ? 'bg-white text-blue-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
               }`}
@@ -480,7 +480,7 @@ function Bemorlarim() {
 
           <button
             onClick={() => setStatusFilter('cancelled')}
-            className={`flex items-center gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
+            className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
               ? 'bg-white text-red-600 shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
               }`}
@@ -538,7 +538,7 @@ function Bemorlarim() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleViewDetails(appointment)}
-                    className="text-[#00BCE4] flex items-center justify-center hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-3 w-12 h-12 rounded-lg transition-all duration-300"
+                    className="text-[#00BCE4] cursor-pointer  flex items-center justify-center hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-3 w-12 h-12 rounded-lg transition-all duration-300"
                     title="To'liq ko'rish"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -550,7 +550,7 @@ function Bemorlarim() {
                   {appointment.status === 'pending' && (   // faqat pending bo'lsa ko'rsatish yaxshi
                     <button
                       onClick={() => handleConfirm(appointment._id)}
-                      className="bg-green-50 hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                      className="bg-green-50 cursor-pointer hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
                       title="Yakunlash"
                     >
                       <TiTick size={28} />
@@ -560,7 +560,7 @@ function Bemorlarim() {
                   {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                     <button
                       onClick={() => handleCancel(appointment._id)}
-                      className="bg-red-50 hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                      className="bg-red-50 cursor-pointer hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
                       title="Bekor qilish"
                     >
                       <svg
@@ -582,7 +582,7 @@ function Bemorlarim() {
 
                   <button
                     onClick={() => handleDelete(appointment._id)}
-                    className="bg-red-50 hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                    className="bg-red-50 cursor-pointer hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
                     title="O'chirish"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -624,7 +624,7 @@ function Bemorlarim() {
               </thead>
               <tbody>
                 {paginatedAppointments.map((appointment) => (
-                  <tr key={appointment._id} className="hover:bg-gray-50 transition-colors duration-200">
+                  <tr key={appointment._id} className="hover:bg-gray-50 transition-colors duration-200 ">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 bg-blue-50 rounded-full flex items-center justify-center">
@@ -658,7 +658,7 @@ function Bemorlarim() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleViewDetails(appointment)}
-                          className="text-[#00BCE4] hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-all duration-300"
+                          className="text-[#00BCE4] cursor-pointer hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-all duration-300"
                           title="To'liq ko'rish"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -670,7 +670,7 @@ function Bemorlarim() {
                         {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                           <button
                             onClick={() => handleCancel(appointment._id)}
-                            className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-all duration-300"
+                            className="text-red-600 hover:text-red-800 cursor-pointer bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-all duration-300"
                             title="Bekor qilish"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

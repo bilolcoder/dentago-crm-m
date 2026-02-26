@@ -254,7 +254,7 @@ function TexnikgaBuyurtma() {
         <div className="mb-6 flex flex-wrap gap-3">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            className={`px-5 py-2.5 cursor-pointer rounded-full text-sm font-medium transition-all ${
               statusFilter === 'all' ? 'bg-[#00BCE4] text-white shadow-md' : 'bg-white text-gray-700 shadow'
             }`}
           >
@@ -262,7 +262,7 @@ function TexnikgaBuyurtma() {
           </button>
           <button
             onClick={() => setStatusFilter('pending')}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            className={`px-5 py-2.5 cursor-pointer rounded-full text-sm font-medium transition-all ${
               statusFilter === 'pending' ? 'bg-[#00BCE4] text-white shadow-md' : 'bg-white shadow'
             }`}
           >
@@ -270,7 +270,7 @@ function TexnikgaBuyurtma() {
           </button>
           <button
             onClick={() => setStatusFilter('completed')}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            className={`px-5 py-2.5 cursor-pointer  rounded-full text-sm font-medium transition-all ${
               statusFilter === 'completed' ? 'bg-[#00BCE4] text-white shadow-md' : 'bg-white shadow'
             }`}
           >
@@ -278,7 +278,7 @@ function TexnikgaBuyurtma() {
           </button>
           <button
             onClick={() => setStatusFilter('rejected')}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+            className={`px-5 py-2.5  rounded-full text-sm font-medium transition-all ${
               statusFilter === 'rejected' ? 'bg-[#00BCE4] text-white shadow-md' : 'bg-white shadow'
             }`}
           >
@@ -361,7 +361,7 @@ function TexnikgaBuyurtma() {
                               {req.status === 'completed' && (
                                 <button
                                   onClick={() => handleOpenPrompt(req)}
-                                  className="text-sm px-4 py-1.5 bg-[#00BCE4] text-white rounded-lg hover:bg-[#00a8cc] transition font-medium shadow-sm"
+                                  className="text-sm px-4 cursor-pointer py-1.5 bg-[#00BCE4] text-white rounded-lg hover:bg-[#00a8cc] transition font-medium shadow-sm"
                                 >
                                   Baholash
                                 </button>
