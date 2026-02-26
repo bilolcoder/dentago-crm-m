@@ -1101,14 +1101,14 @@ function MyInformation() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsFormCollapsed(!isFormCollapsed)}
-                  className="p-2 hover:bg-gray-50 rounded-lg transition"
+                  className="p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition"
                   title={isFormCollapsed ? "Formani ko'rsatish" : "Formani yashirish"}
                 >
                   {isFormCollapsed ? <ArrowUp className="w-5 h-5 transform rotate-180" /> : <ArrowUp className="w-5 h-5" />}
                 </button>
                 <button
                   onClick={handleCloseForm}
-                  className="p-2 hover:bg-gray-50 rounded-lg transition"
+                  className="p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition"
                   title="Formani yopish"
                 >
                   <X className="w-5 h-5" />
@@ -1189,7 +1189,7 @@ function MyInformation() {
                             {selectedSpecialties.map((specialty, index) => (
                               <div key={index} className="bg-[#00BCE4] text-white px-3 py-1 rounded-lg flex items-center gap-1">
                                 <span>{specialty}</span>
-                                <button type="button" onClick={() => setSelectedSpecialties(selectedSpecialties.filter((_, i) => i !== index))} className="text-white hover:text-gray-200">×</button>
+                                <button type="button" onClick={() => setSelectedSpecialties(selectedSpecialties.filter((_, i) => i !== index))} className="text-white cursor-pointer hover:text-gray-200">×</button>
                               </div>
                             ))}
                             <select
@@ -1219,13 +1219,13 @@ function MyInformation() {
                       <select
                         value={selectedRegion}
                         onChange={(e) => { setSelectedRegion(e.target.value); setSelectedCity(''); }}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
+                        className="w-full cursor-pointer px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition"
                         required
                       >
                         <option value="">Viloyatni tanlang</option>
                         {regions.map(region => <option key={region} value={region}>{region}</option>)}
                       </select>
-                      {!selectedRegion && <p className="mt-1 text-sm text-red-600">Viloyatni tanlang</p>}
+                      {!selectedRegion && <p className="mt-1  text-sm text-red-600">Viloyatni tanlang</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
@@ -1235,7 +1235,7 @@ function MyInformation() {
                         value={selectedCity}
                         onChange={(e) => setSelectedCity(e.target.value)}
                         disabled={!selectedRegion}
-                        className={`w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition ${!selectedRegion ? 'opacity-60 cursor-not-allowed' : ''}`}
+                        className={`w-full cursor-pointer px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#00BCE4] outline-none transition ${!selectedRegion ? 'opacity-60 cursor-not-allowed' : ''}`}
                         required
                       >
                         <option value="">Tuman/Shaharni tanlang</option>
@@ -1296,7 +1296,7 @@ function MyInformation() {
                       <button
                         type="button"
                         onClick={openMapSelector}
-                        className="h-12 px-4 bg-blue-100 hover:bg-blue-200 rounded-xl border border-blue-300 text-blue-700 font-medium transition-colors ml-2 flex items-center justify-center"
+                        className="h-12 cursor-pointer px-4 bg-blue-100 hover:bg-blue-200 rounded-xl border border-blue-300 text-blue-700 font-medium transition-colors ml-2 flex items-center justify-center"
                         disabled={isMapLoading}
                       >
                         {isMapLoading ? (
@@ -1430,7 +1430,7 @@ function MyInformation() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !selectedRegion || !selectedCity}
-                    className={`w-full py-3.5 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all shadow-lg
+                    className={`w-full cursor-pointer py-3.5 px-6 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all shadow-lg
                       ${isSubmitting || !selectedRegion || !selectedCity ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-[#00BCE4] to-[#0099CC] hover:from-[#00A8D4] hover:to-[#0088B3] hover:shadow-xl'}`}
                   >
                     {isSubmitting ? (
@@ -1453,11 +1453,11 @@ function MyInformation() {
           </div>
         )}
         {isViewModalOpen && viewEntity && (
-          <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-60 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
               <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800">Profil</h2>
-                <button onClick={() => setIsViewModalOpen(false)} className="p-2 hover:bg-gray-50 rounded-lg transition text-gray-400">
+                <button onClick={() => setIsViewModalOpen(false)} className="p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition text-gray-400">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -1615,14 +1615,14 @@ function MyInformation() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => { setIsViewModalOpen(false); handleEditEntity(viewEntity); }}
-                    className="flex-1 bg-[#00BCE4] hover:bg-[#0096b8] text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
+                    className="flex-1 bg-[#00BCE4] cursor-pointer hover:bg-[#0096b8] text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
                   >
                     <Edit className="w-4 h-4" />
                     Tahrirlash
                   </button>
                   <button
                     onClick={() => { setIsViewModalOpen(false); handleDeleteEntity(viewEntity._id || viewEntity.id); }}
-                    className="px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition-colors flex items-center gap-2"
+                    className="px-6 cursor-pointer py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl transition-colors flex items-center gap-2"
                   >
                     <Trash2 className="w-4 h-4" />
                     O'chirish

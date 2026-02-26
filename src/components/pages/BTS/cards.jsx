@@ -108,7 +108,7 @@ function Cards() {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={handleGoBack}
-            className="p-3 cursor-pointer bg-white rounded-xl  hover:shadow-md transition-all hover:bg-gray-50 border border-gray-200 flex items-center gap-2 text-gray-700 font-medium"
+            className="p-3 cursor-pointer bg-white rounded-xl    transition-all hover:bg-gray-50    flex items-center gap-2 text-gray-700 font-medium"
           >
             <ArrowLeft size={20} />
             Orqaga

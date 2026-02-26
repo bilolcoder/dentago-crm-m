@@ -692,7 +692,7 @@ function Bemorlarim() {
                         {appointment.status === 'pending' && (
                           <button
                             onClick={() => handleConfirm(appointment._id)}
-                            className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-all duration-300"
+                            className="text-green-600 hover:text-green-800 bg-green-50 cursor-pointer hover:bg-green-100 p-2 rounded-lg transition-all duration-300"
                             title="Tasdiqlash"
                           >
                             <TiTick size={20} />
@@ -764,13 +764,13 @@ function Bemorlarim() {
 
       {/* ================= MODAL ================= */}
       {(selectedAppointment || modalLoading || modalError) && (
-        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-60 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
             <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center z-10">
               <h2 className="text-2xl font-bold text-gray-800">To'liq ma'lumot</h2>
               <button
                 onClick={closeModal}
-                className="text-gray-400 hover:text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-all duration-300"
+                className="text-gray-400 cursor-pointer hover:text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-all duration-300"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -853,7 +853,7 @@ function Bemorlarim() {
                     {selectedAppointment.status !== 'cancelled' && selectedAppointment.status !== 'completed' && (
                       <button
                         onClick={() => handleCancel(selectedAppointment._id)}
-                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 px-6 rounded-xl font-semibold transition-all cursor-pointer duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -864,7 +864,7 @@ function Bemorlarim() {
 
                     <button
                       onClick={() => handleDelete(selectedAppointment._id)}
-                      className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-4 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                      className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-4 px-6 rounded-xl font-semibold transition-all cursor-pointer duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -944,7 +944,7 @@ function Bemorlarim() {
 
       {/* ================= TASDIQLASH MODALI ================= */}
       {isConfirmModalOpen && (
-        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-60 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fadeIn">
             <div className="p-6">
               <div className="text-center mb-6">

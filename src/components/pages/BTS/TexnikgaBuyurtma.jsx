@@ -278,7 +278,7 @@ function TexnikgaBuyurtma() {
           </button>
           <button
             onClick={() => setStatusFilter('rejected')}
-            className={`px-5 py-2.5  rounded-full text-sm font-medium transition-all ${
+            className={`px-5 py-2.5 cursor-pointer rounded-full text-sm font-medium transition-all ${
               statusFilter === 'rejected' ? 'bg-[#00BCE4] text-white shadow-md' : 'bg-white shadow'
             }`}
           >

@@ -415,7 +415,7 @@ function TechnicianManagement() {
                                     <button
                                         type="button"
                                         onClick={() => galleryInputRef.current.click()}
-                                        className="h-24 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-cyan-400 hover:text-cyan-500 transition"
+                                        className="h-24 rounded-xl border-2 border-dashed border-gray-200 cursor-pointer flex flex-col items-center justify-center text-gray-400 hover:border-cyan-400 hover:text-cyan-500 transition"
                                     >
                                         <Plus size={20} />
                                         <span className="text-[10px] mt-1">Rasm qo'shish</span>
@@ -453,7 +453,7 @@ function TechnicianManagement() {
                                         type="button"
                                         onClick={getCurrentLocation}
                                         disabled={isLocating}
-                                        className="p-3 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition disabled:opacity-50 flex items-center justify-center shadow-sm"
+                                        className="p-3 cursor-pointer bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition disabled:opacity-50 flex items-center justify-center shadow-sm"
                                         title="Joriy joylashuvni aniqlash"
                                     >
                                         {isLocating ? (

@@ -15,7 +15,15 @@ const TechniciansList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
-  const [searchTerm, setSearchTerm] = useState(''); // Qidiruv uchun state
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Modal state
+  const [modal, setModal] = useState({
+    isOpen: false,
+    type: null, // 'approve' yoki 'reject'
+    technicianId: null,
+    technicianName: ''
+  });
 
   const token = localStorage.getItem('accessToken');
 
@@ -38,52 +46,66 @@ const TechniciansList = () => {
     fetchTechnicians();
   }, []);
 
-  // Filterlash funksiyasi
   const filteredTechnicians = technicians.filter(tech => {
     const searchContent = `${tech.fullName} ${tech.phone}`.toLowerCase();
     return searchContent.includes(searchTerm.toLowerCase());
   });
 
-  const handleApprove = async (id) => {
-    if (!window.confirm("Ushbu texnikni tasdiqlashni xohlaysizmi?")) return;
-    setActionLoading(id);
-    try {
-      await axios.put(`https://app.dentago.uz/api/admin/technicians/${id}/approve`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTechnicians(prev => prev.map(tech =>
-        tech._id === id ? { ...tech, isApproved: true } : tech
-      ));
-      setMessage({ type: 'success', text: 'Texnik muvaffaqiyatli tasdiqlandi!' });
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Tasdiqlashda xato yuz berdi.' });
-    } finally {
-      setActionLoading(null);
-    }
+  // Modal ochish
+  const openModal = (type, id, name) => {
+    setModal({
+      isOpen: true,
+      type,
+      technicianId: id,
+      technicianName: name || 'texnik'
+    });
   };
 
-  const handleReject = async (id) => {
-    if (!window.confirm("Ushbu texnikni rad etishni xohlaysizmi?")) return;
-    setActionLoading(id);
+  const closeModal = () => {
+    setModal({
+      isOpen: false,
+      type: null,
+      technicianId: null,
+      technicianName: ''
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { type, technicianId } = modal;
+    if (!technicianId) return;
+
+    setActionLoading(technicianId);
+    closeModal();
+
     try {
-      await axios.put(`https://app.dentago.uz/api/admin/technicians/${id}/reject`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTechnicians(prev => prev.map(tech =>
-        tech._id === id ? { ...tech, isApproved: false } : tech
-      ));
-      setMessage({ type: 'success', text: 'Texnik rad etildi.' });
+      if (type === 'approve') {
+        await axios.put(`https://app.dentago.uz/api/admin/technicians/${technicianId}/approve`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setTechnicians(prev => prev.map(tech =>
+          tech._id === technicianId ? { ...tech, isApproved: true } : tech
+        ));
+        setMessage({ type: 'success', text: 'Texnik muvaffaqiyatli tasdiqlandi!' });
+      } else if (type === 'reject') {
+        await axios.put(`https://app.dentago.uz/api/admin/technicians/${technicianId}/reject`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setTechnicians(prev => prev.map(tech =>
+          tech._id === technicianId ? { ...tech, isApproved: false } : tech
+        ));
+        setMessage({ type: 'success', text: 'Texnik rad etildi.' });
+      }
     } catch (err) {
-      setMessage({ type: 'error', text: 'Rad etishda xato yuz berdi.' });
+      setMessage({ type: 'error', text: 'Amalni bajarishda xato yuz berdi.' });
     } finally {
       setActionLoading(null);
     }
   };
 
   const getRowStyle = (isApproved) => {
-    if (isApproved === true) return 'bg-green-100 border-green-200';
-    if (isApproved === false) return 'bg-red-100 border-red-200';
-    return 'bg-white hover:bg-cyan-50/30';
+    if (isApproved === true) return 'bg-green-50/60 border-green-100';
+    if (isApproved === false) return 'bg-red-50/60 border-red-100';
+    return 'bg-white hover:bg-cyan-50/40';
   };
 
   const truncateText = (text, limit = 20) => {
@@ -115,11 +137,11 @@ const TechniciansList = () => {
       </div>
 
       {message.text && (
-        <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 border animate-in fade-in slide-in-from-top-4 duration-300 ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'
+        <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 border ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'
           }`}>
           <AlertCircle size={20} />
           {message.text}
-          <button onClick={() => setMessage({ text: '' })} className="ml-auto opacity-50 hover:opacity-100">
+          <button onClick={() => setMessage({ text: '' })} className="ml-auto cursor-pointer opacity-60 hover:opacity-100">
             <X size={16} />
           </button>
         </div>
@@ -127,36 +149,31 @@ const TechniciansList = () => {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center pb-50">
+          <div className="flex items-center justify-center py-20">
             <LoadingSpinner text="Texniklar yuklanmoqda" />
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="unified-table">
+            <table className="min-w-full divide-y divide-gray-100">
               <thead>
-                <tr className="bg-gray-50 text-white">
-                  <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Ism Familiya</th>
-                  <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Telefon</th>
-                  {/* <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Tajriba</th> */}
-                  {/* <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Tavsif</th> */}
-                  <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider">Status</th>
-                  <th className="px-6 py-4 font-semibold uppercase text-xs tracking-wider text-center">Amallar</th>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Ism Familiya</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Telefon</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-600">Amallar</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {filteredTechnicians.length > 0 ? (
                   filteredTechnicians.map((tech) => (
                     <tr
                       key={tech._id}
-                      className={`transition-colors duration-300 bg-white hover:bg-cyan-50/30 `}
+                      className={`transition-colors ${getRowStyle(tech.isApproved)}`}
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm ${tech.isApproved !== undefined && tech.isApproved !== null
-                              ? 'bg-white text-gray-700'
-                              : 'bg-cyan-100 text-[#00BCE4]'
-                            }`}>
-                            {tech.fullName?.charAt(0)}
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm ${tech.isApproved === true ? 'bg-green-100 text-green-700' : tech.isApproved === false ? 'bg-red-100 text-red-700' : 'bg-cyan-100 text-[#00BCE4]'}`}>
+                            {tech.fullName?.charAt(0) || '?'}
                           </div>
                           <span className="font-medium text-gray-800">{tech.fullName || 'Nomaʼlum'}</span>
                         </div>
@@ -167,42 +184,29 @@ const TechniciansList = () => {
                           {tech.phone || '—'}
                         </div>
                       </td>
-                      {/* <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${tech.isApproved !== undefined && tech.isApproved !== null
-                            ? 'bg-white/60 text-gray-700'
-                            : 'bg-blue-50 text-blue-600'
-                          }`}>
-                          {tech.experienceYears || 0} yil
-                        </span>
-                      </td> */}
-                      {/* <td className="px-6 py-4 text-gray-500 italic text-sm">
-                        {truncateText(tech.description)}
-                      </td> */}
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full  text-xs font-semibold ${tech.isApproved === true ? 'bg-green-50 text-green-700' : tech.isApproved === false ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-500'
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${tech.isApproved === true ? 'bg-green-100 text-green-700' : tech.isApproved === false ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
                           }`}>
-                          {tech.isApproved === true ? 'Tasdiqlangan' : tech.isApproved === false ? 'Bekor qilingan' : 'Kutilmoqda'}
+                          {tech.isApproved === true ? 'Tasdiqlangan' : tech.isApproved === false ? 'Rad etilgan' : 'Kutilmoqda'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex justify-center gap-3">
-                          {/* Tasdiqlash tugmasi faqat tasdiqlanmagan va bekor qilinmagan uchun */}
                           {tech.isApproved !== true && (
                             <button
-                              onClick={() => handleApprove(tech._id)}
+                              onClick={() => openModal('approve', tech._id, tech.fullName)}
                               disabled={actionLoading === tech._id}
-                              className={`p-2 rounded-lg cursor-pointer transition shadow-sm border bg-white text-green-600 border-green-100 hover:bg-green-600 hover:text-white`}
+                              className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 cursor-pointer hover:text-white border border-green-200 transition disabled:opacity-50"
                               title="Tasdiqlash"
                             >
                               {actionLoading === tech._id ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
                             </button>
                           )}
-                          {/* Bekor qilish tugmasi faqat tasdiqlanmagan va bekor qilinmagan uchun */}
                           {tech.isApproved !== false && (
                             <button
-                              onClick={() => handleReject(tech._id)}
+                              onClick={() => openModal('reject', tech._id, tech.fullName)}
                               disabled={actionLoading === tech._id}
-                              className={`p-2 rounded-lg cursor-pointer transition shadow-sm border bg-white text-red-600 border-red-100 hover:bg-red-600 hover:text-white`}
+                              className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 cursor-pointer hover:text-white border border-red-200 transition disabled:opacity-50"
                               title="Rad etish"
                             >
                               {actionLoading === tech._id ? <Loader2 size={18} className="animate-spin" /> : <X size={18} />}
@@ -214,8 +218,8 @@ const TechniciansList = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="px-6 py-10 text-center text-gray-400">
-                      {searchTerm ? `"${searchTerm}" bo'yicha hech kim topilmadi.` : "Hech qanday texnik topilmadi."}
+                    <td colSpan={4} className="px-6 py-16 text-center text-gray-400">
+                      {searchTerm ? `"${searchTerm}" bo'yicha hech narsa topilmadi` : "Hozircha texniklar mavjud emas"}
                     </td>
                   </tr>
                 )}
@@ -224,6 +228,52 @@ const TechniciansList = () => {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                {modal.type === 'approve' ? 'Texnikni tasdiqlash' : 'Texnikni rad etish'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {modal.type === 'approve'
+                  ? `"${modal.technicianName}" nomli texnikni haqiqatan ham tasdiqlamoqchimisiz?`
+                  : `"${modal.technicianName}" nomli texnikni haqiqatan ham rad etmoqchimisiz?`
+                }
+              </p>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={closeModal}
+                  className="px-5 py-2.5 rounded-lg border border-gray-300 cursor-pointer text-gray-700 hover:bg-gray-50 transition"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  onClick={handleConfirmAction}
+                  className={`px-5 py-2.5 cursor-pointer rounded-lg text-white transition flex items-center gap-2 ${
+                    modal.type === 'approve'
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  {modal.type === 'approve' ? (
+                    <>
+                      <Check size={18} /> Ha, tasdiqlayman
+                    </>
+                  ) : (
+                    <>
+                      <X size={18} /> Ha, rad etaman
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
