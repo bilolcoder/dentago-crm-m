@@ -92,13 +92,13 @@ const LocationPage = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="py-6 min-h-screen">
+      <div className="">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Joylashuvlar</h1>
           <button
             onClick={openModal}
-            className="bg-[#02BBE2] hover:bg-[#02a5c9] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow-lg transition-all duration-200 hover:shadow-xl"
+            className="bg-[#02BBE2] hover:bg-[#02a5c9] text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow-lg transition-all duration-200 hover:shadow-xl cursor-pointer outline-none"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -134,7 +134,7 @@ const LocationPage = () => {
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-[60] p-4">
-            <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl">
+            <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-x-auto shadow-2xl">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <h2 className="text-2xl font-bold text-gray-800">
@@ -142,7 +142,7 @@ const LocationPage = () => {
                   </h2>
                   <button
                     onClick={closeModal}
-                    className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer outline-none"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -169,7 +169,7 @@ const LocationPage = () => {
                               required: 'Joylashuv nomi majburiy', 
                               minLength: { value: 3, message: 'Kamida 3 belgi kiriting' }
                             })}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all cursor-pointer outline-none"
                             placeholder="Masalan: Toshkent Markaz"
                           />
                           {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
@@ -181,7 +181,7 @@ const LocationPage = () => {
                           </label>
                           <textarea
                             {...register('description')}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all cursor-pointer outline-none"
                             rows="4"
                             placeholder="Joylashuv haqida batafsil tavsif..."
                           />
@@ -200,7 +200,7 @@ const LocationPage = () => {
                                 min: { value: -90, message: 'Kenglik -90 dan 90 gacha bo\'lishi kerak' },
                                 max: { value: 90, message: 'Kenglik -90 dan 90 gacha bo\'lishi kerak' }
                               })}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all cursor-pointer outline-none"
                               placeholder="41.3111"
                             />
                             {errors.lat && <p className="text-red-500 text-sm mt-1">{errors.lat.message}</p>}
@@ -218,7 +218,7 @@ const LocationPage = () => {
                                 min: { value: -180, message: 'Uzunlik -180 dan 180 gacha bo\'lishi kerak' },
                                 max: { value: 180, message: 'Uzunlik -180 dan 180 gacha bo\'lishi kerak' }
                               })}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#02BBE2] focus:border-transparent transition-all cursor-pointer outline-none"
                               placeholder="69.2797"
                             />
                             {errors.lng && <p className="text-red-500 text-sm mt-1">{errors.lng.message}</p>}
@@ -246,13 +246,13 @@ const LocationPage = () => {
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium cursor-pointer outline-none"
                   >
                     Bekor qilish
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-[#02BBE2] text-white rounded-lg hover:bg-[#02a5c9] transition-colors font-medium shadow-lg hover:shadow-xl"
+                    className="px-6 py-3 bg-[#02BBE2] text-white rounded-lg hover:bg-[#02a5c9] transition-colors font-medium shadow-lg hover:shadow-xl cursor-pointer outline-none"
                   >
                     {selectedLocation ? 'Yangilash' : 'Qo\'shish'}
                   </button>
