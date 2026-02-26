@@ -11,6 +11,8 @@ import {
     CreditCard,
     FileText,
     BookOpen,
+    LocationEdit,
+    MapPin,
 } from 'lucide-react';
 import { UZ, US, RU } from 'country-flag-icons/react/3x2';
 import { useNavigate } from 'react-router-dom';
@@ -290,6 +292,10 @@ const Header = ({ setIsSidebarOpen, isSidebarOpen, currentPage }) => {
                                 <button onClick={() => { navigate('/payments/tariffs'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group cursor-pointer">
                                     <FileText className="w-4 h-4 mr-3 text-slate-400 group-hover:text-[#00BCE4]" />
                                     <span className="font-medium">{t('tariffs') || "Tariflar"}</span>
+                                </button>
+                                <button onClick={() => { navigate('/my-location'); setIsProfileMenuOpen(false); }} className="flex items-center w-full px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 hover:text-[#00BCE4] group cursor-pointer">
+                                    <MapPin className="w-4 h-4 mr-3 text-slate-400 group-hover:text-[#00BCE4]" />
+                                    <span className="font-medium">{t('my_location') || "Mening joylashuvim"}</span>
                                 </button>
 
                                 <div className="h-px bg-blue-50 my-2"></div>

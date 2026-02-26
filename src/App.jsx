@@ -28,6 +28,7 @@ import BrandsContent from './components/storage/BrandsContent';
 import UnitsContent from './components/storage/UnitsContent';
 import SuppliersContent from './components/storage/SuppliersContent';
 import ProductUsageContent from './components/storage/ProductUsageContent';
+import MyLocationContent from './location/indexL';
 
 // BTS / Orders
 import OrderList from './components/pages/BTS/OrderList';
@@ -183,6 +184,7 @@ const ProtectedLayout = () => {
               <Route path="/storage/units" element={<UnitsContent />} />
               <Route path="/storage/suppliers" element={<SuppliersContent />} />
               <Route path="/storage/usage" element={<ProductUsageContent />} />
+              <Route path="/my-location" element={<MyLocationContent />} />
 
               {/* Buyurtmalar / BTS */}
               <Route path="/orders" element={<OrderList />} />
