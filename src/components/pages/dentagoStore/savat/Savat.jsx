@@ -870,10 +870,16 @@ const Savat = () => {
                       <button
                         key={method.id}
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method.id }))}
-                        className="cursor-pointer"
+                        onClick={() => {
+                          // Faqat Payme tanlanishi mumkin
+                          if (method.id === 'payme') {
+                            setFormData(prev => ({ ...prev, paymentMethod: method.id }));
+                          }
+                        }}
+                        className={`cursor-pointer ${method.id !== 'payme' ? 'opacity-50' : ''}`}
+                        style={method.id !== 'payme' ? { cursor: 'not-allowed' } : {}}
                       >
-                        <div className={`relative p-3 rounded-xl transition-all ${formData.paymentMethod === method.id ? method.bgColor : method.lightBg}`}>
+                        <div className={`relative p-3 rounded-xl transition-all ${formData.paymentMethod === method.id ? method.bgColor : method.lightBg} ${method.id !== 'payme' ? 'grayscale' : ''}`}>
                           <div className="flex items-center justify-between mb-3">
                             <span className={`text-xs font-bold ${formData.paymentMethod === method.id ? 'text-white' : method.textColor}`}>{method.name}</span>
                             <div className={`w-8 h-5 rounded flex items-center justify-center ${formData.paymentMethod === method.id ? 'bg-white/20' : 'bg-white'}`}>
