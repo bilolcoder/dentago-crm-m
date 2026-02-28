@@ -58,9 +58,9 @@ const PurchaseModal = ({
                                 <p className="text-xs text-gray-500">{selectedItemsList.length} ta mahsulot</p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-all cursor-pointer">
+                        {/* <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-all cursor-pointer">
                             <X className="w-5 h-5" />
-                        </button>
+                        </button> */}
                     </div>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-5">

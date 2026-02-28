@@ -11,6 +11,7 @@ import { useSocket } from "../../../../context/SocketContext";
 import PaymeSvg from '../../../../assets/payme.png';
 import ClickSvg from '../../../../assets/click.png';
 import RahmatSvg from '../../../../assets/rahmat.png';
+import { QRCodeSVG } from 'qrcode.react';
 
 const BASE_URL = "https://app.dentago.uz";
 
@@ -78,9 +79,6 @@ export const AddToCartButton = ({ productId, productName, productPrice, quantity
   );
 };
 
-// =============================================
-// ASOSIY SAVAT SAHIFASI
-// =============================================
 const Savat = () => {
   const socket = useSocket();
   const [apiCartItems, setApiCartItems] = useState([]);
@@ -92,7 +90,6 @@ const Savat = () => {
   const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(true);
 
-  // Modal state'lari
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [formData, setFormData] = useState({ fullName: '', phone: '', address: '', paymentMethod: 'payme' });
   const [formErrors, setFormErrors] = useState({});
@@ -101,9 +98,12 @@ const Savat = () => {
   const [showLocationPermission, setShowLocationPermission] = useState(false);
   const [locationStatus, setLocationStatus] = useState('pending');
 
-  // Success modal state
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successData, setSuccessData] = useState(null);
+
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [paymentLink, setPaymentLink] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -113,21 +113,44 @@ const Savat = () => {
     { id: 'rahmat', name: 'Rahmat', icon: RahmatSvg, bgColor: 'bg-gradient-to-br from-red-300 to-red-400', lightBg: 'bg-red-50', textColor: 'text-red-600' }
   ];
 
+  // selectedItemsList ni har safar hisoblash
+  const selectedItemsList = apiCartItems.filter(item => selectedItems[item.id]);
+  const selectedCount = selectedItemsList.reduce((acc, item) => acc + item.quantity, 0);
+  const selectedTotal = selectedItemsList.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
+
+  // Savatni tozalash funksiyasi
+  const clearCartAfterPayment = async (orderId) => {
+    try {
+      const token = getToken();
+      if (!token) return;
+
+      console.log("🧹 Savat tozalanmoqda... orderId:", orderId);
+      
+      // Tanlangan mahsulotlarni savatdan o'chirish
+      const itemsToRemove = apiCartItems.filter(item => selectedItems[item.id]);
+      
+      await Promise.all(itemsToRemove.map(item =>
+        axios.delete(`${BASE_URL}/api/cart/item/${item.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }, timeout: 5000
+        }).catch(err => console.log("Item o'chirish xatosi:", err))
+      ));
+      
+      // Savatni yangilash
+      await fetchCartFromAPI(false);
+      console.log("✅ Savat tozalandi");
+    } catch (error) {
+      console.error("Savatni tozalashda xato:", error);
+    }
+  };
+
   useEffect(() => {
     if (!socket) {
       console.warn("⚠️ Socket ishlamayapti - useSocket hook null qaytarmoqda");
       return;
     }
 
-    // Socket соединение логирование
-    console.log("🔗 Socket.io soединение:", socket.connected);
-    console.log("📡 Socket ID:", socket.id);
-    console.log("🛠️ Socket.io ready 🎉");
-
-    // Socket соединение событиялари
     const handleConnect = () => {
       console.log("%c✅ SOCKET СОЕДИНЕНИЕ УСТАНОВЛЕНО", "color: #22c55e; font-size: 14px; font-weight: bold;");
-      console.log("📡 Socket ID:", socket.id);
     };
 
     const handleDisconnect = () => {
@@ -142,16 +165,27 @@ const Savat = () => {
     socket.on("disconnect", handleDisconnect);
     socket.on("connect_error", handleConnectError);
 
-    // To'lov событиялари
-    const handleSuccess = (data) => {
+    const handleSuccess = async (data) => {
       console.log("%c✅ To'lov muvaffaqiyatli:", "color: #22c55e; font-size: 12px;", data);
+      
+      // Success modalni ko'rsatish
       setSuccessData(data);
       setShowSuccessModal(true);
-      setIsPurchaseModalOpen(false);
+      
+      // QR modalni yopish
+      setShowQRModal(false);
+      
+      // SAVATNI TOZALASH - to'lov muvaffaqiyatli bo'lgandan keyin
+      if (currentOrderId) {
+        await clearCartAfterPayment(currentOrderId);
+      }
+      
+      setCurrentOrderId(null);
     };
 
     const handleFailed = (data) => {
       console.log("%c❌ To'lov muvaffaqiyatsiz:", "color: #ef4444; font-size: 12px;", data);
+      setShowQRModal(false);
     };
 
     socket.on("payment_success", handleSuccess);
@@ -164,22 +198,7 @@ const Savat = () => {
       socket.off("payment_success", handleSuccess);
       socket.off("payment_failed", handleFailed);
     };
-  }, [socket]);
-
-  // Dastlabki socket tekshiruvi
-  useEffect(() => {
-    const checkSocket = () => {
-      if (socket?.connected) {
-        console.log("%c✅ Socket allaqachon soединено!", "color: #22c55e; font-size: 12px;");
-      } else if (socket) {
-        console.log("%c⏳ Socket soединishga kutyapdi...", "color: #3b82f6; font-size: 12px;");
-      }
-    };
-
-    checkSocket();
-    const checkInterval = setInterval(checkSocket, 3000);
-    return () => clearInterval(checkInterval);
-  }, []);
+  }, [socket, currentOrderId, apiCartItems, selectedItems]); // Dependency array ga qo'shildi
 
   useEffect(() => { fetchCartFromAPI(); }, []);
 
@@ -308,10 +327,6 @@ const Savat = () => {
     }
   };
 
-  const selectedItemsList = apiCartItems.filter(item => selectedItems[item.id]);
-  const selectedCount = selectedItemsList.reduce((acc, item) => acc + item.quantity, 0);
-  const selectedTotal = selectedItemsList.reduce((acc, item) => acc + item.narxi * item.quantity, 0);
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) newErrors.fullName = "Ism va familiya kiriting";
@@ -365,50 +380,67 @@ const Savat = () => {
         products: selectedItemsList.map(item => item.product_id)
       };
 
-      const response = await axios.post(`${BASE_URL}/api/order/create`, orderData, {
+      console.log("1. Buyurtma yaratish uchun ma'lumot:", orderData);
+
+      const orderResponse = await axios.post(`${BASE_URL}/api/order/create`, orderData, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         timeout: 15000
       });
 
-      if (response.data.success) {
-        const orderId = response.data.data?.order?._id || response.data.data?._id;
-        const amount = response.data.data?.order?.total || selectedTotal;
-        console.log("📦 Buyurtma yaratildi:", orderId);
-        console.log("💳 To'lov usuli:", formData.paymentMethod);
-        console.log("💰 Jami to'lov:", amount);
+      console.log("2. Buyurtma yaratildi - to'liq javob:", orderResponse.data);
 
-        if (socket && socket.connected) {
-          console.log("🔄 Socket orqali to'lov obunasini qo'shish...");
-          socket.emit("payment:subscribe", { orderId }, (response) => {
-            console.log("🎯 Obuna qabul qilindi:", response);
-          });
+      if (orderResponse.data.success) {
+        const orderData = orderResponse.data.data;
+        const orderId = orderData._id;
+        
+        console.log("3. Olingan orderId:", orderId);
+        
+        if (!orderId) {
+          console.error("Buyurtma _id topilmadi! orderData:", orderData);
+          alert("Buyurtma yaratildi, lekin ID topilmadi. Administratorga xabar bering.");
+          return;
+        }
+
+        setCurrentOrderId(orderId);
+
+        console.log("4. To'lov linki so'ralmoqda. order_id:", orderId);
+        
+        const paymentResponse = await axios.post(`${BASE_URL}/api/payment/generate/payme`, {
+          order_id: orderId
+        }, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          timeout: 15000
+        });
+
+        console.log("5. Payment javobi:", paymentResponse.data);
+
+        if (paymentResponse.data.success && paymentResponse.data.url) {
+          console.log("6. Payment url olindi:", paymentResponse.data.url);
+          setPaymentLink(paymentResponse.data.url);
+          
+          // SOCKET ORQALI OBUNA
+          if (socket && socket.connected) {
+            console.log("7. Socket orqali to'lov obunasini qo'shish... orderId:", orderId);
+            socket.emit("payment:subscribe", { orderId }, (response) => {
+              console.log("8. Obuna qabul qilindi:", response);
+            });
+          } else {
+            console.warn("⚠️ Socket soedinение yo'q");
+          }
+
+          // QR MODALNI OCHISH (savat tozalanmaydi!)
+          setIsPurchaseModalOpen(false);
+          setShowQRModal(true);
+          
+          console.log("9. QR modal ochildi. To'lov kutilmoqda...");
         } else {
-          console.warn("⚠️ Socket soединение yo'q");
+          console.error("To'lov url olinmadi:", paymentResponse.data);
+          alert("To'lov sahifasini yaratishda xato yuz berdi: " + (paymentResponse.data.message || "Noma'lum xato"));
         }
-
-        const paymentUrls = { payme: "https://payme.uz/", click: "https://click.uz/", rahmat: "https://rhmt.uz/" };
-        const paymentUrl = paymentUrls[formData.paymentMethod];
-        if (paymentUrl) {
-          console.log("🌐 To'lov sahifasiga o'tish:", paymentUrl);
-          window.open(paymentUrl, "_blank");
-        }
-
-        await Promise.all(selectedItemsList.map(item =>
-          axios.delete(`${BASE_URL}/api/cart/item/${item.id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }, timeout: 5000
-          }).catch(() => { })
-        ));
-
-        await fetchCartFromAPI(false);
-        setIsPurchaseModalOpen(false);
-        setFormData({ fullName: '', phone: '', address: '', paymentMethod: 'payme' });
-        setLocationStatus('pending');
-
-        // Don't navigate yet - wait for payment success via socket
-        console.log("⏳ To'lov tasdiqini kutilmoqda...");
       }
     } catch (error) {
       console.error('Purchase error:', error);
+      alert("Xatolik yuz berdi: " + (error.response?.data?.message || error.message));
     } finally {
       setIsSubmitting(false);
     }
@@ -417,17 +449,18 @@ const Savat = () => {
   const closeModal = () => {
     setIsPurchaseModalOpen(false);
     setShowSuccessModal(false);
+    setShowQRModal(false);
     setFormErrors({});
     setLocationStatus('pending');
     setShowLocationPermission(false);
+    setPaymentLink(null);
+    setCurrentOrderId(null);
   };
 
-  // Loading
   if (loading) {
     return <LoadingSpinner size="lg" color="primary" fullscreen text="Savat yuklanmoqda..." />;
   }
 
-  // Error
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-white p-6">
@@ -444,7 +477,6 @@ const Savat = () => {
     );
   }
 
-  // Bo'sh savat
   if (apiCartItems.length === 0) {
     return (
       <div className="min-h-screen">
@@ -474,28 +506,21 @@ const Savat = () => {
     );
   }
 
-  // ─── Order Summary Panel (qayta ishlatiladigan komponent) ────────────────
   const OrderSummaryPanel = ({ isMobile = false }) => (
     <div className={isMobile
       ? "px-5 py-4"
       : "bg-white rounded-2xl shadow-sm border border-gray-100 p-5"
     }>
-      {/* Desktop — sarlavha */}
       {!isMobile && (
         <h2 className="text-base font-semibold text-gray-900 mb-4">Buyurtma xulosasi</h2>
       )}
 
-      {/* Desktop — narx breakdown */}
       {!isMobile && (
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Mahsulotlar ({selectedCount} ta)</span>
             <span className="font-medium text-gray-800">{selectedTotal.toLocaleString()} so'm</span>
           </div>
-          {/* <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Yetkazib berish</span>
-            <span className="text-green-500 font-medium">Bepul</span>
-          </div> */}
           <div className="border-t border-gray-100 pt-2 flex justify-between font-bold text-base">
             <span>Jami:</span>
             <span>{selectedTotal.toLocaleString()} so'm</span>
@@ -503,7 +528,6 @@ const Savat = () => {
         </div>
       )}
 
-      {/* Mobile — narx + tugma inline */}
       {isMobile && (
         <div className="flex items-center gap-4">
           <div className="flex-1">
@@ -524,7 +548,6 @@ const Savat = () => {
         </div>
       )}
 
-      {/* Desktop — to'liq tugma */}
       {!isMobile && (
         <>
           <button
@@ -546,12 +569,8 @@ const Savat = () => {
     </div>
   );
 
-  // ─── MAIN RENDER ─────────────────────────────────────────────────────────
   return (
-    /* Mobilda pastga joy qoldirish, desktopda yo'q */
     <div className="min-h-screen pb-24 md:pb-0">
-
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="py-3 px-4">
           <div className="flex items-center justify-between">
@@ -566,19 +585,8 @@ const Savat = () => {
         </div>
       </div>
 
-      {/*
-        ┌─────────────────────────────────────────────────────────────────┐
-        │  LAYOUT:                                                        │
-        │  ≥ md  →  flex row: [mahsulotlar list]  [sticky right panel]   │
-        │  < md  →  faqat mahsulotlar + fixed bottom panel               │
-        └─────────────────────────────────────────────────────────────────┘
-      */}
       <div className="lg:flex lg:gap-6 lg:items-start lg:py-6">
-
-        {/* Chap: mahsulotlar */}
         <div className="flex-1 min-w-0">
-
-          {/* Select all bar */}
           <div className="my-4 mx-4 md:mx-0">
             <div className="bg-white rounded-xl p-3 flex items-center justify-between shadow-sm">
               <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -602,7 +610,6 @@ const Savat = () => {
             </div>
           </div>
 
-          {/* Mahsulotlar */}
           <div className="space-y-3 lg:px-0">
             {apiCartItems.map(item => (
               <div key={item.id} className="bg-white rounded-xl p-4 shadow-sm relative">
@@ -673,22 +680,17 @@ const Savat = () => {
           </div>
         </div>
 
-        {/* ── O'NG PANEL: faqat md+ ekranlarda sticky sidebar ── */}
         <div className="hidden md:block w-full lg:w-80 flex-shrink-0 bottom-0 sticky top-30">
           <OrderSummaryPanel isMobile={false} />
         </div>
       </div>
 
-      {/* ── PASTKI PANEL: faqat mobil (md dan kichik) ekranlarda fixed ── */}
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] md:hidden">
         <OrderSummaryPanel isMobile={true} />
       </div>
 
-      {/* ===== MODAL ===== */}
       {isPurchaseModalOpen && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-
-          {/* Lokatsiya ruxsati ekrani */}
           {showLocationPermission ? (
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
               <div className="flex flex-col items-center text-center mb-6">
@@ -740,9 +742,7 @@ const Savat = () => {
               </div>
             </div>
           ) : (
-            /* Asosiy buyurtma modal */
             <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
-              {/* Modal header */}
               <div className="sticky top-0 bg-white border-b border-gray-200 p-5 rounded-t-2xl z-10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -761,7 +761,6 @@ const Savat = () => {
               </div>
 
               <form onSubmit={handlePurchase} className="p-5 space-y-5">
-                {/* Ism */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">
                     <User className="w-3.5 h-3.5 inline mr-1" /> Ism Familiya
@@ -776,7 +775,6 @@ const Savat = () => {
                   {formErrors.fullName && <p className="mt-1 text-xs text-red-500">{formErrors.fullName}</p>}
                 </div>
 
-                {/* Telefon */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">
                     <Smartphone className="w-3.5 h-3.5 inline mr-1" /> Telefon
@@ -791,7 +789,6 @@ const Savat = () => {
                   {formErrors.phone && <p className="mt-1 text-xs text-red-500">{formErrors.phone}</p>}
                 </div>
 
-                {/* Lokatsiya statusi */}
                 {locationStatus !== 'pending' && (
                   <div className={`p-3 rounded-xl border ${locationStatus === 'granted' ? 'bg-green-50 border-green-200' : 'bg-gray-100 border-gray-200'}`}>
                     <div className="flex items-center justify-between">
@@ -821,7 +818,6 @@ const Savat = () => {
                   </div>
                 )}
 
-                {/* Manzil */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">
                     <MapPin className="w-3.5 h-3.5 inline mr-1" /> Yetkazib berish manzili
@@ -852,7 +848,6 @@ const Savat = () => {
                   {formErrors.address && <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>}
                 </div>
 
-                {/* Buyurtma tafsilotlari */}
                 <div className="rounded-xl shadow-sm p-4">
                   <h3 className="text-black/80 text-xs mb-3">Buyurtma tafsilotlari</h3>
                   <div className="space-y-2">
@@ -860,10 +855,6 @@ const Savat = () => {
                       <span className="text-black/60 text-xs">Mahsulotlar ({selectedCount} ta)</span>
                       <span className="text-black font-medium text-sm">{selectedTotal.toLocaleString()} so'm</span>
                     </div>
-                    {/* <div className="flex justify-between">
-                      <span className="text-black/60 text-xs">Yetkazib berish</span>
-                      <span className="text-green-400 text-xs font-medium">Bepul</span>
-                    </div> */}
                     <div className="border-t border-gray-100 my-2"></div>
                     <div className="flex justify-between">
                       <span className="text-black text-sm">Jami:</span>
@@ -872,7 +863,6 @@ const Savat = () => {
                   </div>
                 </div>
 
-                {/* To'lov usuli */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-3">To'lov usulini tanlang</label>
                   <div className="grid grid-cols-3 gap-3">
@@ -910,7 +900,6 @@ const Savat = () => {
                   </div>
                 </div>
 
-                {/* Tugmalar */}
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
@@ -936,11 +925,9 @@ const Savat = () => {
         </div>
       )}
 
-      {/* ===== SUCCESS MODAL ===== */}
       {showSuccessModal && successData && (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-in zoom-in-95">
-            {/* Success Icon */}
             <div className="flex flex-col items-center pt-8">
               <div className="relative">
                 <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
@@ -952,12 +939,10 @@ const Savat = () => {
               </div>
             </div>
 
-            {/* Content */}
             <div className="p-8 text-center">
               <h2 className="text-3xl font-bold text-gray-900 mb-3">To'lov Muvaffaqiyatli!</h2>
               <p className="text-gray-600 mb-6">Buyurtmangiz qabul qilindi va tayyorlashni boshladi</p>
 
-              {/* Order Details */}
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 mb-6 space-y-3 border border-blue-100">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600 text-sm">Buyurtma ID:</span>
@@ -989,13 +974,11 @@ const Savat = () => {
                 )}
               </div>
 
-              {/* Message */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-6">
                 <p className="text-green-700 text-sm font-medium">✅ To'lovingiz tamam, buyurtmangiz yetkazib beriladi</p>
               </div>
             </div>
 
-            {/* Button */}
             <div className="px-8 pb-8">
               <button
                 onClick={() => {
@@ -1015,6 +998,87 @@ const Savat = () => {
               >
                 Yana Xarid Qilish
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QR MODAL */}
+      {showQRModal && paymentLink && (
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl overflow-hidden w-full max-w-md shadow-2xl relative">
+            {/* X tugmasi */}
+            <button
+              onClick={() => setShowQRModal(false)}
+              className="absolute top-4 right-4 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-all cursor-pointer outline-none"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <div className="p-8 text-center h-[90vh] overflow-y-auto">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Payme orqali to'lov</h2>
+              <p className="text-gray-600 text-sm mb-6">
+                QR kodni skanerlang va to'lovni amalga oshiring
+              </p>
+
+              {/* QR KOD */}
+              <div className="flex justify-center mb-6 p-4">
+                <QRCodeSVG
+                  value={paymentLink}
+                  size={240}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+
+              {/* To'lov summasi */}
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6">
+                <p className="text-gray-600 text-sm mb-1">To'lov summasi:</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {selectedTotal.toLocaleString()} so'm
+                </p>
+              </div>
+
+              {/* Qo'llanma */}
+              <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left">
+                <p className="text-blue-800 text-sm font-medium mb-2 flex items-center gap-2">
+                  <span>📱</span> Qanday to'lash kerak:
+                </p>
+                <ol className="text-blue-700 text-xs space-y-2 list-decimal pl-5">
+                  <li>Payme ilovasini oching</li>
+                  <li>"QR to'lov" bo'limiga o'ting</li>
+                  <li>QR kodni skanerlang</li>
+                  <li>To'lovni tasdiqlang</li>
+                </ol>
+              </div>
+
+              {/* Tugmalar */}
+              <div className="space-y-2">
+                <button
+                  onClick={() => setShowQRModal(false)}
+                  className="w-full py-3 bg-gradient-to-r from-blue-400 to-cyan-600 text-white rounded-xl font-bold transition-all cursor-pointer outline-none"
+                >
+                  Yopish
+                </button>
+                <button
+                  onClick={() => window.open(paymentLink, '_blank')}
+                  className="w-full py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all cursor-pointer outline-none"
+                >
+                  To'lov sahifasini ochish
+                </button>
+              </div>
             </div>
           </div>
         </div>
