@@ -65,7 +65,6 @@ ${message}`;
       const updatedRequests = [requestWithId, ...savedRequests];
       localStorage.setItem('needRequests', JSON.stringify(updatedRequests));
 
-      // alert('Xabaringiz muvaffaqiyatli yuborildi!');
       reset();
 
     } catch (error) {
