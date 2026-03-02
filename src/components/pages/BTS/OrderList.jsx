@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Package, Loader2, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Search, Package, Loader2, X, ChevronLeft, ChevronRight, Check, CreditCard } from 'lucide-react';
 import LoadingSpinner from '../../common/LoadingSpinner';
 import axios from 'axios';
 import { useData } from '../../../context/DataProvider';
@@ -17,6 +17,8 @@ function Aperator() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [technicianOrders, setTechnicianOrders] = useState([]);
   const [filteredTechOrders, setFilteredTechOrders] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
 
   const [orderStats, setOrderStats] = useState({
     totalOrders: 0,
@@ -33,14 +35,12 @@ function Aperator() {
   const [actionLoading, setActionLoading] = useState({});
   const [techActionLoading, setTechActionLoading] = useState({});
 
-  // Bekor qilish sababi uchun modal
   const [rejectModal, setRejectModal] = useState({
     open: false,
     requestId: null,
     description: ''
   });
 
-  // Bajarildi tasdiqlash uchun modal
   const [confirmCompleteModal, setConfirmCompleteModal] = useState({
     open: false,
     requestId: null
@@ -48,6 +48,11 @@ function Aperator() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState('payme');
+
+  // ───────────────────────────────────────────────
+  //                FETCH FUNCTIONS
+  // ───────────────────────────────────────────────
 
   const fetchProductOrders = async () => {
     try {
@@ -72,6 +77,7 @@ function Aperator() {
       } catch (e) {
         console.warn("Stats xatosi:", e);
       }
+
       setOrderStats(stats);
 
       const flatOrders = ordersData.flatMap(order => {
@@ -86,7 +92,6 @@ function Aperator() {
 
         let userName = "Noma'lum foydalanuvchi";
         let userPhone = "—";
-
         if (order.user_id && typeof order.user_id === 'object') {
           userName = order.user_id.username || "Noma'lum foydalanuvchi";
           userPhone = order.user_id.phone || '—';
@@ -111,14 +116,13 @@ function Aperator() {
       setFilteredOrders(flatOrders);
     } catch (err) {
       console.error("Mahsulot buyurtmalari xatosi:", err);
-      console.log("Ma'lumotlarni yuklashda xatolik: " + err.message);
     }
   };
 
   const fetchTechnicianOrders = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) throw new Error("Token topilmadi!");
+      if (!token) return;
 
       const res = await axios.get(`${BASE_URL}/api/admin/technicians/requests`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -145,19 +149,62 @@ function Aperator() {
       }
     } catch (err) {
       console.error("Texnik buyurtmalari xatosi:", err);
-      // console.log("Texnik buyurtmalarini yuklashda xatolik: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const fetchPaymentTransactions = async (method = paymentMethodFilter) => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      const url = `${BASE_URL}/api/payment/transactions?page=1&limit=500`;
+
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.data?.success && Array.isArray(res.data.data || res.data.transactions)) {
+        const txs = (res.data.data || res.data.transactions).map(t => ({
+          id: t._id,
+          transactionId: t.transaction || t._id?.slice(-10)?.toUpperCase() || '—',
+          totalAmount: t.order_id?.totalAmount || t.amount || null,
+          orderNumber: t.order_id?.orderNumber || t.orderNumber || "—",
+          userName: t.user?.username || t.user?.phone || "—",
+          userPhone: t.user?.phone || "—",
+          paymentMethod: (t.payment_method || method || 'unknown').toUpperCase(),
+          createdAt: t.created_at
+            ? new Date(t.created_at).toLocaleString('uz-UZ', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+            : '—',
+          status: t.status || "PAID"
+        }));
+
+        setTransactions(txs);
+        setFilteredTransactions(txs);
+      } else {
+        setTransactions([]);
+        setFilteredTransactions([]);
+      }
+    } catch (err) {
+      console.error("To'lov tranzaksiyalari xatosi:", err);
+      setTransactions([]);
+      setFilteredTransactions([]);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchProductOrders(), fetchTechnicianOrders()]);
+      await Promise.all([
+        fetchProductOrders(),
+        fetchTechnicianOrders(),
+        fetchPaymentTransactions()
+      ]);
       setLoading(false);
     };
     fetchData();
   }, []);
 
+  // Mahsulot buyurtmalari filtri
   useEffect(() => {
     if (activeTab !== 'products') return;
     let filtered = [...allFlatOrders];
@@ -187,6 +234,7 @@ function Aperator() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, allFlatOrders, activeTab]);
 
+  // Texnik buyurtmalari filtri
   useEffect(() => {
     if (activeTab !== 'technicians') return;
     let filtered = [...technicianOrders];
@@ -209,18 +257,47 @@ function Aperator() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, technicianOrders, activeTab]);
 
+  // To'lovlar filtri
+  useEffect(() => {
+    if (activeTab !== 'payments') return;
+    let filtered = [...transactions];
+    const term = searchTerm.toLowerCase();
+
+    if (searchTerm) {
+      filtered = filtered.filter(t =>
+        (t.transactionId || '').toLowerCase().includes(term) ||
+        (t.orderNumber || '').toLowerCase().includes(term) ||
+        (t.userName || '').toLowerCase().includes(term) ||
+        (t.userPhone || '').includes(term) ||
+        String(t.totalAmount || '').includes(term)
+      );
+    }
+
+    setFilteredTransactions(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, transactions, activeTab]);
+
+  // payment method o'zgarganda yangidan yuklash
+  useEffect(() => {
+    if (activeTab === 'payments') {
+      fetchPaymentTransactions(paymentMethodFilter);
+    }
+  }, [paymentMethodFilter, activeTab]);
+
+  // ───────────────────────────────────────────────
+  //              ACTION HANDLERS
+  // ───────────────────────────────────────────────
+
   const handleConfirmPayment = async (orderId) => {
     if (!orderId) return;
     setActionLoading(prev => ({ ...prev, [orderId]: true }));
-
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.patch(
+      await axios.put(
         `${BASE_URL}/api/order/payment/${orderId}`,
         { paymentStatus: "paid" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setAllFlatOrders(prev =>
         prev.map(item =>
           item.id === orderId ? { ...item, paymentStatus: "paid", status: "to'langan" } : item
@@ -228,7 +305,7 @@ function Aperator() {
       );
       console.log("To'lov tasdiqlandi!");
     } catch (err) {
-      console.log("Xatolik: " + (err.response?.data?.message || err.message));
+      console.error("To'lov tasdiqlash xatosi:", err);
     } finally {
       setActionLoading(prev => ({ ...prev, [orderId]: false }));
     }
@@ -248,25 +325,17 @@ function Aperator() {
       console.log("Sababni kiriting!");
       return;
     }
-
     setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
-
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("Token topilmadi");
 
-      // /work endpoint'iga faqat description jo'natamiz
-      const workRes = await axios.post(
+      await axios.post(
         `${BASE_URL}/api/admin/technicians/requests/${requestId}/work`,
         { description },
         { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
       );
 
-      if (!workRes.data?.success) {
-        throw new Error(workRes.data?.message || "Sabab saqlanmadi");
-      }
-
-      // Statusni "rejected" ga o'zgartiramiz
       const statusRes = await axios.put(
         `${BASE_URL}/api/admin/technicians/requests/${requestId}/status`,
         { status: 'rejected' },
@@ -281,11 +350,9 @@ function Aperator() {
           prev.map(o => o.requestId === requestId ? { ...o, status: 'rejected' } : o)
         );
         closeRejectModal();
-        console.log("Buyurtma bekor qilindi!");
       }
     } catch (err) {
-      console.error("Xato:", err);
-      console.log("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+      console.error("Bekor qilish xatosi:", err);
     } finally {
       setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
     }
@@ -302,7 +369,6 @@ function Aperator() {
   const submitConfirmComplete = async () => {
     const { requestId } = confirmCompleteModal;
     setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
-
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("Token topilmadi");
@@ -321,13 +387,9 @@ function Aperator() {
           prev.map(o => o.requestId === requestId ? { ...o, status: 'completed' } : o)
         );
         closeConfirmCompleteModal();
-        console.log("Buyurtma bajarildi!");
-      } else {
-        throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
       }
     } catch (err) {
-      console.error("Status yangilash xatosi:", err);
-      console.log("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
+      console.error("Bajarildi xatosi:", err);
     } finally {
       setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
     }
@@ -338,15 +400,12 @@ function Aperator() {
       openRejectModal(requestId);
       return;
     }
-
     if (status === 'completed') {
       openConfirmCompleteModal(requestId);
       return;
     }
 
-    // Boshqa statuslar uchun (masalan 'accepted')
     setTechActionLoading(prev => ({ ...prev, [requestId]: true }));
-
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("Token topilmadi");
@@ -364,34 +423,25 @@ function Aperator() {
         setFilteredTechOrders(prev =>
           prev.map(o => o.requestId === requestId ? { ...o, status } : o)
         );
-      } else {
-        throw new Error(response.data?.message || "Javob muvaffaqiyatsiz");
       }
     } catch (err) {
       console.error("Status yangilash xatosi:", err);
-      console.log("Xatolik: " + (err.response?.data?.message || err.message || "Noma'lum xato"));
     } finally {
       setTechActionLoading(prev => ({ ...prev, [requestId]: false }));
     }
   };
 
   const getStatusBadge = (status) => {
-    const lower = (status || '').toLowerCase();
+    const lower = (status || '').toUpperCase();
     let color = 'bg-gray-100 text-gray-700';
     let text = status || '—';
 
-    if (lower === 'yetkazib berildi' || lower === 'delivered') {
-      color = 'bg-emerald-100 text-emerald-800';
-      text = 'Yetkazib berildi';
-    } else if (lower === 'to\'langan' || lower === 'paid') {
-      color = 'bg-green-400 text-white ';
-      text = "To'langan";
-    } else if (lower === 'kutilmoqda' || lower === 'pending') {
-      color = 'bg-amber-100 text-amber-800';
-      text = 'Kutilmoqda';
-    } else if (lower === 'bekor qilingan' || lower === 'cancelled') {
+    if (lower === 'PAID') {
+      color = 'bg-green-100 text-green-800';
+      text = 'To\'langan';
+    } else if (lower === 'CANCELED') {
       color = 'bg-rose-100 text-rose-800';
-      text = 'Bekor qilingan';
+      text = 'To\'lov bekor qilindi';
     }
 
     return <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${color}`}>{text}</span>;
@@ -407,13 +457,11 @@ function Aperator() {
       color = 'bg-amber-100 text-amber-800';
       text = 'Kutilmoqda';
       icons = <Package className="w-3 h-3 mr-1" />;
-    }
-    else if (lower === 'accepted') {
+    } else if (lower === 'accepted') {
       color = 'bg-blue-100 text-blue-800';
       text = 'Qabul qilindi';
       icons = <Check className="w-3 h-3 mr-1" />;
-    }
-    else if (lower === 'completed') {
+    } else if (lower === 'completed') {
       color = 'bg-emerald-100 text-emerald-800';
       text = 'Bajarildi';
       icons = (
@@ -422,8 +470,7 @@ function Aperator() {
           <Check className="w-3.5 h-3.5" />
         </div>
       );
-    }
-    else if (lower === 'rejected') {
+    } else if (lower === 'rejected') {
       color = 'bg-rose-100 text-rose-800';
       text = 'Bekor qilindi';
       icons = (
@@ -443,10 +490,14 @@ function Aperator() {
   };
 
   if (loading) {
-    return <LoadingSpinner text="Buyurtmalar yuklanmoqda" />;
+    return <LoadingSpinner text="Ma'lumotlar yuklanmoqda..." />;
   }
 
-  const currentData = activeTab === 'technicians' ? filteredTechOrders : filteredOrders;
+  const currentData =
+    activeTab === 'technicians' ? filteredTechOrders :
+    activeTab === 'payments'    ? filteredTransactions :
+    filteredOrders;
+
   const totalItems = currentData.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -465,57 +516,65 @@ function Aperator() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 border cursor-pointer border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 bg-white min-w-[180px]"
-          >
-            <option value="all">Barcha statuslar</option>
-            {activeTab === 'technicians' ? (
-              <>
-                <option value="pending">Kutilmoqda</option>
-                <option value="accepted">Qabul qilindi</option>
-                <option value="completed">Bajarildi</option>
-                <option value="rejected">Bekor qilindi</option>
-              </>
-            ) : (
-              <>
-                <option value="pending">Kutilmoqda</option>
-                <option value="paid">To'langan</option>
-                <option value="delivered">Yetkazib berilgan</option>
-                <option value="cancelled">Bekor qilingan</option>
-              </>
-            )}
-          </select>
+           
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2.5 border cursor-pointer border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4]/50 bg-white min-w-[180px]"
+            >
+              <option value="all">Barcha statuslar</option>
+              {activeTab === 'technicians' ? (
+                <>
+                  <option value="pending">Kutilmoqda</option>
+                  <option value="accepted">Qabul qilindi</option>
+                  <option value="completed">Bajarildi</option>
+                  <option value="rejected">Bekor qilindi</option>
+                </>
+              ) : (
+                <>
+                  <option value="pending">Kutilmoqda</option>
+                  <option value="paid">To'langan</option>
+                  <option value="delivered">Yetkazib berilgan</option>
+                  <option value="cancelled">Bekor qilingan</option>
+                </>
+              )}
+            </select>
+          
         </div>
       </div>
 
       <div className="mb-8 flex flex-wrap gap-3 border-b border-slate-200 pb-3">
-  {/* Mahsulot buyurtmalari → hammaga ko‘rinadi */}
-  <button
-    onClick={() => setActiveTab('products')}
-    className={`flex items-center cursor-pointer gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-      activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-    }`}
-  >
-    <Package size={18} />
-    Mahsulot buyurtmalari
-  </button>
+        <button
+          onClick={() => setActiveTab('products')}
+          className={`flex items-center cursor-pointer gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+            activeTab === 'products' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <Package size={18} />
+          Mahsulot buyurtmalari
+        </button>
 
-  {/* Texnik buyurtmalari → faqat admin yoki technician ga */}
-  {["admin", "technician"].includes(user?.role) && (
-    <button
-      onClick={() => setActiveTab('technicians')}
-      className={`flex cursor-pointer items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-        activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
-      }`}
-    >
-      Texnik buyurtmalari
-    </button>
-  )}
-</div>
+        {["admin", "technician"].includes(user?.role) && (
+          <button
+            onClick={() => setActiveTab('technicians')}
+            className={`flex cursor-pointer items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+              activeTab === 'technicians' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            Texnik buyurtmalari
+          </button>
+        )}
+
+        <button
+          onClick={() => setActiveTab('payments')}
+          className={`flex cursor-pointer items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+            activeTab === 'payments' ? 'bg-[#00BCE4] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <CreditCard size={18} />
+          To'lovlar tarixi
+        </button>
+      </div>
 
       {activeTab === 'products' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -552,9 +611,9 @@ function Aperator() {
                     <th className="text-center">Narx</th>
                     <th className="text-center">Sana</th>
                     <th className="text-center">Status</th>
-                    {isAdmin && <th className="text-center">To'lov</th>}
+                    {/* {isAdmin && <th className="text-center">To'lov</th>} */}
                   </>
-                ) : (
+                ) : activeTab === 'technicians' ? (
                   <>
                     <th>Texnik</th>
                     <th>Kompaniya</th>
@@ -564,18 +623,27 @@ function Aperator() {
                     <th className="text-center">Status</th>
                     <th className="text-center">Harakat</th>
                   </>
+                ) : (
+                  <>
+                    <th>Tranzaksiya ID</th>
+                    <th>Buyurtma #</th>
+                    <th>Summa</th>
+                    <th>Usul</th>
+                    <th>Sana</th>
+                    <th>Status</th>
+                  </>
                 )}
               </tr>
             </thead>
-
             <tbody>
-              {paginatedData.length > 0 ? paginatedData.map((item) => {
+              {paginatedData.length > 0 ? paginatedData.map((item, index) => {
+                const key = activeTab === 'products' ? `${item.id}-${item.itemIndex || index}` : item.id || item.requestId || index;
+
                 if (activeTab === 'products') {
                   const canConfirm = item.paymentStatus === "pending" || item.paymentStatus === "waiting";
                   const isLoading = actionLoading[item.id];
-
                   return (
-                    <tr key={`${item.id}-${item.itemIndex}`} className="hover:bg-[#00BCE4]/[0.03]">
+                    <tr key={key} className="hover:bg-[#00BCE4]/[0.03]">
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
                           <span className="text-xs font-black text-[#00BCE4]">#{item.orderNumber}</span>
@@ -591,122 +659,140 @@ function Aperator() {
                         </td>
                       )}
                       <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.tadbirkor}</td>
-                      <td className="px-6 py-5 text-center">
+                      <td className="px-6 py-5">
                         <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
                           {item.soni}
                         </span>
                       </td>
-                      <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
+                      <td className="px-6 py-5 text-sm font-black text-slate-800">
                         {(item.totalNarx || 0).toLocaleString()} so'm
                       </td>
-                      <td className="px-6 py-5 text-center text-sm font-bold text-slate-700">
+                      <td className="px-6 py-5 text-sm font-bold text-slate-700">
                         {item.createdAt}
                       </td>
-                      <td className="px-6 py-5 text-center">{getStatusBadge(item.status)}</td>
-                      {isAdmin && (
-                        <td className="px-6 py-5 text-center">
-                          {canConfirm ? (
-                            <button
-                              onClick={() => handleConfirmPayment(item.id)}
-                              disabled={isLoading}
-                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
-                            >
-                              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
-                            </button>
-                          ) : (
-                            <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center cursor-default">
-                              <X size={20} />
-                            </div>
-                          )}
-                        </td>
-                      )}
+                      <td className="px-6 py-5">{getStatusBadge(item.status)}</td>
+                      
                     </tr>
                   );
                 }
 
-                const isTechLoading = techActionLoading[item.requestId];
+                if (activeTab === 'technicians') {
+                  const isTechLoading = techActionLoading[item.requestId];
+                  return (
+                    <tr key={key} className="hover:bg-[#00BCE4]/[0.03]">
+                      <td className="px-6 py-5">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-800">{item.technicianName}</span>
+                          {item.technicianPhone && <span className="text-xs text-slate-500">{item.technicianPhone}</span>}
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.productCompany}</td>
+                      <td className="px-6 py-5 text-center">
+                        <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
+                          {item.quantity}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
+                        {(item.totalPrice || 0).toLocaleString()} so'm
+                      </td>
+                      <td className="px-6 py-5 text-center text-sm font-bold text-slate-700">
+                        {item.createdAt}
+                      </td>
+                      <td className="px-6 py-5 text-center">
+                        {getTechStatusBadge(item.status)}
+                      </td>
+                      <td className="px-6 py-5 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          {item.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => updateTechnicianOrderStatus(item.requestId, 'accepted')}
+                                disabled={isTechLoading}
+                                className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                              >
+                                {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
+                              </button>
+                              <button
+                                onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
+                                disabled={isTechLoading}
+                                className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
+                              >
+                                {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
+                              </button>
+                            </>
+                          )}
+                          {item.status === 'accepted' && (
+                            <>
+                              <button
+                                onClick={() => updateTechnicianOrderStatus(item.requestId, 'completed')}
+                                disabled={isTechLoading}
+                                className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
+                              >
+                                {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
+                              </button>
+                              <button
+                                onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
+                                disabled={isTechLoading}
+                                className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
+                              >
+                                {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
+                              </button>
+                            </>
+                          )}
+                          {(item.status === 'completed' || item.status === 'rejected') && (
+                            <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center cursor-default">
+                              <X size={20} />
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                }
 
+                // To'lovlar qatori
                 return (
-                  <tr key={item.requestId} className="hover:bg-[#00BCE4]/[0.03]">
+                  <tr key={key} className="hover:bg-[#00BCE4]/[0.03]">
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800">{item.technicianName}</span>
-                        {item.technicianPhone && <span className="text-xs text-slate-500">{item.technicianPhone}</span>}
+                        <span className="text-xs font-black text-[#00BCE4]">{item.transactionId}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-sm font-bold text-slate-600">{item.productCompany}</td>
-                    <td className="px-6 py-5 text-center">
-                      <span className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs font-black">
-                        {item.quantity}
+                    <td className="px-6 py-5 text-sm font-bold text-slate-800">#{item.orderNumber}</td>
+                    <td className="px-6 py-5 text-sm font-black text-slate-800">
+                      {item.totalAmount != null ? item.totalAmount.toLocaleString() + " so'm" : '—'}
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        {item.paymentMethod}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-center text-sm font-black text-slate-800">
-                      {(item.totalPrice || 0).toLocaleString()} so'm
-                    </td>
-                    <td className="px-6 py-5 text-center text-sm font-bold text-slate-700">
+                    <td className="px-6 py-5 text-sm font-bold text-slate-700">
                       {item.createdAt}
                     </td>
-                    <td className="px-6 py-5 text-center">
-                      {getTechStatusBadge(item.status)}
-                    </td>
-                    <td className="px-6 py-5 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        {item.status === 'pending' && (
-                          <>
-                            <button
-                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'accepted')}
-                              disabled={isTechLoading}
-                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
-                            >
-                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
-                            </button>
-
-                            <button
-                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
-                              disabled={isTechLoading}
-                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
-                            >
-                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
-                            </button>
-                          </>
-                        )}
-
-                        {item.status === 'accepted' && (
-                          <>
-                            <button
-                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'completed')}
-                              disabled={isTechLoading}
-                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'}`}
-                            >
-                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
-                            </button>
-
-                            <button
-                              onClick={() => updateTechnicianOrderStatus(item.requestId, 'rejected')}
-                              disabled={isTechLoading}
-                              className={`cursor-pointer w-9 h-9 rounded-xl flex items-center justify-center ${isTechLoading ? 'bg-gray-100 cursor-not-allowed' : 'bg-rose-50 hover:bg-rose-100 text-rose-600'}`}
-                            >
-                              {isTechLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
-                            </button>
-                          </>
-                        )}
-
-                        {(item.status === 'completed' || item.status === 'rejected') && (
-                          <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 flex items-center justify-center cursor-default">
-                            <X size={20} />
-                          </div>
-                        )}
-                      </div>
+                    <td className="px-6 py-5">
+                      {getStatusBadge(item.status)}
                     </td>
                   </tr>
                 );
               }) : (
                 <tr>
-                  <td colSpan={activeTab === 'products' ? (isAdmin ? 8 : 6) : 8} className="py-20 text-center text-slate-500">
+                  <td
+                    colSpan={
+                      activeTab === 'products' ? (isAdmin ? 8 : 6) :
+                      activeTab === 'technicians' ? 7 :
+                      6
+                    }
+                    className="py-20 text-center text-slate-500"
+                  >
                     <div className="table-empty">
                       <div className="empty-icon">📋</div>
                       <h3 className="empty-title">
-                        {activeTab === 'technicians' ? 'Texnik buyurtmalari topilmadi' : 'Mahsulot buyurtmalari topilmadi'}
+                        {activeTab === 'technicians'
+                          ? 'Texnik buyurtmalari topilmadi'
+                          : activeTab === 'payments'
+                          ? 'To‘lov tranzaksiyalari topilmadi'
+                          : 'Mahsulot buyurtmalari topilmadi'}
                       </h3>
                       <p className="empty-description">Hozircha ma'lumotlar mavjud emas</p>
                     </div>
@@ -744,7 +830,9 @@ function Aperator() {
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`cursor-pointer w-9 h-9 rounded-md border text-sm font-medium ${currentPage === pageNum ? 'bg-[#00BCE4] text-white border-[#00BCE4]' : 'border-slate-300 hover:bg-slate-100'}`}
+                  className={`cursor-pointer w-9 h-9 rounded-md border text-sm font-medium ${
+                    currentPage === pageNum ? 'bg-[#00BCE4] text-white border-[#00BCE4]' : 'border-slate-300 hover:bg-slate-100'
+                  }`}
                 >
                   {pageNum}
                 </button>
@@ -754,7 +842,9 @@ function Aperator() {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className={`cursor-pointer w-9 h-9 flex items-center justify-center rounded-md border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'}`}
+              className={`cursor-pointer w-9 h-9 flex items-center justify-center rounded-md border ${
+                currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-100'
+              }`}
             >
               <ChevronRight size={18} />
             </button>
@@ -762,7 +852,7 @@ function Aperator() {
         </div>
       )}
 
-      {/* Bekor qilish uchun modal */}
+      {/* Bekor qilish modal */}
       {rejectModal.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
@@ -770,7 +860,6 @@ function Aperator() {
             <p className="text-slate-600 mb-6">
               Buyurtmani <strong>"Bekor qilindi"</strong> holatiga o‘tkazmoqchimisiz? Sababni kiriting.
             </p>
-
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">Sabab</label>
               <textarea
@@ -781,7 +870,6 @@ function Aperator() {
                 onChange={(e) => setRejectModal(prev => ({ ...prev, description: e.target.value }))}
               />
             </div>
-
             <div className="flex justify-end gap-4">
               <button
                 onClick={closeRejectModal}
@@ -792,7 +880,9 @@ function Aperator() {
               <button
                 onClick={submitReject}
                 disabled={techActionLoading[rejectModal.requestId]}
-                className={`px-6 py-2.5 text-white rounded-lg transition flex items-center gap-2 min-w-[140px] justify-center bg-rose-600 hover:bg-rose-700 ${techActionLoading[rejectModal.requestId] ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`px-6 py-2.5 text-white rounded-lg transition flex items-center gap-2 min-w-[140px] justify-center bg-rose-600 hover:bg-rose-700 ${
+                  techActionLoading[rejectModal.requestId] ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                }`}
               >
                 {techActionLoading[rejectModal.requestId] ? <Loader2 className="w-5 h-5 animate-spin" /> : <X size={20} />}
                 Bekor qil
@@ -802,7 +892,7 @@ function Aperator() {
         </div>
       )}
 
-      {/* Bajarildi tasdiqlash uchun modal */}
+      {/* Bajarildi tasdiqlash modal */}
       {confirmCompleteModal.open && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
@@ -810,7 +900,6 @@ function Aperator() {
             <p className="text-slate-600 mb-6">
               Rostdan ham buyurtmani bajarib bo'ldingizmi? Buyurtmani <strong>"Bajarildi"</strong> holatiga o‘tkazmoqchimisiz?
             </p>
-
             <div className="flex justify-end gap-4">
               <button
                 onClick={closeConfirmCompleteModal}
@@ -821,7 +910,9 @@ function Aperator() {
               <button
                 onClick={submitConfirmComplete}
                 disabled={techActionLoading[confirmCompleteModal.requestId]}
-                className={`px-6 py-2.5 text-white rounded-lg transition flex items-center gap-2 min-w-[140px] justify-center bg-emerald-600 hover:bg-emerald-700 ${techActionLoading[confirmCompleteModal.requestId] ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`px-6 py-2.5 text-white rounded-lg transition flex items-center gap-2 min-w-[140px] justify-center bg-emerald-600 hover:bg-emerald-700 ${
+                  techActionLoading[confirmCompleteModal.requestId] ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                }`}
               >
                 {techActionLoading[confirmCompleteModal.requestId] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check size={20} />}
                 Ha, bajarildi
