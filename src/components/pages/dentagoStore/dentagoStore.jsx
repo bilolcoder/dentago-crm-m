@@ -209,7 +209,6 @@ function Boshsaxifa() {
         setProducts(formattedProducts);
         setFilteredProducts(formattedProducts);
         updateFeaturedProducts(formattedProducts);
-        console.log("Yuklangan mahsulotlar:", formattedProducts);
       } catch (err) {
         console.error("Mahsulot yuklash xatosi:", err);
         setError("Mahsulotlarni yuklab bo'lmadi");
@@ -482,9 +481,17 @@ function Boshsaxifa() {
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-4 px-2">
                       <h3 className="text-lg font-bold text-gray-800">Kategoriyalar</h3>
-                      <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                        {filteredCategories.length} ta
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                          {filteredCategories.length} ta
+                        </span>
+                        <button
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="p-1 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                        >
+                          <X size={20} className="text-gray-500" />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
@@ -948,12 +955,25 @@ function ProductCard({ product, navigate, onAddToCart, isLoading, isInCart, onCo
       className="cursor-pointer rounded-[20px] p-3 md:rounded-[30px] md:p-4 shadow-sm border border-gray-100 flex flex-col relative group transition-all hover:shadow-xl hover:-translate-y-1 h-full"
     >
       <div className="bg-gradient-to-br rounded-[15px] md:rounded-[20px] overflow-hidden mb-5 md:mb-4 flex items-center justify-center h-32 md:h-48">
-        <img
-          src={product.img}
-          alt={product.name}
-          className="object-contain h-full w-full p-3 md:p-4 group-hover:scale-110 transition-all duration-300"
-          onError={(e) => e.target.src = ""}
-        />
+        {product.img ? (
+          <img
+            src={product.img}
+            alt={product.name}
+            className="object-contain h-full w-full p-3 md:p-4 group-hover:scale-110 transition-all duration-300"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.nextSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        {!product.img && (
+          <div className="flex items-center justify-center h-full w-full text-gray-400">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📦</div>
+              <div className="text-sm">Rasm mavjud emas</div>
+            </div>
+          </div>
+        )}
       </div>
       <h3 className="text-gray-800 font-semibold text-[14px] md:text-[17px] mb-2 leading-tight min-h-[40px] line-clamp-2">
         {product.name}

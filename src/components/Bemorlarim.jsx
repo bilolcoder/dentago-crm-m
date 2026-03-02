@@ -1,64 +1,148 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
 import { TiTick } from "react-icons/ti";
 import { CiViewTable } from "react-icons/ci";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Trash2, CheckCircle } from 'lucide-react';
 import LoadingSpinner from './common/LoadingSpinner';
-import UnifiedTable from './common/UnifiedTable';
+
+// Tasdiqlash Modal (o'chirish, tasdiqlash, bekor qilish uchun umumiy)
+const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = "Ha", confirmColor = "bg-rose-600", loading = false }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999] p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
+        <div className="p-8">
+          <div className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-6 ${confirmColor === "bg-green-600" ? "bg-green-100" : "bg-rose-100"}`}>
+            {confirmColor === "bg-green-600" ? (
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            ) : (
+              <X className="w-8 h-8 text-rose-600" />
+            )}
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">{title}</h3>
+          <p className="text-gray-600 text-center leading-relaxed mb-8">{message}</p>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-2xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Yo'q
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={loading}
+              className={`flex-1 py-4 ${confirmColor} hover:opacity-90 text-white font-semibold rounded-2xl transition-all active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2`}
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Jarayonda...
+                </>
+              ) : (
+                confirmText
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Toast xabarlar uchun (muvaffaqiyat xabarlari)
+const AlertModal = ({ isOpen, onClose, type, message }) => {
+  if (!isOpen) return null;
+
+  const bgColor = type === 'success' 
+    ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+    : 'bg-rose-50 border-rose-200 text-rose-700';
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(onClose, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, onClose]);
+
+  return (
+    <div className="fixed top-6 right-6 z-[1000] max-w-sm w-full animate-in fade-in slide-in-from-top-4">
+      <div className={`p-5 rounded-2xl border shadow-xl ${bgColor} flex items-start gap-4`}>
+        <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center ${type === 'success' ? 'bg-emerald-100' : 'bg-rose-100'}`}>
+          {type === 'success' ? '✅' : '⚠️'}
+        </div>
+        <div className="flex-1 pt-0.5">
+          <p className="font-semibold text-sm leading-snug">{message}</p>
+        </div>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition cursor-pointer">
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+};
 
 function Bemorlarim() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // View mode: 'card' yoki 'table'
   const [viewMode, setViewMode] = useState('card');
-
-  // Modal uchun state'lar
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState('');
-  // Mavjud state'lar orasiga qo'shing
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'pending' | 'confirmed' | 'cancelled'
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  // Bekor qilish modali uchun state'lar
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  // Bekor qilish uchun tasdiqlash modal
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
   const [cancelId, setCancelId] = useState(null);
-  const [isCancelling, setIsCancelling] = useState(false); // ✅ Yangi loading state
+  const [isCancelling, setIsCancelling] = useState(false);
 
-  // Tasdiqlash modali uchun state'lar
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmId, setConfirmId] = useState(null);
-  const [isConfirming, setIsConfirming] = useState(false);
+  // Umumiy tasdiqlash modal (o'chirish va qabul tasdiqlash)
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    id: null,
+    type: 'delete', // 'delete' | 'confirm'
+    title: '',
+    message: '',
+    confirmText: 'Ha',
+    confirmColor: 'bg-rose-600',
+    loading: false
+  });
 
-  // Pagination state
+  // Toast xabarlar
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    type: 'success',
+    message: ''
+  });
+
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
-
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
-  // filter 
   const filteredAppointments = appointments.filter(app => {
     if (statusFilter === 'all') return true;
     return app.status?.toLowerCase() === statusFilter;
   });
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredAppointments.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedAppointments = filteredAppointments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // Sahifa o'zgarganda yuqoriga chiqish
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
 
-  // Filter o'zgarganda 1-sahifaga qaytish
   useEffect(() => {
     setCurrentPage(1);
   }, [statusFilter]);
@@ -77,37 +161,22 @@ function Bemorlarim() {
       const response = await axios.get(
         'https://app.dentago.uz/api/admin/appointments?limit=1000000',
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
+          headers: { Authorization: `Bearer ${token}` },
           timeout: 15000,
         }
       );
 
-      if (response.data?.success) {
-        setAppointments(response.data.data || response.data.appointments || response.data || []);
-      } else if (Array.isArray(response.data)) {
-        setAppointments(response.data);
-      } else {
-        setError('Ma\'lumotlar formati kutilmagan');
-      }
+      setAppointments(response.data.data || response.data.appointments || response.data || []);
     } catch (err) {
+      console.error("fetchAppointments xatosi:", err);
       let errorMsg = 'Ma\'lumotlarni yuklab bo\'lmadi';
-      if (err.response) {
-        errorMsg = err.response.data?.message || `Server xatosi: ${err.response.status}`;
-      } else if (err.request) {
-        errorMsg = 'Serverga ulanib bo\'lmadi (CORS yoki tarmoq muammosi)';
-      } else {
-        errorMsg = err.message;
-      }
+      if (err.response) errorMsg += ` (${err.response.status})`;
       setError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
-  // To'liq ma'lumotni olish
   const fetchAppointmentById = async (id) => {
     try {
       setModalLoading(true);
@@ -117,133 +186,143 @@ function Bemorlarim() {
       const token = localStorage.getItem('accessToken');
       const response = await axios.get(
         `https://app.dentago.uz/api/admin/appointments/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-          timeout: 10000,
-        }
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
       );
 
-      if (response.data?.success) {
-        setSelectedAppointment(response.data.data || response.data);
-      } else {
-        setModalError('To\'liq ma\'lumot yuklanmadi');
-      }
+      setSelectedAppointment(response.data.data || response.data);
     } catch (err) {
-      let msg = 'To\'liq ma\'lumotni yuklab bo\'lmadi';
-      if (err.response) {
-        msg = err.response.data?.message || `Xato: ${err.response.status}`;
-      } else if (err.request) {
-        msg = 'Server bilan aloqa muammosi';
-      } else {
-        msg = err.message;
-      }
-      setModalError(msg);
+      console.error("fetchAppointmentById xatosi:", err);
+      setModalError('To\'liq ma\'lumot yuklanmadi');
     } finally {
       setModalLoading(false);
     }
   };
 
-  // Bekor qilish modali ochish
+  // Bekor qilish tasdiqlashni ochish (sababsiz)
   const handleCancel = (id) => {
     setCancelId(id);
-    setIsCancelModalOpen(true);
-    reset(); // Formani tozalash
+    setIsCancelConfirmOpen(true);
   };
 
-  // Bekor qilish sababini yuborish va statusni o'zgartirish
-  const onCancelSubmit = async (data) => {
+  const executeCancel = async () => {
+    setIsCancelling(true);
     try {
-      setIsCancelling(true); // ✅ Loading boshlash
-
       const token = localStorage.getItem('accessToken');
-
-      const response = await axios.put(
+      await axios.put(
         `https://app.dentago.uz/api/admin/appointments/${cancelId}/status`,
-        {
-          status: 'cancelled',
-          cancellationReason: data.cancellationReason || null,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          timeout: 5000,
-        }
+        { status: 'cancelled' },
+        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, timeout: 5000 }
       );
 
-      if (response.data?.success || response.status === 200) {
-        // Ro'yxatni yangilash
-        setAppointments(prev => prev.map(app =>
-          app._id === cancelId ? { ...app, status: 'cancelled' } : app
-        ));
+      setAppointments(prev => prev.map(app =>
+        app._id === cancelId ? { ...app, status: 'cancelled' } : app
+      ));
 
-        // Agar modal ochiq bo'lsa, modaldagi ma'lumotni ham yangilash
-        if (selectedAppointment && selectedAppointment._id === cancelId) {
-          setSelectedAppointment(prev => ({ ...prev, status: 'cancelled' }));
-        }
-
-        setIsCancelModalOpen(false);
-        reset();
-      } else {
-        console.log("Navbatni bekor qilib bo'lmadi.");
+      if (selectedAppointment && selectedAppointment._id === cancelId) {
+        setSelectedAppointment(prev => ({ ...prev, status: 'cancelled' }));
       }
+
+      setIsCancelConfirmOpen(false);
+      setCancelId(null);
+
+      setAlertModal({
+        open: true,
+        type: 'success',
+        message: '✅ Navbat muvaffaqiyatli bekor qilindi'
+      });
     } catch (err) {
       console.error("Bekor qilish xatosi:", err);
-      let msg = "Navbatni bekor qilib bo'lmadi";
-      if (err.response) {
-        msg += `: ${err.response.status} - ${err.response.data?.message || 'Server xatosi'}`;
-      } else if (err.request) {
-        msg += " (Serverga ulanib bo'lmadi)";
-      } else {
-        msg += `: ${err.message}`;
-      }
-      console.log(msg);
     } finally {
-      setIsCancelling(false); // ✅ Loading tugashi shu albatta amalga oshadi
+      setIsCancelling(false);
     }
   };
 
-  // O'chirish funksiyasi
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bu navbatni o'chirishni xohlaysizmi?")) {
-      return;
-    }
+  // O'chirish tasdiqlash
+  const handleDelete = (id) => {
+    setConfirmModal({
+      open: true,
+      id,
+      type: 'delete',
+      title: "Navbatni o'chirish",
+      message: "Bu navbatni butunlay o'chirib tashlamoqchimisiz?",
+      confirmText: "O'chirish",
+      confirmColor: "bg-rose-600",
+      loading: false
+    });
+  };
 
+  const executeDelete = async () => {
+    setConfirmModal(prev => ({ ...prev, loading: true }));
     try {
       const token = localStorage.getItem('accessToken');
       await axios.delete(
-        `https://app.dentago.uz/api/admin/appointments/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 10000,
-        }
+        `https://app.dentago.uz/api/admin/appointments/${confirmModal.id}`,
+        { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 }
       );
 
-      // Muvaffaqiyatli o'chirilgandan keyin ro'yxatni yangilash
-      setAppointments(prev => prev.filter(app => app._id !== id));
+      setAppointments(prev => prev.filter(app => app._id !== confirmModal.id));
 
-      // Agar modal ochiq bo'lsa va o'chirilayotgan element modalda ko'rinayotgan bo'lsa, modalni yopish
-      if (selectedAppointment && selectedAppointment._id === id) {
-        closeModal();
+      if (selectedAppointment && selectedAppointment._id === confirmModal.id) {
+        setSelectedAppointment(null);
       }
 
+      setConfirmModal({ open: false, id: null, loading: false });
+
+      setAlertModal({
+        open: true,
+        type: 'success',
+        message: '✅ Navbat muvaffaqiyatli o‘chirildi'
+      });
     } catch (err) {
       console.error("O'chirish xatosi:", err);
-      let msg = "Navbatni o'chirib bo'lmadi";
-      if (err.response) {
-        msg += `: ${err.response.status} - ${err.response.data?.message || 'Server xatosi'}`;
-      } else if (err.request) {
-        msg += " (Serverga ulanib bo'lmadi)";
-      } else {
-        msg += `: ${err.message}`;
+    } finally {
+      setConfirmModal(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  // Qabul tasdiqlash
+  const handleConfirm = (id) => {
+    setConfirmModal({
+      open: true,
+      id,
+      type: 'confirm',
+      title: "Qabulni tasdiqlash",
+      message: "Bu bemorni qabul qilasizmi?",
+      confirmText: "Tasdiqlash",
+      confirmColor: "bg-green-600",
+      loading: false
+    });
+  };
+
+  const executeConfirm = async () => {
+    setConfirmModal(prev => ({ ...prev, loading: true }));
+    try {
+      const token = localStorage.getItem('accessToken');
+      await axios.put(
+        `https://app.dentago.uz/api/admin/appointments/${confirmModal.id}/status`,
+        { status: "confirmed" },
+        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, timeout: 5000 }
+      );
+
+      setAppointments(prev =>
+        prev.map(app => app._id === confirmModal.id ? { ...app, status: 'confirmed' } : app)
+      );
+
+      if (selectedAppointment && selectedAppointment._id === confirmModal.id) {
+        setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
       }
-      console.log(msg);
+
+      setConfirmModal({ open: false, id: null, loading: false });
+
+      setAlertModal({
+        open: true,
+        type: 'success',
+        message: '✅ Navbat tasdiqlandi'
+      });
+    } catch (err) {
+      console.error("Tasdiqlash xatosi:", err);
+    } finally {
+      setConfirmModal(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -257,24 +336,12 @@ function Bemorlarim() {
     setModalLoading(false);
   };
 
-  const closeCancelModal = () => {
-    setIsCancelModalOpen(false);
-    setCancelId(null);
-    setIsCancelling(false); // ✅ Loading ni tozalash
-    reset();
-  };
-
-  // Format funksiyalari
   const formatDate = (dateString) => {
     if (!dateString) return '—';
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return '—';
-      return date.toLocaleDateString('uz-UZ', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
+      return date.toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long', year: 'numeric' });
     } catch {
       return String(dateString);
     }
@@ -302,86 +369,17 @@ function Bemorlarim() {
     }
   };
 
-
-  // Yakunlash (qabul qilish) funksiyasi
-  const handleConfirm = (id) => {
-    setConfirmId(id);
-    setIsConfirmModalOpen(true);
-  };
-
-  // Tasdiqlash so'rovini yuborish
-  const confirmAppointment = async () => {
-    try {
-      setIsConfirming(true);
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.log("Token topilmadi. Iltimos qayta kirish qiling.");
-        return;
-      }
-
-      const response = await axios.put(
-        `https://app.dentago.uz/api/admin/appointments/${confirmId}/status`,
-        { status: "confirmed" },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          timeout: 5000,
-        }
-      );
-
-      if (response.data?.success || response.status === 200) {
-        // Ro'yxatni yangilash
-        setAppointments(prev =>
-          prev.map(app =>
-            app._id === confirmId ? { ...app, status: 'confirmed' } : app
-          )
-        );
-
-        // Agar modalda bo'lsa, uni ham yangilash
-        if (selectedAppointment && selectedAppointment._id === confirmId) {
-          setSelectedAppointment(prev => ({ ...prev, status: 'confirmed' }));
-        }
-
-        setIsConfirmModalOpen(false);
-        setConfirmId(null);
-      } else {
-        console.log("Statusni o'zgartirib bo'lmadi");
-      }
-    } catch (err) {
-      console.error("Tasdiqlash xatosi:", err);
-      let msg = "Xato yuz berdi";
-      if (err.response) {
-        msg = err.response.data?.message || `Server xatosi: ${err.response.status}`;
-      } else if (err.request) {
-        msg = "Server bilan aloqa yo'q";
-      } else {
-        msg = err.message;
-      }
-      console.log(msg);
-    } finally {
-      setIsConfirming(false);
-    }
-  };
-
-  const closeConfirmModal = () => {
-    setIsConfirmModalOpen(false);
-    setConfirmId(null);
-    setIsConfirming(false);
-  };
-
   if (loading) return <LoadingSpinner text="Bemorlar yuklanmoqda" />;
 
   if (error) {
     return (
-      <div className="table-error">
-        <div className="error-icon">⚠️</div>
-        <h3 className="error-title">Xatolik yuz berdi</h3>
-        <p className="error-description">{error}</p>
+      <div className="text-center py-12">
+        <div className="text-6xl mb-4">⚠️</div>
+        <h3 className="text-2xl font-bold text-red-600 mb-3">Xatolik yuz berdi</h3>
+        <p className="text-gray-700 mb-6">{error}</p>
         <button
           onClick={fetchAppointments}
-          className="bg-[#00BCE4] cursor-pointer hover:bg-[#00a8cc] text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg mt-6"
+          className="bg-[#00BCE4] cursor-pointer hover:bg-[#00a8cc] text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
         >
           Qayta urinish
         </button>
@@ -393,7 +391,6 @@ function Bemorlarim() {
     <div className="pb-5">
       <div className="mb-8 md:mb-10">
         <div className="flex flex-col lg:flex-row justify-between border-b pb-4 gap-4">
-          {/* Sarlavha qismi */}
           <div className="text-left">
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 tracking-tight">
               Bemorlar Navbatlari
@@ -404,41 +401,32 @@ function Bemorlarim() {
             </p>
           </div>
 
-          {/* Tugmalar qismi */}
-          <div className="flex flex-wrap items-center gap-3 justify-start md:justify-start">
-            {/* View toggle buttons */}
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
               <button
                 onClick={() => setViewMode('card')}
-                className={`flex items-center gap-2 px-3 md:px-4 py-2 cursor-pointer   rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'card'
-                  ? 'bg-white text-[#00BCE4] shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-lg transition-all ${viewMode === 'card' ? 'bg-white text-[#00BCE4] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
-                <span className="hidden xs:block">Kartalar</span>
+                <span>Kartalar</span>
               </button>
 
               <button
                 onClick={() => setViewMode('table')}
-                className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 rounded-lg transition-all duration-300 text-sm md:text-base ${viewMode === 'table'
-                  ? 'bg-white text-[#00BCE4] shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                className={`flex items-center gap-2 px-4 py-2 cursor-pointer rounded-lg transition-all ${viewMode === 'table' ? 'bg-white text-[#00BCE4] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                <CiViewTable />
-                <span className="hidden xs:block">Jadval</span>
+                <CiViewTable size={20} />
+                <span>Jadval</span>
               </button>
             </div>
 
-            {/* Yangilash tugmasi */}
             <button
               onClick={fetchAppointments}
-              className="bg-[#00BCE4] hover:bg-[#00a8cc] cursor-pointer text-white px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2 text-sm md:text-base shadow-md active:scale-95"
+              className="bg-[#00BCE4] hover:bg-[#0099cc] cursor-pointer text-white px-5 py-2 rounded-xl font-medium transition-all flex items-center gap-2 shadow-md active:scale-95"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
               </svg>
               Yangilash
@@ -446,89 +434,69 @@ function Bemorlarim() {
           </div>
         </div>
 
-        {/* Status filter tugmalari */}
-        <div className="flex mt-8 bg-gray-100 p-1 rounded-xl border border-gray-200 lg:w-[473px] md:w-[473px] sm:w-[398px] max-sm:w-[315px]">
+        <div className="flex mt-8 bg-gray-100 p-1 rounded-xl border border-gray-200 w-fit">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`flex items-center gap-2 cursor-pointer px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'all'
-              ? 'bg-white text-[#00BCE4] shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-              }`}
+            className={`flex-1 px-4 py-2 cursor-pointer rounded-lg transition-all text-sm ${statusFilter === 'all' ? 'bg-white text-[#00BCE4] shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
           >
-            <span>Barchasi</span>
+            Barchasi
           </button>
-
           <button
             onClick={() => setStatusFilter('pending')}
-            className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'pending'
-              ? 'bg-white text-yellow-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-              }`}
+            className={`flex-1 px-4 py-2 cursor-pointer rounded-lg transition-all text-sm ${statusFilter === 'pending' ? 'bg-white text-yellow-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
           >
-            <span>Kutilmoqda</span>
+            Kutilmoqda
           </button>
-
           <button
             onClick={() => setStatusFilter('confirmed')}
-            className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'confirmed'
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-              }`}
+            className={`flex-1 px-4 py-2 cursor-pointer rounded-lg transition-all text-sm ${statusFilter === 'confirmed' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
           >
-            <span>Yakunlangan</span>
+            Yakunlangan
           </button>
-
           <button
             onClick={() => setStatusFilter('cancelled')}
-            className={`flex items-center cursor-pointer gap-2 px-3 md:px-4 py-2 max-sm:text-[10px] rounded-lg transition-all duration-300 text-sm md:text-base ${statusFilter === 'cancelled'
-              ? 'bg-white text-red-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
-              }`}
+            className={`flex-1 px-4 py-2 cursor-pointer rounded-lg transition-all text-sm ${statusFilter === 'cancelled' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
           >
-            <span>Bekor qilingan</span>
+            Bekor qilingan
           </button>
         </div>
-
       </div>
 
       {appointments.length === 0 ? (
-        <div className="table-empty">
-          <div className="empty-icon">📋</div>
-          <h3 className="empty-title">Navbatlar topilmadi</h3>
-          <p className="empty-description">Hozircha hech qanday navbat mavjud emas</p>
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📋</div>
+          <h3 className="text-2xl font-bold text-gray-700 mb-3">Navbatlar topilmadi</h3>
+          <p className="text-gray-500">Hozircha hech qanday navbat mavjud emas</p>
         </div>
       ) : viewMode === 'card' ? (
-        // CARD VIEW
-        <div className="grid grid-cols-2 md:grid-cols-1 max-[725px]:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedAppointments.map((appointment) => (
             <div
               key={appointment._id}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 group"
             >
               <div className="p-6">
-                <div className="flex justify-center items-start mb-5 h-[100px]">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-[#00BCE4] transition-colors">
+                <div className="flex justify-between items-start mb-5">
+                  <div>
+                    <h3 className="text-xl font-bold text-[#00BCE4] group-hover:text-[#0099cc] transition-colors">
                       {appointment.patient?.fullName || 'Noma\'lum bemor'}
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">{appointment.patient?.phone || '—'}</p>
                   </div>
-                  <span className={`px-2 py-1.5 rounded-[10px] text-xs font-semibold text-white ${getStatusStyle(appointment.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${getStatusStyle(appointment.status)}`}>
                     {getStatusText(appointment.status)}
                   </span>
                 </div>
 
                 <div className="space-y-3 text-gray-700 mb-6">
                   <div className="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#00BCE4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5 text-[#00BCE4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span>{formatDate(appointment.appointmentDate)} • {formatTime(appointment.appointmentTime)}</span>
                   </div>
-
                   <div className="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#00BCE4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-5 w-5 text-[#00BCE4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                     <span>{appointment.service || '—'}</span>
@@ -538,20 +506,19 @@ function Bemorlarim() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleViewDetails(appointment)}
-                    className="text-[#00BCE4] cursor-pointer  flex items-center justify-center hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-3 w-12 h-12 rounded-lg transition-all duration-300"
+                    className="text-[#00BCE4] hover:text-[#0099cc] bg-blue-50 hover:bg-blue-100 p-3 rounded-xl transition-all cursor-pointer flex items-center justify-center w-12 h-12"
                     title="To'liq ko'rish"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
 
-                  {appointment.status === 'pending' && (   // faqat pending bo'lsa ko'rsatish yaxshi
+                  {appointment.status === 'pending' && (
                     <button
                       onClick={() => handleConfirm(appointment._id)}
-                      className="bg-green-50 cursor-pointer hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
-                      title="Yakunlash"
+                      className="bg-green-50 hover:bg-green-100 text-green-600 p-3 rounded-xl transition-all cursor-pointer flex items-center justify-center w-12 h-12"
+                      title="Tasdiqlash"
                     >
                       <TiTick size={28} />
                     </button>
@@ -560,191 +527,138 @@ function Bemorlarim() {
                   {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
                     <button
                       onClick={() => handleCancel(appointment._id)}
-                      className="bg-red-50 cursor-pointer hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                      className="bg-red-50 hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all cursor-pointer flex items-center justify-center w-12 h-12"
                       title="Bekor qilish"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                      <X size={24} />
                     </button>
                   )}
 
                   <button
                     onClick={() => handleDelete(appointment._id)}
-                    className="bg-red-50 cursor-pointer hover:bg-red-100 text-red-600 p-3 rounded-xl transition-all duration-300 flex items-center justify-center w-12 h-12"
+                    className="bg-rose-50 hover:bg-rose-100 text-rose-600 p-3 rounded-xl transition-all cursor-pointer flex items-center justify-center w-12 h-12"
                     title="O'chirish"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <Trash2 size={24} />
                   </button>
-
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        // TABLE VIEW
-        <div className="unified-table-container">
-          <div className="overflow-x-auto">
-            <table className="unified-table">
-              <thead>
-                <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Bemor
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Telefon
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Sana & Vaqt
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Xizmat
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Holati
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Harakatlar
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedAppointments.map((appointment) => (
-                  <tr key={appointment._id} className="hover:bg-gray-50 transition-colors duration-200 ">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-blue-50 rounded-full flex items-center justify-center">
-                          <span className="text-[#00BCE4] font-semibold">
-                            {appointment.patient?.fullName?.charAt(0) || 'N'}
-                          </span>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {appointment.patient?.fullName || 'Noma\'lum bemor'}
-                          </div>
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Bemor</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Telefon</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Sana & Vaqt</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Xizmat</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Holati</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Harakatlar</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {paginatedAppointments.map((appointment) => (
+                <tr key={appointment._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10 bg-blue-50 rounded-full flex items-center justify-center">
+                        <span className="text-[#00BCE4] font-semibold">
+                          {appointment.patient?.fullName?.charAt(0) || 'N'}
+                        </span>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {appointment.patient?.fullName || 'Noma\'lum bemor'}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{appointment.patient?.phone || '—'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{formatDate(appointment.appointmentDate)}</div>
-                      <div className="text-sm text-gray-500">{formatTime(appointment.appointmentTime)}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{appointment.service || '—'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white ${getStatusStyle(appointment.status)}`}>
-                        {getStatusText(appointment.status)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center gap-2">
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{appointment.patient?.phone || '—'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {formatDate(appointment.appointmentDate)} • {formatTime(appointment.appointmentTime)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{appointment.service || '—'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white ${getStatusStyle(appointment.status)}`}>
+                      {getStatusText(appointment.status)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleViewDetails(appointment)}
+                        className="text-[#00BCE4] hover:text-[#0099cc] bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-all cursor-pointer"
+                        title="To'liq ko'rish"
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+
+                      {appointment.status === 'pending' && (
                         <button
-                          onClick={() => handleViewDetails(appointment)}
-                          className="text-[#00BCE4] cursor-pointer hover:text-[#00a8cc] bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-all duration-300"
-                          title="To'liq ko'rish"
+                          onClick={() => handleConfirm(appointment._id)}
+                          className="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-all cursor-pointer"
+                          title="Tasdiqlash"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
+                          <TiTick size={20} />
                         </button>
+                      )}
 
-                        {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
-                          <button
-                            onClick={() => handleCancel(appointment._id)}
-                            className="text-red-600 hover:text-red-800 cursor-pointer bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-all duration-300"
-                            title="Bekor qilish"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        )}
-
-                        {/* <button
-                          onClick={() => handleDelete(appointment._id)}
-                          className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-all duration-300"
-                          title="O'chirish"
+                      {appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                        <button
+                          onClick={() => handleCancel(appointment._id)}
+                          className="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-all cursor-pointer"
+                          title="Bekor qilish"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button> */}
+                          <X size={20} />
+                        </button>
+                      )}
 
-                        {appointment.status === 'pending' && (
-                          <button
-                            onClick={() => handleConfirm(appointment._id)}
-                            className="text-green-600 hover:text-green-800 bg-green-50 cursor-pointer hover:bg-green-100 p-2 rounded-lg transition-all duration-300"
-                            title="Tasdiqlash"
-                          >
-                            <TiTick size={20} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <button
+                        onClick={() => handleDelete(appointment._id)}
+                        className="text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 p-2 rounded-lg transition-all cursor-pointer"
+                        title="O'chirish"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-8 p-4">
           <div className="text-sm text-gray-600">
-            Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
+            Sahifa <span className="font-semibold">{currentPage}</span> / {totalPages}
           </div>
-
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-2 cursor-pointer rounded-full text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="p-2 rounded-full text-gray-700 hover:bg-gray-50 disabled:opacity-50 cursor-pointer transition-all"
             >
               <ChevronLeft size={20} />
             </button>
 
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
+              let pageNum = currentPage <= 3 ? i + 1 :
+                            currentPage >= totalPages - 2 ? totalPages - 4 + i :
+                            currentPage - 2 + i;
 
               return (
                 <button
                   key={pageNum}
                   onClick={() => setCurrentPage(pageNum)}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${currentPage === pageNum
-                    ? 'bg-[#00BCE4] text-white shadow-md'
-                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all cursor-pointer ${currentPage === pageNum ? 'bg-[#00BCE4] text-white shadow-md' : 'border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                 >
                   {pageNum}
                 </button>
@@ -754,7 +668,7 @@ function Bemorlarim() {
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="p-2 rounded-full text-gray-700 hover:bg-gray-50 disabled:opacity-50 cursor-pointer transition-all"
             >
               <ChevronRight size={20} />
             </button>
@@ -762,9 +676,9 @@ function Bemorlarim() {
         </div>
       )}
 
-      {/* ================= MODAL ================= */}
+      {/* Ko'zni bosganda ochiladigan to'liq ma'lumot modali (eski holatda saqlangan) */}
       {(selectedAppointment || modalLoading || modalError) && (
-        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-60 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
             <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center z-10">
               <h2 className="text-2xl font-bold text-gray-800">To'liq ma'lumot</h2>
@@ -772,39 +686,28 @@ function Bemorlarim() {
                 onClick={closeModal}
                 className="text-gray-400 cursor-pointer hover:text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-all duration-300"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X size={28} />
               </button>
             </div>
 
             <div className="p-6">
               {modalLoading ? (
                 <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00BCE4] mb-4"></div>
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-[#00BCE4] mb-4"></div>
                   <p className="text-gray-600 font-medium">Yuklanmoqda...</p>
                 </div>
               ) : modalError ? (
-                <div className="text-center py-10">
-                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <p className="text-red-600 font-medium">{modalError}</p>
-                </div>
+                <div className="text-center py-10 text-red-600 font-medium">{modalError}</div>
               ) : selectedAppointment ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white border border-blue-50 p-5 rounded-xl">
+                    <div className="bg-blue-50 p-5 rounded-2xl">
                       <p className="text-gray-500 text-sm mb-1">Bemor</p>
-                      <p className="font-bold text-lg text-gray-800">{selectedAppointment.patient?.fullName || '—'}</p>
-                      <p className="text-gray-600 mt-2">
-                        <span className="font-medium">Telefon:</span> {selectedAppointment.patient?.phone || '—'}
-                      </p>
+                      <p className="font-bold text-lg">{selectedAppointment.patient?.fullName || '—'}</p>
+                      <p className="text-gray-600 mt-1">Telefon: {selectedAppointment.patient?.phone || '—'}</p>
                     </div>
 
-                    <div className="bg-white border border-blue-50 p-5 rounded-xl">
+                    <div className="bg-blue-50 p-5 rounded-2xl">
                       <p className="text-gray-500 text-sm mb-1">Holati</p>
                       <span className={`inline-block px-4 py-2 rounded-full font-semibold text-white ${getStatusStyle(selectedAppointment.status)}`}>
                         {getStatusText(selectedAppointment.status)}
@@ -813,63 +716,56 @@ function Bemorlarim() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white border border-gray-100 p-5 rounded-xl">
+                    <div className="bg-gray-50 p-5 rounded-2xl">
                       <p className="text-gray-500 text-sm mb-1">Sana va vaqt</p>
-                      <p className="font-medium text-lg">
-                        {formatDate(selectedAppointment.appointmentDate)} • {formatTime(selectedAppointment.appointmentTime)}
-                      </p>
+                      <p className="font-medium text-lg">{formatDate(selectedAppointment.appointmentDate)} • {formatTime(selectedAppointment.appointmentTime)}</p>
                     </div>
 
-                    <div className="bg-white border border-gray-100 p-5 rounded-xl">
+                    <div className="bg-gray-50 p-5 rounded-2xl">
                       <p className="text-gray-500 text-sm mb-1">Xizmat turi</p>
                       <p className="font-medium text-lg">{selectedAppointment.service || '—'}</p>
                     </div>
                   </div>
 
                   {selectedAppointment.doctor && (
-                    <div className="bg-gradient-to-r from-blue-50 to-white p-5 rounded-xl border border-blue-100">
-                      <p className="text-gray-500 text-sm mb-2">Shifokor</p>
-                      <p className="font-bold text-lg text-gray-800">{selectedAppointment.doctor.fullName}</p>
-                      <p className="text-[#00BCE4] font-medium mt-1">{selectedAppointment.doctor.specialty}</p>
+                    <div className="bg-gradient-to-r from-blue-50 to-white p-5 rounded-2xl">
+                      <p className="text-gray-500 text-sm mb-1">Shifokor</p>
+                      <p className="font-bold text-lg">{selectedAppointment.doctor.fullName}</p>
+                      <p className="text-[#00BCE4]">{selectedAppointment.doctor.specialty}</p>
                     </div>
                   )}
 
                   {selectedAppointment.comment && (
-                    <div className="bg-white border border-gray-200 p-5 rounded-xl">
+                    <div className="bg-gray-50 p-5 rounded-2xl">
                       <p className="text-gray-500 text-sm mb-2">Izoh</p>
-                      <p className="text-gray-700 whitespace-pre-wrap break-words bg-white border border-gray-100 p-4 rounded-lg">{selectedAppointment.comment}</p>
+                      <p className="text-gray-700 whitespace-pre-wrap">{selectedAppointment.comment}</p>
                     </div>
                   )}
+
                   {selectedAppointment.doctor?.clinic && (
-                    <div className="bg-white border border-gray-200 p-5 rounded-xl">
+                    <div className="bg-gray-50 p-5 rounded-2xl">
                       <p className="text-gray-500 text-sm mb-2">Klinika</p>
                       <p className="font-bold text-gray-800">{selectedAppointment.doctor.clinic.name}</p>
                       <p className="text-gray-600 mt-1">{selectedAppointment.doctor.clinic.address}</p>
                     </div>
                   )}
 
-                  {/* Modal ichida bekor qilish va o'chirish tugmalari */}
-                  <div className="pt-6 border-t border-gray-200 flex gap-4">
+                  {/* Modal ichidagi harakat tugmalari */}
+                  <div className="pt-6 border-t flex gap-4">
                     {selectedAppointment.status !== 'cancelled' && selectedAppointment.status !== 'completed' && (
                       <button
                         onClick={() => handleCancel(selectedAppointment._id)}
-                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 px-6 rounded-xl font-semibold transition-all cursor-pointer duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-semibold cursor-pointer transition-all flex items-center justify-center gap-2"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Bekor qilish
+                        <X size={20} /> Bekor qilish
                       </button>
                     )}
 
                     <button
                       onClick={() => handleDelete(selectedAppointment._id)}
-                      className="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-4 px-6 rounded-xl font-semibold transition-all cursor-pointer duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                      className="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-700 py-4 rounded-2xl font-semibold cursor-pointer transition-all flex items-center justify-center gap-2"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      O'chirish
+                      <Trash2 size={20} /> O'chirish
                     </button>
                   </div>
                 </div>
@@ -879,131 +775,40 @@ function Bemorlarim() {
         </div>
       )}
 
-      {/* ================= BEKOR QILISH SABABI MODALI ================= */}
-      {isCancelModalOpen && (
-        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-fadeIn">
-            <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex justify-between items-center z-10">
-              <h2 className="text-2xl font-bold text-gray-800">Bekor qilish</h2>
-              <button
-                onClick={closeCancelModal}
-                className="text-gray-400 hover:text-gray-800 hover:bg-gray-100 p-2 rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isCancelling}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+      {/* Bekor qilish tasdiqlash modali (sababsiz) */}
+      <ConfirmModal
+        isOpen={isCancelConfirmOpen}
+        onClose={() => {
+          setIsCancelConfirmOpen(false);
+          setCancelId(null);
+        }}
+        onConfirm={executeCancel}
+        title="Bekor qilish"
+        message="Bu navbatni haqiqatan ham bekor qilmoqchimisiz?"
+        confirmText="Bekor qilish"
+        confirmColor="bg-rose-600"
+        loading={isCancelling}
+      />
 
-            <div className="p-6">
-              <form onSubmit={handleSubmit(onCancelSubmit)}>
-                <h1 className="text-xl font-semibold text-gray-800 mb-4">Nimaga bekor qilyapsiz?</h1>
-                <textarea
-                  {...register('cancellationReason', { required: 'Sababni kiriting' })}
-                  className="w-full h-32 p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00BCE4] focus:border-transparent resize-none disabled:opacity-70 disabled:cursor-not-allowed"
-                  placeholder="Bekor qilish sababini yozing..."
-                  disabled={isCancelling}
-                ></textarea>
-                {errors.cancellationReason && (
-                  <p className="text-red-600 text-sm mt-2">{errors.cancellationReason.message}</p>
-                )}
+      {/* Umumiy tasdiqlash / o'chirish modali */}
+      <ConfirmModal
+        isOpen={confirmModal.open}
+        onClose={() => setConfirmModal({ ...confirmModal, open: false })}
+        onConfirm={confirmModal.type === 'delete' ? executeDelete : executeConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        confirmColor={confirmModal.confirmColor}
+        loading={confirmModal.loading}
+      />
 
-                <div className="mt-6 flex justify-end gap-4">
-                  <button
-                    type="button"
-                    onClick={closeCancelModal}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-200"
-                    disabled={isCancelling}
-                  >
-                    Bekor qilish
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-[#00BCE4] hover:bg-[#00a8cc] text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[120px] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-[#00BCE4]"
-                    disabled={isCancelling}
-                  >
-                    {isCancelling ? (
-                      <>
-                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Yuborilmoqda...
-                      </>
-                    ) : (
-                      'Yuborish'
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================= TASDIQLASH MODALI ================= */}
-      {isConfirmModalOpen && (
-        <div className="fixed inset-0 bg-opacity-60 flex items-center justify-center z-60 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-fadeIn">
-            <div className="p-6">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-bold text-gray-800">Bu bemorni qabul qilasizmi?</h2>
-              </div>
-
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={closeConfirmModal}
-                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={isConfirming}
-                >
-                  Yo'q
-                </button>
-                <button
-                  type="button"
-                  onClick={confirmAppointment}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-green-600"
-                  disabled={isConfirming}
-                >
-                  {isConfirming ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Yuborilmoqda...
-                    </>
-                  ) : (
-                    'Ha'
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
+      {/* Toast xabarlar */}
+      <AlertModal
+        isOpen={alertModal.open}
+        onClose={() => setAlertModal({ open: false, type: '', message: '' })}
+        type={alertModal.type}
+        message={alertModal.message}
+      />
     </div>
   );
 }

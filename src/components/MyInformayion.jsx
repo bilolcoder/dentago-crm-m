@@ -315,9 +315,75 @@ const uzbekistanCities = [
   }
 ];
 
+// Tasdiqlash Modal komponenti
+const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[999] p-4 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
+        <div className="p-8">
+          <div className="w-16 h-16 mx-auto bg-rose-100 rounded-2xl flex items-center justify-center mb-6">
+            <Trash2 className="w-8 h-8 text-rose-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-3">{title || "Tasdiqlang"}</h3>
+          <p className="text-gray-600 text-center leading-relaxed mb-8">{message || "Bu amalni bajarmoqchimisiz?"}</p>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 py-4 cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-2xl transition-all active:scale-95"
+            >
+              Yo'q, bekor qilish
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 py-4 cursor-pointer bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-2xl transition-all active:scale-95 shadow-lg shadow-rose-500/30"
+            >
+              Ha, o'chirish
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Xato / Muvaffaqiyat Toast Modal (avtomatik yopiladi)
+const AlertModal = ({ isOpen, onClose, type, message }) => {
+  if (!isOpen) return null;
+
+  const bgColor = type === 'error' 
+    ? 'bg-rose-50 border-rose-200 text-rose-700' 
+    : type === 'success' 
+      ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+      : 'bg-blue-50 border-blue-200 text-blue-700';
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => onClose(), 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, onClose]);
+
+  return (
+    <div className="fixed top-6 right-6 z-[1000] max-w-sm w-full animate-in fade-in slide-in-from-top-4">
+      <div className={`p-5 rounded-2xl border shadow-xl ${bgColor} flex items-start gap-4`}>
+        <div className={`w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center ${type === 'success' ? 'bg-emerald-100' : 'bg-rose-100'}`}>
+          {type === 'success' ? '✅' : '⚠️'}
+        </div>
+        <div className="flex-1 pt-0.5">
+          <p className="font-semibold text-sm leading-snug">{message}</p>
+        </div>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function MyInformation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
   const [token, setToken] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -343,6 +409,21 @@ function MyInformation() {
   const formRef = useRef(null);
   const ITEMS_PER_PAGE = 10;
 
+  // Yangi modal state'lari
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    id: null,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    type: 'info', // 'success' | 'error'
+    message: ''
+  });
+
   const regions = [...new Set(uzbekistanCities.map(city => city.region))].sort();
   const filteredCities = uzbekistanCities.filter(city => city.region === selectedRegion);
 
@@ -353,9 +434,10 @@ function MyInformation() {
     setUserRole(role);
     setIsLoading(false);
     if (!savedToken) {
-      setSubmitMessage({
+      setAlertModal({
+        open: true,
         type: 'error',
-        text: '❌ Access token topilmadi. localStorage.setItem("accessToken", "YOUR_TOKEN") qilib sinab ko\'ring'
+        message: '❌ Access token topilmadi. localStorage.setItem("accessToken", "YOUR_TOKEN") qilib sinab ko\'ring'
       });
     }
   }, []);
@@ -409,9 +491,10 @@ function MyInformation() {
     } catch (error) {
       console.error('Yuklashda xato:', error);
       setDebugInfo(`Xato: ${error.message}`);
-      setSubmitMessage({
+      setAlertModal({
+        open: true,
         type: 'error',
-        text: `Yuklashda xato: ${error.message}`
+        message: `❌ Yuklashda xato: ${error.message}`
       });
     }
   };
@@ -448,6 +531,11 @@ function MyInformation() {
       else if (error.response?.status === 403) errorMsg = 'Ruxsat yo\'q (403)';
       else if (error.response?.status === 500) errorMsg = 'Server xatosi (500)';
       console.log(errorMsg);
+      setAlertModal({
+        open: true,
+        type: 'error',
+        message: `❌ ${errorMsg}`
+      });
     }
   };
 
@@ -514,23 +602,41 @@ function MyInformation() {
     }, 100);
   };
 
-  const handleDeleteEntity = async (id) => {
+  // Yangi: Modal orqali o'chirish
+  const handleDeleteEntity = (id) => {
     if (!id) {
       console.log('ID topilmadi');
       return;
     }
-    if (!window.confirm('Haqiqatan ham o\'chirmoqchimisiz?')) return;
-    try {
-      await axios.delete(
-        `${getEndpoint('base')}/${id}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-      setEntities(entities.filter(entity => (entity._id || entity.id) !== id));
-      setSubmitMessage({ type: 'success', text: '✅ Muvaffaqiyatli o\'chirildi!' });
-    } catch (error) {
-      console.error('O\'chirishda xato:', error);
-      setSubmitMessage({ type: 'error', text: `❌ O'chirishda xato: ${error.message}` });
-    }
+
+    setConfirmModal({
+      open: true,
+      id,
+      title: "O'chirishni tasdiqlang",
+      message: "Bu ma'lumotni butunlay o'chirib tashlamoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
+      onConfirm: async () => {
+        try {
+          await axios.delete(
+            `${getEndpoint('base')}/${id}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+          );
+          setEntities(entities.filter(entity => (entity._id || entity.id) !== id));
+          setAlertModal({
+            open: true,
+            type: 'success',
+            message: '✅ Muvaffaqiyatli o\'chirildi!'
+          });
+        } catch (error) {
+          console.error('O\'chirishda xato:', error);
+          setAlertModal({
+            open: true,
+            type: 'error',
+            message: `❌ O'chirishda xato: ${error.message}`
+          });
+        }
+        setConfirmModal({ open: false, id: null, title: '', message: '', onConfirm: () => {} });
+      }
+    });
   };
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ mode: 'onChange' });
@@ -549,12 +655,22 @@ function MyInformation() {
           console.error('Geolokatsiya xatosi:', error);
           console.log('Joylashuvni aniqlashda xatolik yuz berdi. Iltimos, koordinatalarni qo\'lda kiriting.');
           setIsMapLoading(false);
+          setAlertModal({
+            open: true,
+            type: 'error',
+            message: '❌ Joylashuvni aniqlashda xatolik yuz berdi'
+          });
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     } else {
       console.log('Sizning brauzeringiz geolokatsiya funksiyasini qo\'llab-quvvatlamaydi.');
       setIsMapLoading(false);
+      setAlertModal({
+        open: true,
+        type: 'error',
+        message: '❌ Brauzer geolokatsiyani qo\'llab-quvvatlamaydi'
+      });
     }
   };
 
@@ -566,7 +682,6 @@ function MyInformation() {
     setSelectedFile(null);
     setPreviewUrl(null);
     setIsFormCollapsed(true);
-    setSubmitMessage({ type: '', text: '' });
     setSelectedRegion('');
     setSelectedCity('');
     setSelectedSpecialties([]);
@@ -579,6 +694,11 @@ function MyInformation() {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       console.log('Faqat rasm fayllarini tanlashingiz mumkin!');
+      setAlertModal({
+        open: true,
+        type: 'error',
+        message: '❌ Faqat rasm fayllarini tanlashingiz mumkin!'
+      });
       return;
     }
     setSelectedFile(file);
@@ -598,15 +718,22 @@ function MyInformation() {
 
   const onSubmit = async (data) => {
     if (!token) {
-      setSubmitMessage({ type: 'error', text: '❌ Token mavjud emas!' });
+      setAlertModal({
+        open: true,
+        type: 'error',
+        message: '❌ Token mavjud emas!'
+      });
       return;
     }
     if (!selectedRegion || !selectedCity) {
-      setSubmitMessage({ type: 'error', text: '❌ Viloyat va tuman/shaharni tanlang!' });
+      setAlertModal({
+        open: true,
+        type: 'error',
+        message: '❌ Viloyat va tuman/shaharni tanlang!'
+      });
       return;
     }
     setIsSubmitting(true);
-    setSubmitMessage({ type: '', text: '' });
     setDebugInfo('Form yuborilmoqda...');
     try {
       let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName || (userRole === 'technician' ? 'Technician' : 'Doctor'))}&background=00BCE4&color=fff`;
@@ -625,6 +752,11 @@ function MyInformation() {
           if (filename) avatarUrl = `https://app.dentago.uz/images/${filename}`;
         } catch (uploadError) {
           console.warn('Rasm yuklashda xato:', uploadError);
+          setAlertModal({
+            open: true,
+            type: 'error',
+            message: '⚠️ Rasm yuklanmadi, lekin davom etyapman...'
+          });
         }
       } else if (isEditing && selectedEntity && (selectedEntity.avatar || selectedEntity.image)) {
         avatarUrl = selectedEntity.avatar || selectedEntity.image;
@@ -693,9 +825,10 @@ function MyInformation() {
         setSelectedRegion('');
         setSelectedCity('');
         await fetchEntities();
-        setSubmitMessage({
+        setAlertModal({
+          open: true,
           type: 'success',
-          text: `✅ ${userRole === 'technician' ? 'Texnik' : 'Shifokor'} ${isEditing ? 'tahrirlandi' : 'qo\'shildi'}!`
+          message: `✅ ${userRole === 'technician' ? 'Texnik' : 'Shifokor'} ${isEditing ? 'tahrirlandi' : 'qo\'shildi'}!`
         });
       }
     } catch (err) {
@@ -713,7 +846,11 @@ function MyInformation() {
       } else if (err.code === 'ERR_NETWORK') msg = '❌ Internet aloqasi uzildi';
       else if (err.code === 'ERR_BAD_REQUEST') msg = '❌ Noto\'g\'ri so\'rov';
       setDebugInfo(`Xato: ${msg}`);
-      setSubmitMessage({ type: 'error', text: msg });
+      setAlertModal({
+        open: true,
+        type: 'error',
+        message: msg
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -827,11 +964,7 @@ function MyInformation() {
                 <User className="w-16 h-16 text-gray-300" />
               </div>
             )}
-            {price && price > 0 && (
-            <div className="absolute top-4 right-4">
-           
-            </div>
-            )}
+       
           </div>
           <div className="p-5">
             <div className="mb-4">
@@ -957,15 +1090,15 @@ function MyInformation() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center bg-white">
+      <div className="flex items-center justify-center bg-white min-h-[400px]">
         <Loader2 className="w-12 h-12 animate-spin text-[#00BCE4]" />
       </div>
     );
   }
 
   return (
-    <div className="bg-white">
-      <div className="">
+    <div className="bg-white min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
@@ -997,11 +1130,7 @@ function MyInformation() {
             </div>
           </div>
         </div>
-        {submitMessage.text && (
-          <div className={`mb-6 p-4 rounded-lg ${submitMessage.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
-            {submitMessage.text}
-          </div>
-        )}
+
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Barchasi</h2>
           {entities.length === 0 ? (
@@ -1085,6 +1214,7 @@ function MyInformation() {
             </>
           )}
         </div>
+
         {showForm && (
           <div ref={formRef} className="bg-white rounded-2xl border border-gray-200 mb-8 p-6">
             <div className="flex items-center justify-between mb-8">
@@ -1452,6 +1582,7 @@ function MyInformation() {
             )}
           </div>
         )}
+
         {isViewModalOpen && viewEntity && (
           <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-60 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-100">
@@ -1632,7 +1763,24 @@ function MyInformation() {
             </div>
           </div>
         )}
-        <footer className="mt-8 text-center text-gray-500 text-sm">
+
+        {/* Modal'lar */}
+        <ConfirmModal
+          isOpen={confirmModal.open}
+          onClose={() => setConfirmModal({ open: false, id: null, title: '', message: '', onConfirm: () => {} })}
+          onConfirm={confirmModal.onConfirm}
+          title={confirmModal.title}
+          message={confirmModal.message}
+        />
+
+        <AlertModal
+          isOpen={alertModal.open}
+          onClose={() => setAlertModal({ open: false, type: '', message: '' })}
+          type={alertModal.type}
+          message={alertModal.message}
+        />
+
+        <footer className="mt-12 text-center text-gray-400 text-sm border-t border-gray-100 pt-8">
           © {new Date().getFullYear()} DentaGo. Barcha huquqlar himoyalangan.
         </footer>
       </div>

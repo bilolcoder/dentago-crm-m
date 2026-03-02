@@ -15,6 +15,7 @@ import { useData } from '../context/DataProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import axios from 'axios';
+import ErrorBoundary from './common/ErrorBoundary';
 
 const DashboardContent = () => {
     const { user, t, logout } = useData();
@@ -29,57 +30,119 @@ const DashboardContent = () => {
     const [services, setServices] = useState([]);
     const [payments, setPayments] = useState([]);
 
-    const BASE_URL = "https://app.dentago.uz";
+    const BASE_URL = import.meta.env.VITE_API_URL || "https://app.dentago.uz";
 
     // Statistikani yuklash funksiyasi
     const fetchOrderStats = async () => {
         try {
             setLoadingStats(true);
             const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+            
+            if (!token) {
+                console.warn("Token topilmadi");
+                setLoadingStats(false);
+                return;
+            }
 
             const response = await axios.get(`${BASE_URL}/api/order/stats`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            if (response.data.success) {
+            if (response.data?.success) {
                 setOrderStats(response.data.data);
+            } else {
+                console.warn("Statistika ma'lumotlari topilmadi");
             }
         } catch (err) {
             console.error("Statistika yuklashda xatolik:", err);
+            // Xatolik yuz berganda default qiymatlar
+            setOrderStats({
+                totalOrders: 0,
+                paid: 0,
+                pendingPayment: 0,
+                processing: 0,
+                shipped: 0,
+                delivered: 0
+            });
         } finally {
             setLoadingStats(false);
         }
     };
 
-    // Servislarni yuklash
+    // Servislarni yuklash - endpoint tekshirish
     const fetchServices = async () => {
         try {
             const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-            const response = await axios.get(`${BASE_URL}/api/services`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.data.success) {
-                setServices(response.data.data || []);
+            // Avval to'g'ri endpointni tekshirish
+            const endpoints = [
+                `${BASE_URL}/api/services`,
+                `${BASE_URL}/api/service/list`,
+                `${BASE_URL}/api/services/list`
+            ];
+            
+            let servicesData = [];
+            
+            // Barcha mumkin bo'lgan endpointlarni sinab ko'rish
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await axios.get(endpoint, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.data?.success || response.data?.data) {
+                        servicesData = response.data.data || response.data || [];
+                        break;
+                    }
+                } catch (err) {
+                    // Endpoint ishlamasa keyingisini sinab ko'ramiz
+                    continue;
+                }
             }
+            
+            setServices(Array.isArray(servicesData) ? servicesData : []);
         } catch (err) {
             console.error("Servislarni yuklashda xatolik:", err);
+            // Xatolik yuz berganda bo'sh array qaytarish
+            setServices([]);
         }
     };
 
-    // To'lovlarni yuklash
+    // To'lovlarni yuklash - endpoint tekshirish
     const fetchPayments = async () => {
         try {
             const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-            const response = await axios.get(`${BASE_URL}/api/payments`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.data.success) {
-                setPayments(response.data.data || []);
+            // Avval to'g'ri endpointni tekshirish
+            const endpoints = [
+                `${BASE_URL}/api/payments`,
+                `${BASE_URL}/api/payment/list`,
+                `${BASE_URL}/api/payments/list`,
+                `${BASE_URL}/api/transactions`
+            ];
+            
+            let paymentsData = [];
+            
+            // Barcha mumkin bo'lgan endpointlarni sinab ko'rish
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await axios.get(endpoint, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.data?.success || response.data?.data) {
+                        paymentsData = response.data.data || response.data || [];
+                        break;
+                    }
+                } catch (err) {
+                    // Endpoint ishlamasa keyingisini sinab ko'ramiz
+                    continue;
+                }
             }
+            
+            setPayments(Array.isArray(paymentsData) ? paymentsData : []);
         } catch (err) {
             console.error("To'lovlarni yuklashda xatolik:", err);
+            // Xatolik yuz berganda bo'sh array qaytarish
+            setPayments([]);
         }
     };
 

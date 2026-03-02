@@ -268,11 +268,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <nav className={`flex-1 z-50 overflow-y-auto bg-white ${isCollapsed ? 'px-2 mt-3' : 'mt-[-60px]  px-4'} space-y-1 custom-scrollbar pb-4`}>
                         {visibleNavItems.map((item, index) =>
                             isCollapsed ? (
-                                <div key={index} className="flex justify-center">
+                                <div key={index} className="flex   justify-center">
                                     <button
                                         onClick={() => handleNavigation(item.route)}
                                         className={`
-                                            p-3 rounded-xl transition-colors duration-200
+                                            p-3 rounded-xl cursor-pointer transition-colors duration-200
                                             ${location.pathname === item.route
                                                 ? 'bg-[#00BCE4] text-white shadow-md'
                                                 : 'text-slate-400 hover:bg-[#00BCE4]/10 hover:text-[#00BCE4]'}

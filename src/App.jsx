@@ -2,6 +2,7 @@ import TechnicianManagement from './components/Texnikan/TexnikInformation';
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataProvider';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Layout
 import Sidebar from './components/layout/Sidebar';
@@ -242,14 +243,16 @@ const ProtectedLayout = () => {
 
 const App = () => {
   return (
-    <DataProvider>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Registration />} />
-        <Route path="/*" element={<ProtectedLayout />} />
-      </Routes>
-    </DataProvider>
+    <ErrorBoundary>
+      <DataProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Registration />} />
+          <Route path="/*" element={<ProtectedLayout />} />
+        </Routes>
+      </DataProvider>
+    </ErrorBoundary>
   );
 };
 

@@ -483,8 +483,8 @@ const Savat = () => {
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="py-3">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <FaChevronLeft size={18} className="text-gray-700" />
+              <button onClick={() => navigate(-1)} className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors">
+                <FaChevronLeft size={18} className="text-gray-700 " />
               </button>
               <h1 className="text-lg font-semibold text-gray-900">Savat</h1>
             </div>
@@ -575,7 +575,7 @@ const Savat = () => {
         <div className="py-3 px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <button onClick={() => navigate(-1)} className="p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors">
                 <FaChevronLeft size={18} className="text-gray-700" />
               </button>
               <h1 className="text-lg font-semibold text-gray-900">Savat</h1>

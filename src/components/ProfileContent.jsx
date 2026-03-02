@@ -240,11 +240,27 @@ const ProfileContent = () => {
             <div className="relative">
               <div className="w-32 h-32 rounded-full overflow-hidden bg-white border border-gray-100 shadow-sm">
                 {formData.image ? (
-                  <img src={formData.image} alt="Yangi" className="w-full h-full object-cover" />
+                  <img 
+                    src={formData.image} 
+                    alt="Yangi" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
                 ) : formData.currentImage ? (
-                  <img src={formData.currentImage} alt="Joriy" className="w-full h-full object-cover" />
+                  <img 
+                    src={formData.currentImage} 
+                    alt="Joriy" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentNode.querySelector('.initials-placeholder').style.display = 'flex';
+                    }}
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-5xl font-black text-[#00BCE4]">
+                  <div className="w-full h-full flex items-center justify-center text-5xl font-black text-[#00BCE4] initials-placeholder">
                     {getInitials()}
                   </div>
                 )}

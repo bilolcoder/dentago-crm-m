@@ -364,21 +364,36 @@ function AdminProduct() {
   };
 
   // O'chirish
-  const deleteProduct = async (id) => {
-    if (!window.confirm("Mahsulotni o'chirishni xohlaysizmi?")) return;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productIdToDelete, setProductIdToDelete] = useState(null);
 
-    setDeletingId(id);
+  const confirmDelete = (id) => {
+    setProductIdToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!productIdToDelete) return;
+
+    setDeletingId(productIdToDelete);
     try {
-      await axios.delete(`${BASE_URL}/api/product/${id}`, {
+      await axios.delete(`${BASE_URL}/api/product/${productIdToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProducts(prev => prev.filter(p => p._id !== id));
+      setProducts(prev => prev.filter(p => p._id !== productIdToDelete));
       console.log("O'chirildi!");
     } catch (err) {
       console.log(err.response?.data?.message || "O'chirishda xato");
     } finally {
       setDeletingId(null);
+      setShowDeleteModal(false);
+      setProductIdToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setProductIdToDelete(null);
   };
 
   if (loading) {
@@ -479,7 +494,7 @@ function AdminProduct() {
                       <Edit2 size={18} />
                     </button>
                     <button
-                      onClick={() => deleteProduct(product._id)}
+                      onClick={() => confirmDelete(product._id)}
                       disabled={deletingId === product._id}
                       className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg disabled:opacity-50"
                     >
@@ -741,6 +756,49 @@ function AdminProduct() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fadeIn">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-800">Mahsulotni o'chirish</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Haqiqatan ham ushbu mahsulotni o'chirishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deletingId !== null}
+                  className="flex-1 py-3 px-4 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {deletingId !== null ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      O'chirilmoqda...
+                    </>
+                  ) : (
+                    "O'chirish"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

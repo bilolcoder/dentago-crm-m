@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function BuyurtmaSotuvchi() {
   const [stats, setStats] = useState(null);
@@ -11,6 +12,10 @@ function BuyurtmaSotuvchi() {
   const [error, setError] = useState(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateMessage, setUpdateMessage] = useState(null);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   const token = localStorage.getItem('accessToken');
 
@@ -149,6 +154,31 @@ function BuyurtmaSotuvchi() {
   };
 
   const closeModal = () => setSelectedOrder(null);
+  
+  // Pagination functions
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const nextPage = () => {
+    if (currentPage < Math.ceil(flatItems.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Get current page items
+  const getCurrentItems = () => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return flatItems.slice(indexOfFirstItem, indexOfLastItem);
+  };
+
+  // Pagination info
+  const totalPages = Math.ceil(flatItems.length / itemsPerPage);
 
   if (loading) return <LoadingSpinner text="Buyurtmalar yuklanmoqda" />;
   if (error) return <div className="text-red-600 text-center py-16 text-xl">{error}</div>;
@@ -231,14 +261,14 @@ function BuyurtmaSotuvchi() {
               </tr>
             </thead>
             <tbody>
-              {flatItems.length === 0 ? (
+              {getCurrentItems().length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-20 text-center text-slate-500">
                     <p className="text-lg font-medium">Maʼlumot yoʻq</p>
                   </td>
                 </tr>
               ) : (
-                flatItems.map((item, idx) => (
+                getCurrentItems().map((item, idx) => (
                   <tr
                     key={idx}
                     onClick={() => handleRowClick(item)}
@@ -263,6 +293,62 @@ function BuyurtmaSotuvchi() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {flatItems.length > itemsPerPage && (
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl">
+          <div className="text-sm text-slate-600">
+            Jami: <span className="font-semibold">{flatItems.length}</span> ta buyurtma,
+            Sahifa <span className="font-semibold">{currentPage}</span> dan <span className="font-semibold">{totalPages}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className="p-2 cursor-pointer rounded-full text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => paginate(pageNum)}
+                    className={`w-10 h-10 rounded-lg cursor-pointer ${currentPage === pageNum
+                        ? 'bg-[#00BCE4] text-white'
+                        : 'border border-slate-300 text-slate-700 hover:bg-slate-50'
+                      } transition-colors`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {selectedOrder && !selectedOrder.error && (
         <div
