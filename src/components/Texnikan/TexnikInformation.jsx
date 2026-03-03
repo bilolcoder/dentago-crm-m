@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import LoadingSpinner from '../common/LoadingSpinner';
+import { QRCodeSVG } from 'qrcode.react';
 
 import {
     UserCircle, BriefcaseMedical, MapPin, Phone, Save,
     Loader2, Edit, Trash2, X, Plus, Image as ImageIcon,
-    Clock, Star, Globe, Images
-} from 'lucide-react';
+    Clock, Star, Globe, Images, ShoppingCart
+} from 'lucide-react';  
 
 // O'zbekiston shaharlari ro'yxati
 const uzbekistanCities = [
@@ -50,20 +51,26 @@ function TechnicianManagement() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
     const [token, setToken] = useState(null);
-    const [isLocating, setIsLocating] = useState(false);
 
     // Avatar states
     const [previewUrl, setPreviewUrl] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
 
     // Gallery states
-    const [galleryFiles, setGalleryFiles] = useState([]); // Yangi tanlangan fayllar
-    const [galleryPreviews, setGalleryPreviews] = useState([]); // Oldindan ko'rish
+    const [galleryFiles, setGalleryFiles] = useState([]);
+    const [galleryPreviews, setGalleryPreviews] = useState([]);
 
-    const [isEditing, setIsEditing] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [selectedRegion, setSelectedRegion] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
+
+    // Payment / Purchase modal states
+    const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+    const [formData, setFormData] = useState({ fullName: '', phone: '', paymentMethod: 'payme' });
+    const [formErrors, setFormErrors] = useState({});
+    const [totalAmount, setTotalAmount] = useState(0);       // backenddan keladigan summa
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [paymentLink, setPaymentLink] = useState(null);
 
     const fileInputRef = useRef(null);
     const galleryInputRef = useRef(null);
@@ -80,6 +87,20 @@ function TechnicianManagement() {
     useEffect(() => {
         if (token) fetchTechnician();
     }, [token]);
+
+    useEffect(() => {
+        if (showPurchaseModal && token) {
+            // User ma'lumotlarini localStorage dan olish
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                setFormData(prev => ({
+                    ...prev,
+                    fullName: userData.name || userData.username || '',
+                    phone: localStorage.getItem('userPhone') || userData.phone || ''
+                }));
+            } catch (e) {}
+        }
+    }, [showPurchaseModal, token]);
 
     const fetchTechnician = async () => {
         setIsLoading(true);
@@ -108,51 +129,6 @@ function TechnicianManagement() {
         }
     };
 
-    const getCurrentLocation = () => {
-        if (!navigator.geolocation) {
-            console.log("Sizning brauzeringizda joylashuv funksiyasi mavjud emas yoki qo'llab-quvvatlanmaydi.");
-            return;
-        }
-
-        setIsLocating(true);
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-
-                reset(
-                    (prev) => ({
-                        ...prev,
-                        lat: latitude.toFixed(6),
-                        lng: longitude.toFixed(6),
-                    }),
-                    { keepDefaultValues: true }
-                );
-
-                setIsLocating(false);
-                setSubmitMessage({ type: 'success', text: 'Joriy joylashuv muvaffaqiyatli olindi!' });
-            },
-            (error) => {
-                setIsLocating(false);
-                let msg = 'Joylashuv olishda xato yuz berdi.';
-                if (error.code === error.PERMISSION_DENIED) {
-                    msg = 'Joylashuvga ruxsat berilmagan. Iltimos, brauzer sozlamalarida ruxsat bering.';
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    msg = 'Joylashuv maʼlumotlari mavjud emas.';
-                } else if (error.code === error.TIMEOUT) {
-                    msg = 'Joylashuv so‘rovi vaqtida xato (timeout).';
-                }
-                console.log(msg);
-                setSubmitMessage({ type: 'error', text: msg });
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0,
-            }
-        );
-    };
-
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
         if (file && file.type.startsWith('image/')) {
@@ -177,8 +153,6 @@ function TechnicianManagement() {
 
     const removeGalleryItem = (index) => {
         setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
-        // Agar u yangi qo'shilgan fayl bo'lsa, fayllar ro'yxatidan ham o'chiramiz
-        // Bu yerda soddalik uchun biz asosan previewlarni boshqaramiz
     };
 
     const uploadSingleImage = async (file) => {
@@ -194,20 +168,17 @@ function TechnicianManagement() {
         return `https://app.dentago.uz/images/${filename}`;
     };
 
-    const onSubmit = async (data) => {
+    const saveAfterPayment = async (data) => {
         if (!token) return;
         setIsSubmitting(true);
         setSubmitMessage({ type: '', text: '' });
 
         try {
-            // 1. Avatar yuklash
             let avatarUrl = technician?.avatar || "";
             if (selectedFile) {
                 avatarUrl = await uploadSingleImage(selectedFile);
             }
 
-            // 2. Galereya yuklash (faqat yangi fayllarni yuklaymiz)
-            // Bu yerda mavjud gallery URL lari + yangi yuklangan URL larni birlashtiramiz
             let finalGallery = galleryPreviews.filter(p => p.startsWith('http'));
 
             for (const file of galleryFiles) {
@@ -215,7 +186,6 @@ function TechnicianManagement() {
                 finalGallery.push(url);
             }
 
-            // Faqat oxirgi 4 tasini olamiz (xavfsizlik uchun)
             finalGallery = finalGallery.slice(0, 4);
 
             const selectedCityObj = uzbekistanCities.find(c => c.value === selectedCity);
@@ -226,7 +196,7 @@ function TechnicianManagement() {
                 specialization: data.specialization,
                 description: data.description,
                 phone: data.phone,
-                address: data.address,
+                address: data.address || "",  // manzil bo'sh bo'lishi mumkin
                 region: selectedRegion,
                 city: selectedCityObj ? selectedCityObj.label : selectedCity,
                 location: {
@@ -246,11 +216,17 @@ function TechnicianManagement() {
             setShowForm(false);
             setGalleryFiles([]);
             setTimeout(fetchTechnician, 1000);
+            setShowQRModal(false);
+            setShowPurchaseModal(false);
         } catch (err) {
             setSubmitMessage({ type: 'error', text: `❌ Xato: ${err.response?.data?.message || err.message}` });
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const onSubmit = async (data) => {
+        setShowPurchaseModal(true);
     };
 
     const handleDelete = async () => {
@@ -261,16 +237,66 @@ function TechnicianManagement() {
             });
             setTechnician(null);
             setSubmitMessage({ type: 'success', text: '✅ Texnik o‘chirildi' });
-            reset(); // Clear all form fields
-            setPreviewUrl(null); // Clear avatar preview
-            setSelectedFile(null); // Clear avatar file
-            setGalleryFiles([]); // Clear gallery files
-            setGalleryPreviews([]); // Clear gallery previews
-            setSelectedRegion(''); // Reset region
-            setSelectedCity(''); // Reset city
+            reset();
+            setPreviewUrl(null);
+            setSelectedFile(null);
+            setGalleryFiles([]);
+            setGalleryPreviews([]);
+            setSelectedRegion('');
+            setSelectedCity('');
         } catch (err) {
             setSubmitMessage({ type: 'error', text: 'O‘chirishda xato' });
         }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.fullName.trim()) newErrors.fullName = "Ism va familiya kiriting";
+        if (!formData.phone.trim()) newErrors.phone = "Telefon raqam kiriting";
+        setFormErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handlePurchase = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+        setIsSubmitting(true);
+
+        try {
+            const orderId = "69a6afd4eb0b4548749cb10f";
+
+            const paymentResponse = await axios.post('https://app.dentago.uz/api/payment/generate/payme', {
+                order_id: orderId
+            }, {
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                timeout: 15000
+            });
+
+            if (paymentResponse.data.success && paymentResponse.data.url) {
+                // Backenddan kelgan totalAmount ni olish
+                const receivedAmount = paymentResponse.data.order.totalAmount;
+
+                setTotalAmount(receivedAmount);
+                setPaymentLink(paymentResponse.data.url);
+                setShowPurchaseModal(false);
+                setShowQRModal(true);
+            } else {
+                alert("To'lov sahifasini yaratishda xato: " + (paymentResponse.data.message || "Noma'lum xato"));
+            }
+        } catch (error) {
+            console.error('To\'lov yaratishda xato:', error);
+            alert("Xatolik yuz berdi: " + (error.response?.data?.message || error.message));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const closeModal = () => {
+        setShowPurchaseModal(false);
+        setShowQRModal(false);
+        setFormErrors({});
+        setPaymentLink(null);
+        setTotalAmount(0);
     };
 
     if (isLoading) return <LoadingSpinner text="Texniklar yuklanmoqda" />;
@@ -324,7 +350,6 @@ function TechnicianManagement() {
                             </div>
                         </div>
 
-                        {/* Gallery Display */}
                         {technician.gallery?.length > 0 && (
                             <div className="mt-8">
                                 <h3 className="font-semibold mb-4 flex items-center gap-2"><Images size={18} /> Ishlaridan namunalar</h3>
@@ -346,7 +371,6 @@ function TechnicianManagement() {
                 <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="flex flex-col md:flex-row gap-8">
-                            {/* Profile Image Upload */}
                             <div className="shrink-0">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Profil rasmi</label>
                                 <div
@@ -395,7 +419,6 @@ function TechnicianManagement() {
                             </div>
                         </div>
 
-                        {/* Gallery Upload Section */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Ish namunalarini yuklash (Maks. 4 ta)</label>
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -436,33 +459,26 @@ function TechnicianManagement() {
                                         className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none"
                                         placeholder="41.2995"
                                     />
-
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Longitude</label>
                                 <div className="flex items-center gap-2">
-                                <input
-                                    type="number"
-                                    step="any"
-                                    {...register('lng')}
-                                    className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none"
-                                    placeholder="69.2401"
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        {...register('lng')}
+                                        className="w-full px-4 py-2 rounded-xl border border-[#00BCE4] outline-none"
+                                        placeholder="69.2401"
                                     />
-                                <button
+                                    <button
                                         type="button"
-                                        onClick={getCurrentLocation}
-                                        disabled={isLocating}
-                                        className="p-3 cursor-pointer bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition disabled:opacity-50 flex items-center justify-center shadow-sm"
+                                        className="p-3 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition flex items-center justify-center shadow-sm"
                                         title="Joriy joylashuvni aniqlash"
                                     >
-                                        {isLocating ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <MapPin className="w-5 h-5" />
-                                        )}
+                                        <MapPin className="w-5 h-5" />
                                     </button>
-                                        </div>
+                                </div>
                             </div>
                         </div>
 
@@ -480,7 +496,7 @@ function TechnicianManagement() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-gradient-to-r cursor-pointer from-cyan-500 to-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:bg-gray-400"
+                                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:bg-gray-400 cursor-pointer"
                             >
                                 {isSubmitting ? <Loader2 className="animate-spin" /> : <Save size={20} />}
                                 {technician ? 'O‘zgarishlarni saqlash' : 'Texnikni yaratish'}
@@ -489,13 +505,176 @@ function TechnicianManagement() {
                                 <button
                                     type="button"
                                     onClick={() => setShowForm(false)}
-                                    className="px-6 cursor-pointer py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition"
+                                    className="px-6 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition cursor-pointer"
                                 >
                                     Bekor qilish
                                 </button>
                             )}
                         </div>
                     </form>
+                </div>
+            )}
+
+            {/* Purchase Modal */}
+            {showPurchaseModal && (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
+                        <div className="sticky top-0 bg-white border-b border-gray-200 p-5 rounded-t-2xl z-10">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-[#00C2FF] p-2.5 rounded-xl">
+                                        <ShoppingCart className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-900">To'lov</h2>
+                                        <p className="text-xs text-gray-500">Profil ma'lumotlarini saqlash uchun to'lov</p>
+                                    </div>
+                                </div>
+                                <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-all cursor-pointer">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handlePurchase} className="p-5 space-y-5">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                                    Ism Familiya
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.fullName}
+                                    disabled
+                                    className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-700 cursor-not-allowed outline-none"
+                                />
+                                {formErrors.fullName && <p className="mt-1 text-xs text-red-500">{formErrors.fullName}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                                    Telefon
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={formData.phone}
+                                    disabled
+                                    className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-700 cursor-not-allowed outline-none"
+                                />
+                                {formErrors.phone && <p className="mt-1 text-xs text-red-500">{formErrors.phone}</p>}
+                            </div>
+
+                            <div className="rounded-xl shadow-sm p-4 bg-gray-50">
+                                <h3 className="text-gray-800 text-sm mb-3 font-medium">To'lov tafsilotlari</h3>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Summa</span>
+                                        <span className="font-bold text-lg">{totalAmount > 0 ? totalAmount.toLocaleString('uz-UZ') : "..."} so'm</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    disabled={isSubmitting}
+                                    className="flex-1 py-3 px-4 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all cursor-pointer text-sm"
+                                >
+                                    Bekor qilish
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="flex-1 py-3 px-4 bg-[#00C2FF] text-white rounded-xl font-bold hover:bg-[#0099DD] hover:shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer text-sm"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                                            <span>Jarayonda...</span>
+                                        </>
+                                    ) : 'To\'lov qilish'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* QR Modal - summasi backenddan kelgan totalAmount dan */}
+            {showQRModal && paymentLink && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl h-[90vh] overflow-x-auto w-full max-w-md shadow-2xl relative">
+                        <button
+                            onClick={() => setShowQRModal(false)}
+                            className="absolute top-4 right-4 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-all cursor-pointer outline-none"
+                        >
+                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div className="p-8 text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full flex items-center justify-center">
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Payme orqali to'lov</h2>
+                            <p className="text-gray-600 text-sm mb-6">
+                                QR kodni skanerlang va to'lovni amalga oshiring
+                            </p>
+
+                            <div className="flex justify-center mb-6 p-4">
+                                <QRCodeSVG
+                                    value={paymentLink}
+                                    size={190}
+                                    bgColor="#ffffff"
+                                    fgColor="#000000"
+                                    level="L"
+                                    includeMargin={false}
+                                />
+                            </div>
+
+                            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 mb-6">
+                                <p className="text-gray-600 text-sm mb-1">To'lov summasi:</p>
+                                <p className="text-3xl font-bold text-gray-900">
+                                    {totalAmount.toLocaleString('uz-UZ')} so'm
+                                </p>
+                            </div>
+
+                            <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left">
+                                <p className="text-blue-800 text-sm font-medium mb-2 flex items-center gap-2">
+                                    <span>📱</span> Qanday to'lash kerak:
+                                </p>
+                                <ol className="text-blue-700 text-xs space-y-2 list-decimal pl-5">
+                                    <li>Payme ilovasini oching</li>
+                                    <li>"QR to'lov" bo'limiga o'ting</li>
+                                    <li>QR kodni skanerlang</li>
+                                    <li>To'lovni tasdiqlang</li>
+                                </ol>
+                            </div>
+
+                            <div className="space-y-2">
+                                <button
+                                    onClick={() => {
+                                        handleSubmit(saveAfterPayment)();
+                                    }}
+                                    className="w-full py-3 bg-gradient-to-r from-blue-400 to-cyan-600 text-white rounded-xl font-bold transition-all cursor-pointer"
+                                >
+                                    To'lov qildim, saqlash
+                                </button>
+                                <button
+                                    onClick={() => window.open(paymentLink, '_blank')}
+                                    className="w-full py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all cursor-pointer"
+                                >
+                                    To'lov sahifasini ochish
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

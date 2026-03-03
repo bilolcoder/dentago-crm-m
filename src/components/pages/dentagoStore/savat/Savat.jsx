@@ -862,7 +862,7 @@ const Savat = () => {
                     </div>
                   </div>
                 </div>
-
+ 
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-3">To'lov usulini tanlang</label>
                   <div className="grid grid-cols-3 gap-3">
