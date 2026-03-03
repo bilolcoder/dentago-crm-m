@@ -1041,10 +1041,10 @@ const Savat = () => {
               <div className="flex justify-center mb-6 p-4">
                 <QRCodeSVG
                   value={paymentLink}
-                  size={240}
+                  size={190}
                   bgColor="#ffffff"
                   fgColor="#000000"
-                  level="H"
+                  level="L"
                   includeMargin={false}
                 />
               </div>
