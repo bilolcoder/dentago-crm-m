@@ -8,7 +8,7 @@ import {
     UserCircle, BriefcaseMedical, MapPin, Phone, Save,
     Loader2, Edit, Trash2, X, Plus, Image as ImageIcon,
     Clock, Star, Globe, Images, ShoppingCart
-} from 'lucide-react';  
+} from 'lucide-react';
 
 // O'zbekiston shaharlari ro'yxati
 const uzbekistanCities = [
@@ -96,7 +96,7 @@ function TechnicianManagement() {
                 setFormData(prev => ({
                     ...prev,
                     fullName: userData.name || userData.username || '',
-                    phone: localStorage.getItem('userPhone') || userData.phone || ''
+                    phone: localStorage.getItem('userPhone') || userData.phone || '',
                 }));
             } catch (e) {}
         }
@@ -215,7 +215,7 @@ function TechnicianManagement() {
             setSubmitMessage({ type: 'success', text: '✅ Maʼlumotlar muvaffaqiyatli saqlandi!' });
             setShowForm(false);
             setGalleryFiles([]);
-            setTimeout(fetchTechnician, 1000);
+            setTimeout(fetchTechnician, 2000);
             setShowQRModal(false);
             setShowPurchaseModal(false);
         } catch (err) {
@@ -263,20 +263,33 @@ function TechnicianManagement() {
         setIsSubmitting(true);
 
         try {
-            const orderId = "69a6afd4eb0b4548749cb10f";
+            const productId = "69a6ae84eb0b4548749cafb1";
+            const orderId = "69a7f033eb0b4548749cc524";
 
+            // Mahsulot narxini olish
+            const productRes = await axios.get(`https://app.dentago.uz/api/product/${productId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const productData = productRes.data?.data || productRes.data || {};
+            let amount = productData.price || 0;
+
+            if (amount <= 0) {
+                throw new Error("Mahsulot narxi topilmadi yoki 0 ga teng");
+            }
+
+            setTotalAmount(amount);
+
+            // To'lovni generatsiya qilish, amount ni yuborish
             const paymentResponse = await axios.post('https://app.dentago.uz/api/payment/generate/payme', {
-                order_id: orderId
+                order_id: orderId,
+                amount: amount
             }, {
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                 timeout: 15000
             });
 
             if (paymentResponse.data.success && paymentResponse.data.url) {
-                // Backenddan kelgan totalAmount ni olish
-                const receivedAmount = paymentResponse.data.order.totalAmount;
-
-                setTotalAmount(receivedAmount);
                 setPaymentLink(paymentResponse.data.url);
                 setShowPurchaseModal(false);
                 setShowQRModal(true);
