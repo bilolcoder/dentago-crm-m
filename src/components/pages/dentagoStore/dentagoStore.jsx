@@ -14,6 +14,8 @@ import Logo from "../../../assets/logo.png";
 import StoreBanner from "./components/StoreBanner";
 import StoreCategories from "./components/StoreCategories";
 
+const HIDDEN_PRODUCT_IDS = ['69aa9c81eb0b4548749cce80']; // Yashiriladigan mahsulot IDlari
+
 const CategoryIcon = ({ className = "w-5 h-5", color = "#0891b2" }) => (
   <svg
     className={className}
@@ -207,8 +209,11 @@ function Boshsaxifa() {
         }));
 
         setProducts(formattedProducts);
-        setFilteredProducts(formattedProducts);
-        updateFeaturedProducts(formattedProducts);
+        
+        // Filter out hidden products before setting filtered products
+        const visibleProducts = formattedProducts.filter(product => !HIDDEN_PRODUCT_IDS.includes(product.id));
+        setFilteredProducts(visibleProducts);
+        updateFeaturedProducts(visibleProducts);
       } catch (err) {
         console.error("Mahsulot yuklash xatosi:", err);
         setError("Mahsulotlarni yuklab bo'lmadi");
@@ -222,8 +227,11 @@ function Boshsaxifa() {
           company: 'VDS_DENTAL'
         }];
         setProducts(demoProducts);
-        setFilteredProducts(demoProducts);
-        updateFeaturedProducts(demoProducts);
+        
+        // Filter out hidden products from demo products
+        const visibleDemoProducts = demoProducts.filter(product => !HIDDEN_PRODUCT_IDS.includes(product.id));
+        setFilteredProducts(visibleDemoProducts);
+        updateFeaturedProducts(visibleDemoProducts);
       } finally {
         setLoading(false);
       }
@@ -251,8 +259,13 @@ function Boshsaxifa() {
   }, [filteredProducts]);
 
   const applyFilters = () => {
+    // Start with all products
     let result = [...products];
 
+    // Filter out hidden products
+    result = result.filter(product => !HIDDEN_PRODUCT_IDS.includes(product.id));
+
+    // Apply category filter if selected
     if (selectedFilterCategory) {
       const selectedCat = productCategories.find(cat => cat.id === selectedFilterCategory);
       if (selectedCat) {
@@ -268,6 +281,7 @@ function Boshsaxifa() {
       }
     }
 
+    // Apply search filter if exists
     if (searchFilter.trim() !== "") {
       const searchLower = searchFilter.toLowerCase().trim();
       result = result.filter(product => {
@@ -357,7 +371,11 @@ function Boshsaxifa() {
     try {
       setSubcategoryLoading(true);
       const subcategoryLabel = subcategory.label.toLowerCase();
-      const filtered = products.filter(product => {
+      
+      // Start with all products and filter out hidden ones
+      const visibleProducts = products.filter(product => !HIDDEN_PRODUCT_IDS.includes(product.id));
+      
+      const filtered = visibleProducts.filter(product => {
         const productCategory = (product.categoryName || product.category || '').toLowerCase();
         const productName = (product.name || '').toLowerCase();
         const productDescription = (product.description || '').toLowerCase();

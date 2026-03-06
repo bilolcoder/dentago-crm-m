@@ -20,7 +20,6 @@ const DentoGoApp = () => {
       try {
         setIsLoading(true);
         const res = await axios.get("https://app.dentago.uz/api/public/technicians");
-        // API strukturangizga qarab: res.data yoki res.data.data
         const data = res.data?.data || res.data || [];
         setTechnicians(data);
       } catch (error) {
