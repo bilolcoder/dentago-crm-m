@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Edit3, Trash2, Plus, Loader2, AlertCircle, CheckCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Edit3, Trash2, Plus, Loader2, AlertCircle, CheckCircle, X, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function AllCategories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,7 +12,7 @@ function AllCategories() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // kerak bo'lsa 8, 12, 15 qilib o'zgartirsa bo'ladi
+  const itemsPerPage = 10; 
 
   // Modal va form
   const [modalOpen, setModalOpen] = useState(false);
@@ -21,7 +23,6 @@ function AllCategories() {
     catType: 'dentalMaterials',
   });
 
-  // To'liq tavsif modal uchun
   const [selectedDescription, setSelectedDescription] = useState(null);
 
   const BASE_URL = "https://app.dentago.uz";
@@ -52,7 +53,6 @@ function AllCategories() {
     setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 2800);
   };
 
-  // Pagination hisoblash
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCategories = categories.slice(indexOfFirstItem, indexOfLastItem);
@@ -129,14 +129,22 @@ function AllCategories() {
   }
 
   return (
-    <div className="">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Kategoriyalar ro'yxati</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Jami <span className="font-semibold text-gray-800">{categories.length}</span> ta kategoriya
-          </p>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10   text-gray-600   hover:text-[#00BCE4] transition-all cursor-pointer group"
+            title="Orqaga qaytish"
+          >
+            <ArrowLeft size={22} className="group-hover:-translate-x-0.5 transition-transform " />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Kategoriyalar ro'yxati</h1>
+            <p className="text-gray-500 text-sm mt-1">
+              Jami <span className="font-semibold text-gray-800">{categories.length}</span> ta kategoriya
+            </p>
+          </div>
         </div>
 
         <button
@@ -145,20 +153,19 @@ function AllCategories() {
             setFormData({ name: '', description: '', catType: 'dentalMaterials' });
             setModalOpen(true);
           }}
-          className="flex items-center gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-all cursor-pointer"
+          className="flex items-center gap-2 bg-[#00BCE4] hover:bg-[#00a6c9] text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-all cursor-pointer ml-auto"
         >
           <Plus size={18} /> Yangi kategoriya
         </button>
       </div>
 
       {error && (
-        <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
           <AlertCircle size={20} />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Jadval */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -232,16 +239,13 @@ function AllCategories() {
           </table>
         </div>
 
-        {/* Pagination - mahsulotlar sahifasidagi kabi */}
         {totalPages > 1 && (
-          <div className="px-5 py-4  bg-white flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-            {/* Chap taraf */}
+          <div className="px-5 py-4 bg-white flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
             <div className="text-center sm:text-left">
               Jami <span className="font-semibold text-gray-800">{categories.length}</span> ta kategoriya,
               Sahifa <span className="font-semibold text-gray-800">{currentPage}</span> dan <span className="font-semibold text-gray-800">{totalPages}</span>
             </div>
 
-            {/* O'ng taraf - sahifalar */}
             <div className="flex items-center gap-1 flex-wrap justify-center">
               <button
                 onClick={() => paginate(currentPage - 1)}
@@ -279,7 +283,6 @@ function AllCategories() {
         )}
       </div>
 
-      {/* To'liq tavsif modal */}
       {selectedDescription && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 cursor-pointer"
@@ -303,7 +306,6 @@ function AllCategories() {
         </div>
       )}
 
-      {/* Yangi / Tahrirlash modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-lg">
@@ -357,7 +359,7 @@ function AllCategories() {
               </div>
             </div>
 
-            <div className="p-5  flex justify-end gap-3">
+            <div className="p-5 flex justify-end gap-3">
               <button
                 onClick={() => setModalOpen(false)}
                 className="px-5 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition cursor-pointer"
@@ -375,7 +377,6 @@ function AllCategories() {
         </div>
       )}
 
-      {/* Notification */}
       {notification.show && (
         <div className={`fixed bottom-6 right-6 z-50 p-4 rounded-xl shadow-lg flex items-center gap-3 border ${
           notification.type === 'success'
