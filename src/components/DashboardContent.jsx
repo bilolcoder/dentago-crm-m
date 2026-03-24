@@ -301,53 +301,184 @@ const DashboardContent = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-8 space-y-6 text-slate-700">
-                            <p>Oferta matni...</p>
+                        <div className="flex-1 overflow-y-auto p-8 space-y-8 text-slate-700 custom-scrollbar scroll-smooth">
+                            <div className="flex justify-between items-start border-b border-slate-100 pb-6">
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900">Marketplace Sotuvchi Oferta</h3>
+                                    <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
+                                        <Calendar size={14} className="text-[#00BCE4]" /> Sana: 29.08.2025
+                                    </p>
+                                </div>
+                                <div className="px-3 py-1 bg-[#00BCE4]/10 text-[#00BCE4] text-[10px] font-bold rounded-full uppercase tracking-widest border border-[#00BCE4]/20">
+                                    Rasmiy hujjat
+                                </div>
+                            </div>
+
+                            <div className="grid gap-8">
+                                {/* 1. Umumiy qoidalar */}
+                                <section className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">1</div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Umumiy qoidalar</h4>
+                                    </div>
+                                    <div className="pl-11 pr-4">
+                                        <p className="leading-relaxed text-sm text-slate-600">
+                                            Ushbu oferta orqali sotuvchi Denta GO marketplace’da mahsulotlarini joylashtirish va sotishga rozilik bildiradi. Ro‘yxatdan o‘tish — shartnomani qabul qilish hisoblanadi.
+                                        </p>
+                                    </div>
+                                </section>
+
+                                {/* 2. Tomonlar */}
+                                <section className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">2</div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Tomonlar</h4>
+                                    </div>
+                                    <div className="pl-11 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Platforma</p>
+                                            <p className="text-sm font-semibold text-slate-900">Denta GO</p>
+                                        </div>
+                                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Sotuvchi</p>
+                                            <p className="text-sm font-semibold text-slate-900">Siz (Shaxs/Kompaniya)</p>
+                                        </div>
+                                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Xaridor</p>
+                                            <p className="text-sm font-semibold text-slate-900">Foydalanuvchilar</p>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* 3. Denta GO majburiyatlari */}
+                                <section className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">3</div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Denta GO majburiyatlari</h4>
+                                    </div>
+                                    <div className="pl-11 space-y-2">
+                                        {["Mahsulotlarni platformaga joylash", "Xaridor bilan savdo jarayonini tashkil qilish", "To‘lovlarni qabul qilish", "Sotuvchiga pulni o‘tkazish"].map((item, i) => (
+                                            <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#00BCE4]" />
+                                                <span>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                {/* 4. Sotuvchi majburiyatlari */}
+                                <section className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">4</div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Sotuvchi majburiyatlari</h4>
+                                    </div>
+                                    <div className="pl-11 space-y-2">
+                                        {["Mahsulotni o‘z vaqtida yetkazib berish", "Mahsulot haqida to‘liq va to‘g‘ri ma’lumot kiritish", "Mahsulot sifati va qonuniyligi uchun javob berish"].map((item, i) => (
+                                            <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                                                <span>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* 5. Narx va komissiya */}
+                                    <section className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">5</div>
+                                            <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Narx va komissiya</h4>
+                                        </div>
+                                        <div className="pl-11">
+                                            <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
+                                                <p className="text-2xl font-black text-[#00BCE4]">5%</p>
+                                                <p className="text-xs text-[#00BCE4] font-bold mt-1">Platforma komissiyasi</p>
+                                                <p className="text-xs text-slate-500 mt-2 italic">Narx bozor narxidan yuqori bo‘lmasligi shart</p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* 6. To‘lovlar */}
+                                    <section className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">6</div>
+                                            <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">To‘lovlar</h4>
+                                        </div>
+                                        <div className="pl-11 space-y-3 text-sm text-slate-600">
+                                            <div className="flex items-center gap-2">
+                                                <div className="px-2 py-0.5 rounded-md bg-green-50 text-green-600 font-bold text-[10px]">10 kun</div>
+                                                <span>Pul chiqarishga tayyor bo‘ladi</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 font-bold text-[10px]">14 kun</div>
+                                                <span>O‘tkazma amalga oshiriladi</span>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+
+                                {/* 7. Yetkazib berish va 8. Qaytarish */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <section className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">7</div>
+                                            <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Yetkazib berish</h4>
+                                        </div>
+                                        <div className="pl-11">
+                                            <p className="text-sm text-slate-600 leading-relaxed">
+                                                Yetkazib berish <span className="font-bold text-slate-900">sotuvchi zimmasida</span>. Mahsulot to‘g‘ridan-to‘g‘ri xaridor manziliga yetkaziladi.
+                                            </p>
+                                        </div>
+                                    </section>
+                                    <section className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">8</div>
+                                            <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Qaytarish</h4>
+                                        </div>
+                                        <div className="pl-11">
+                                            <p className="text-sm text-slate-600 leading-relaxed">
+                                                Xaridor <span className="font-bold text-slate-900">10 kun</span> ichida mahsulotni qaytarishi mumkin. Bunda summa ushlab qolinadi.
+                                            </p>
+                                        </div>
+                                    </section>
+                                </div>
+
+                                {/* 9. Javobgarlik */}
+                                <section className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-600 font-bold text-sm border border-red-100">9</div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Javobgarlik</h4>
+                                    </div>
+                                    <div className="pl-11 pr-4">
+                                        <p className="text-sm text-slate-600 leading-relaxed bg-red-50/30 p-4 rounded-2xl border border-red-100/50">
+                                            Sotuvchi mahsulot sifati va qonuniyligi uchun <span className="font-bold text-red-600">to‘liq javobgar</span>. Har qanday zarar sotuvchi tomonidan qoplanadi.
+                                        </p>
+                                    </div>
+                                </section>
+
+                                {/* 10. Yakuniy qoidalar */}
+                                <section className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 font-bold text-sm border border-slate-100">10</div>
+                                        <h4 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Yakuniy qoidalar</h4>
+                                    </div>
+                                    <div className="pl-11 pr-4">
+                                        <p className="text-sm text-slate-600 leading-relaxed italic">
+                                            Shartnoma muddatsiz. Nizolar O‘zbekiston Respublikasi qonunchiligi asosida hal qilinadi.
+                                        </p>
+                                    </div>
+                                </section>
+                            </div>
                         </div>
                         <div className="p-6 border-t border-slate-100 bg-white flex flex-col sm:flex-row gap-4">
-                            <button onClick={handleRejectOffer} className="flex-1 py-4 px-8 text-slate-500 font-bold rounded-2xl border border-slate-200">Bekor qilish</button>
-                            <button onClick={handleAcceptOffer} className="flex-[2] py-4 px-8 bg-[#00BCE4] text-white font-bold rounded-2xl shadow-lg">Roziman va davom etish</button>
+                            <button onClick={handleRejectOffer} className="flex-1 py-4 px-8 text-slate-500 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors">Bekor qilish</button>
+                            <button onClick={handleAcceptOffer} className="flex-[2] py-4 px-8 bg-[#00BCE4] text-white font-bold rounded-2xl shadow-lg hover:bg-[#00A5C9] transition-all hover:shadow-xl active:scale-[0.98]">Roziman va davom etish</button>
                         </div>
                     </div>
                 </div>
             )}
 
             <div className="space-y-6">
-                {/* Dashboard Kartalari */}
-                <section className="grid grid-cols-2 max-sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                    {visibleStats.map((stat, index) => (
-                        <Link
-                            to={stat.link}
-                            key={index}
-                            className="p-6 rounded-2xl bg-white border border-gray-100 flex justify-between items-center transition-all duration-300 hover:scale-[1.02] hover:shadow-md group"
-                        >
-                            <div className="flex items-center gap-5">
-                                <div
-                                    className="p-4 rounded-2xl transition-all duration-300 group-hover:rotate-6"
-                                    style={{ backgroundColor: `${stat.color}10`, color: stat.color }}
-                                >
-                                    <stat.icon size={32} strokeWidth={2} />
-                                </div>
-                                <div>
-                                    {loadingStats ? (
-                                        <div className="h-8 w-12 bg-gray-50 animate-pulse rounded-md mb-1"></div>
-                                    ) : (
-                                        <p className="text-[20px] font-black text-slate-800 tracking-tight leading-none">
-                                            {stat.value}
-                                        </p>
-                                    )}
-                                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">
-                                        {stat.title}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="bg-white p-2 rounded-full group-hover:bg-[#00BCE4]/10 transition-colors">
-                                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#00BCE4]" />
-                            </div>
-                        </Link>
-                    ))}
-                </section>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* To'lovlar Grafigi */}
                     <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 p-6">

@@ -73,7 +73,7 @@ import BuyurtmaSotuvchi from './components/seller/BuyurtmaSotuvchi';
 
 const getCurrentPageTitle = (pathname) => {
   const routes = {
-    '/dashboard': 'Dashboard',
+    // '/dashboard': 'Dashboard',
     '/hisobot/to\'lovlar': 'To\'lovlar',
     '/hisobot/lead-statistika': 'Lead Statistika',
     '/hisobot/kunilik-xarajatlar': 'Kunlik Xarajatlar',
