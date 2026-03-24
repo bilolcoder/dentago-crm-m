@@ -380,6 +380,7 @@ function AllDoctorsEdit() {
       gender: doctor.gender || 'male',
       phone: doctor.phone || '',
       price: doctor.price || 0,
+      role: doctor.role || 'doctor',
       experienceYears: doctor.experienceYears || 0,
       clinicName: doctor.clinic?.name || '',
       clinicAddress: doctor.clinic?.address || '',
@@ -486,6 +487,7 @@ function AllDoctorsEdit() {
           start: data.workTimeStart || '09:00',
           end: data.workTimeEnd || '18:00',
         },
+        role: data.role || 'doctor',
         avatar: avatarUrl,
       };
 
@@ -722,6 +724,14 @@ function AllDoctorsEdit() {
                 <div>
                   <label className="block text-sm font-medium mb-1">Tajriba (yil)</label>
                   <input type="number" {...register('experienceYears')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none" />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Role *</label>
+                  <select {...register('role')} className="w-full p-3 border border-cyan-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <option value="doctor">Stomatolog</option>
+                    <option value="technician">Zub-texnik</option>
+                  </select>
                 </div>
               </div>
 
